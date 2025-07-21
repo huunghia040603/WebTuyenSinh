@@ -1,0 +1,605 @@
+
+
+{% block stylesheets %}
+<style>
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'SF Compact Rounded', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    
+    overflow-x: hidden;
+    min-height: 60vh;
+    min-width: 70vw;
+}
+
+.team-showcase {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+   
+    gap: 0;
+    position: relative;
+}
+
+/* Left Side - Information Panel */
+.info-panel {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    padding: 80px 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.info-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+    pointer-events: none;
+}
+
+.info-content {
+    position: relative;
+    z-index: 2;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.info-content.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.info-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    opacity: 0.8;
+}
+
+.info-name {
+    font-size: 4.5rem;
+    font-weight: 900;
+    line-height: 0.9;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    transition: all 0.4s ease;
+    padding-bottom: 10px;
+}
+
+.info-role {
+    font-size: 1.4rem;
+    color: #f59e0b;
+    font-weight: 600;
+    margin-bottom: 30px;
+    opacity: 0.9;
+}
+
+.info-description {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: #4a5568;
+    margin-bottom: 40px;
+    max-width: 500px;
+}
+
+.info-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 40px;
+}
+
+.info-skill {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    transform: translateY(20px);
+    opacity: 0;
+    transition: all 0.4s ease;
+}
+
+.info-skill.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.info-contact {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.info-contact-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #6b7280;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.info-contact-item:hover {
+    color: #667eea;
+    transform: translateX(5px);
+}
+
+.info-contact-item i {
+    color: #f59e0b;
+    font-size: 16px;
+}
+
+/* Right Side - Team Members Grid */
+.members-grid {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-image: url('/static/images/nentv1.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 30px 60px;
+    position: relative;
+    overflow: hidden;
+    min-height: 300px;
+
+}
+
+.members-grid::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /* background:url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>'); */
+    opacity: 0.3;
+}
+
+.members-container {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    min-height: 600px;
+}
+
+.team-member {
+    position: absolute;
+    cursor: pointer;
+    border-radius: 50%;
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    transform: scale(1);
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    opacity: 1;
+    filter: brightness(1);
+    z-index: 2;
+}
+
+.team-member:hover {
+    transform: scale(1.5) translateY(-10px);
+    z-index: 10;
+    box-shadow: 0 0 0 0 rgba(102,126,234,0.5), 0 0 0 0 rgba(245,158,11,0.3), 0 25px 50px rgba(0,0,0,0.4);
+    animation: pulse 1.2s infinite;
+    border: 4px solid #f59e0b;
+    filter: brightness(1.2) drop-shadow(0 0 10px #fbbf24);
+}
+
+.members-container:hover .team-member:not(:hover) {
+    opacity: 0.25;
+    filter: blur(1.5px) grayscale(0.3) brightness(0.7);
+    transform: scale(0.8);
+    z-index: 1;
+}
+
+.team-member::after {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #667eea, #764ba2, #f59e0b, #667eea);
+    background-size: 400% 400%;
+    animation: borderGlow 3s ease-in-out infinite;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.team-member:hover::after {
+    opacity: 1;
+}
+
+.team-member img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.team-member::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3));
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 1;
+    border-radius: 50%;
+}
+
+.team-member:hover::before {
+    opacity: 1;
+}
+
+.team-member:hover img {
+    transform: scale(1.05);
+}
+
+/* Different sizes and circular orbits for different zones */
+.member-1 { width: 170px; height: 170px; top: 25%; left: 35%; animation: orbit1 12s linear infinite; z-index: 2; }
+.member-2 { width: 140px; height: 140px; top: 65%; left: 25%; animation: orbit2 14s linear infinite; z-index: 2; }
+.member-3 { width: 150px; height: 150px; top: 75%; left: 70%; animation: orbit3 16s linear infinite; z-index: 2; }
+.member-4 { width: 130px; height: 130px; top: 15%; left: 5%; animation: orbit4 13s linear infinite; z-index: 2; }
+.member-5 { width: 160px; height: 160px; top: 15%; left: 75%; animation: orbit5 15s linear infinite; z-index: 2; }
+
+/* Circular orbit animations for different zones */
+@keyframes orbit1 {
+    0% { transform: rotate(0deg) translateX(80px) rotate(0deg); }
+    100% { transform: rotate(360deg) translateX(80px) rotate(-360deg); }
+}
+
+@keyframes orbit2 {
+    0% { transform: rotate(0deg) translateX(60px) rotate(0deg); }
+    100% { transform: rotate(360deg) translateX(60px) rotate(-360deg); }
+}
+
+@keyframes orbit3 {
+    0% { transform: rotate(0deg) translateX(100px) rotate(0deg); }
+    100% { transform: rotate(360deg) translateX(100px) rotate(-360deg); }
+}
+
+@keyframes orbit4 {
+    0% { transform: rotate(0deg) translateX(70px) rotate(0deg); }
+    100% { transform: rotate(360deg) translateX(70px) rotate(-360deg); }
+}
+
+@keyframes orbit5 {
+    0% { transform: rotate(0deg) translateX(90px) rotate(0deg); }
+    100% { transform: rotate(360deg) translateX(90px) rotate(-360deg); }
+}
+
+/* Border glow animation */
+@keyframes borderGlow {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+/* Animation for skills */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.info-skill.show {
+    animation: slideInUp 0.4s ease forwards;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .team-showcase {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+    }
+    
+    .info-panel {
+        padding: 40px 30px;
+    }
+    
+    .info-name {
+        font-size: 3rem;
+    }
+    
+    .members-container {
+        min-height: 400px;
+    }
+    
+    /* Adjust member sizes for tablet */
+    .member-1 { width: 100px; height: 100px; }
+    .member-2 { width: 70px; height: 70px; }
+    .member-3 { width: 80px; height: 80px; }
+    .member-4 { width: 60px; height: 60px; }
+    .member-5 { width: 85px; height: 85px; }
+}
+
+@media (max-width: 768px) {
+    .info-panel {
+        padding: 30px 20px;
+    }
+    
+    .info-name {
+        font-size: 2.5rem;
+    }
+    
+    .members-container {
+        min-height: 350px;
+    }
+    
+    /* Adjust member sizes for mobile */
+    .member-1 { width: 80px; height: 80px; }
+    .member-2 { width: 60px; height: 60px; }
+    .member-3 { width: 70px; height: 70px; }
+    .member-4 { width: 50px; height: 50px; }
+    .member-5 { width: 75px; height: 75px; }
+    
+    .team-member:hover {
+        transform: scale(1.1) translateY(-10px);
+    }
+}
+
+/* Loading animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px) scale(0.5);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.team-member {
+    animation: fadeInUp 0.8s ease forwards;
+}
+
+.team-member:nth-child(1) { animation-delay: 0.1s; }
+.team-member:nth-child(2) { animation-delay: 0.2s; }
+.team-member:nth-child(3) { animation-delay: 0.3s; }
+.team-member:nth-child(4) { animation-delay: 0.4s; }
+.team-member:nth-child(5) { animation-delay: 0.5s; }
+
+/* Hiệu ứng sóng động khi hover */
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(102,126,234,0.5), 0 0 0 0 rgba(245,158,11,0.3); }
+  70% { box-shadow: 0 0 0 20px rgba(102,126,234,0), 0 0 0 40px rgba(245,158,11,0); }
+  100% { box-shadow: 0 0 0 0 rgba(102,126,234,0), 0 0 0 0 rgba(245,158,11,0); }
+}
+
+/* Đảm bảo avatar không bị đè lên nhau khi phóng to */
+.team-member:hover {
+  z-index: 100 !important;
+}
+</style>
+{% endblock %}
+
+<div class="team-showcase">
+    <!-- Left Side - Information Panel -->
+    <div class="info-panel">
+        <div class="info-content" id="infoContent">
+            <div class="info-label">Thông tin của</div>
+            <div class="info-name" id="infoName" style="padding-top: 10px;">THÀNH VIÊN</div>
+            <div class="info-role" id="infoRole">timtruonghoc.vn</div>
+            <div class="info-description" id="infoDescription">
+                Click vào bất kỳ thành viên nào để xem thông tin chi tiết và nền tảng nghề nghiệp của họ.
+            </div>
+            <div class="info-skills" id="infoSkills"></div>
+            <div class="info-contact" id="infoContact"></div>
+        </div>
+    </div>
+
+    <!-- Right Side - Team Members Grid -->
+    <div class="members-grid">
+        <div class="members-container">
+            <div class="team-member member-1" data-member="1">
+                <img src="/static/images/thanhvien/6.png" alt="Hữu Nghĩa">
+            </div>
+            <div class="team-member member-2" data-member="2">
+                <img src="/static/images/thanhvien/8.png" alt="Trần Thị B">
+            </div>
+            <div class="team-member member-3" data-member="3">
+                <img src="/static/images/thanhvien/5.png" alt="Lê Văn C">
+            </div>
+            <div class="team-member member-4" data-member="4">
+                <img src="/static/images/thanhvien/7.png" alt="Phạm Thị D">
+            </div>
+            <div class="team-member member-5" data-member="5">
+                <img src="/static/images/thanhvien/3.png" alt="Hoàng Văn E">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Team member data
+const teamData = {
+    1: {
+        name: "Ngọc Thuận",
+        role: "Founder & Creator",
+        description: "Với gần 10 năm kinh nghiệm trong lĩnh vực tư vấn tuyển sinh, Anh đã truyền tải tinh thần ham học đến hàng nghìn học sinh và thường xuyên xuất hiện trong các buổi tư vấn hướng nghiệp.",
+        skills: ["Lãnh đạo", "Chiến lược", "Giáo dục", "Tư vấn", "SEO"],
+        contact: {
+            email: "huunghia@timtruonghoc.vn",
+            phone: "0901.234.567",
+            linkedin: "linkedin.com/in/huunghia"
+        }
+    },
+    2: {
+        name: "Thuỳ Linh",
+        role: "CTO & Tech Lead",
+        description: "Thùy Linh là chuyên gia công nghệ với kiến thức sâu rộng về AI, Machine Learning, phát triển phần mềm, quản trị dữ liệu và backend. Chị đã xây dựng hệ thống AI thông minh giúp phân tích và đưa ra gợi ý hướng nghiệp chính xác cho từng cá nhân.",
+        skills: ["AI/ML", "Backend", "Database", "System Architecture", "DevOps"],
+        contact: {
+            email: "tranthib@timtruonghoc.vn",
+            phone: "0902.345.678",
+            linkedin: "linkedin.com/in/tranthib"
+        }
+    },
+    3: {
+        name: "Trúc Mai",
+        role: "Co-founder & Consultant",
+        description: "Trúc Mai là chuyên viên tư vấn cao cấp, đồng thời là chuyên viên hành chính và đối ngoại. Cô ấy quản lý hiệu quả công việc nội bộ và xây dựng mối quan hệ bền vững với đối tác, góp phần vào sự phát triển và uy tín của tổ chức.",
+        skills: ["Chuyên viên", "Hành chính", "Đối ngoại", "Tư vấn", "SEO"],
+        contact: {
+            email: "levanc@timtruonghoc.vn",
+            phone: "0903.456.789",
+            linkedin: "linkedin.com/in/levanc"
+        }
+    },
+    4: {
+        name: "Hà Bình",
+        role: "Consulting Professional",
+        description: "Anh Hà Bình là chuyên viên tư vấn và là cử nhân luật, nắm rõ mọi thông tin về pháp luật. Anh có khả năng thu thập thông tin chuẩn xác, giúp hàng nghìn học sinh tiếp cận những dữ liệu đáng tin cậy.",
+        skills: ["Chuyên viên", "Luật", "Hành chính",  "Content Marketing"],
+        contact: {
+            email: "phamthid@timtruonghoc.vn",
+            phone: "0904.567.890",
+            linkedin: "linkedin.com/in/phamthid"
+        }
+    },
+    5: {
+        name: "Hữu Nghĩa",
+        role: "Lead Developer",
+        description: "Hữu Nghĩa là một lập trình viên full-stack và nhà thiết kế UX/UI tài năng với khả năng tạo ra những trải nghiệm người dùng tuyệt vời. Với kinh nghiệm anh đã thiết kế giao diện thân thiện và dễ sử dụng cho nhiều nền tảng, đồng thời tối ưu hóa hệ thống để đảm bảo hiệu suất và sự ổn định.",
+        skills: ["React", "Node.js", "Python", "DevOps", "Microservices"],
+        contact: {
+            email: "hoangvane@timtruonghoc.vn",
+            phone: "0905.678.901",
+            linkedin: "linkedin.com/in/hoangvane"
+        }
+    }
+};
+
+// Initialize the page
+document.addEventListener('DOMContentLoaded', function() {
+    const infoContent = document.getElementById('infoContent');
+    const infoName = document.getElementById('infoName');
+    const infoRole = document.getElementById('infoRole');
+    const infoDescription = document.getElementById('infoDescription');
+    const infoSkills = document.getElementById('infoSkills');
+    const infoContact = document.getElementById('infoContact');
+
+    // Show initial content
+    setTimeout(() => {
+        infoContent.classList.add('active');
+    }, 300);
+
+    // Add hover effects to team members
+    document.querySelectorAll('.team-member').forEach(member => {
+        member.addEventListener('mouseenter', function() {
+            const memberId = this.getAttribute('data-member');
+            const data = teamData[memberId];
+            
+            if (data) {
+                // Update information with smooth transitions
+                infoName.style.opacity = '0';
+                infoRole.style.opacity = '0';
+                infoDescription.style.opacity = '0';
+                
+                setTimeout(() => {
+                    infoName.textContent = data.name;
+                    infoRole.textContent = data.role;
+                    infoDescription.textContent = data.description;
+                    
+                    infoName.style.opacity = '1';
+                    infoRole.style.opacity = '1';
+                    infoDescription.style.opacity = '1';
+                }, 200);
+
+                // Update skills with animation
+                infoSkills.innerHTML = '';
+                data.skills.forEach((skill, index) => {
+                    const skillElement = document.createElement('span');
+                    skillElement.className = 'info-skill';
+                    skillElement.textContent = skill;
+                    skillElement.style.animationDelay = `${index * 0.1}s`;
+                    infoSkills.appendChild(skillElement);
+                    
+                    setTimeout(() => {
+                        skillElement.classList.add('show');
+                    }, 100 + index * 100);
+                });
+
+                // Update contact information
+                infoContact.innerHTML = `
+                    <div class="info-contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>${data.contact.email}</span>
+                    </div>
+                    <div class="info-contact-item">
+                        <i class="fas fa-phone"></i>
+                        <span>${data.contact.phone}</span>
+                    </div>
+                    <div class="info-contact-item">
+                        <i class="fab fa-linkedin"></i>
+                        <span>${data.contact.linkedin}</span>
+                    </div>
+                `;
+            }
+        });
+
+        member.addEventListener('mouseleave', function() {
+            // Optional: Reset to default state when mouse leaves
+            // Uncomment the following lines if you want to reset to default state
+            /*
+            infoName.textContent = 'Select a member';
+            infoRole.textContent = 'Hover over team members';
+            infoDescription.textContent = 'Click on any team member to view their detailed information and professional background.';
+            infoSkills.innerHTML = '';
+            infoContact.innerHTML = '';
+            */
+        });
+    });
+
+    // Add click effect for better interaction
+    document.querySelectorAll('.team-member').forEach(member => {
+        member.addEventListener('click', function() {
+            // Add a subtle click animation
+            this.style.transform = 'scale(1.1)';
+            setTimeout(() => {
+                this.style.transform = '';
+            }, 200);
+        });
+    });
+});
+</script>
+

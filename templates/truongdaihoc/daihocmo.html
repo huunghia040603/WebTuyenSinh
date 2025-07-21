@@ -1,0 +1,715 @@
+{% extends "base.html" %}
+
+{% block stylesheets %}
+<style>
+ .uni-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 12px;
+ }
+    
+.uni-header {
+    background-color:  #e19e01 ;
+    padding-top: 100px;
+    border-radius:0px 0px 18px 18px;
+    position: relative;
+    min-height: 70px;
+    background-image: url('/static/images/daihoc/ou/nen2.png');
+    background-size:cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    
+}
+.uni-header-inner {
+    display: flex;
+    align-items: flex-end;
+    padding: 32px 40px 0 40px;
+} 
+.uni-logo-box {
+    width: 150px;
+    height: 150px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 32px;
+    margin-bottom: -40px;
+    border: 4px solid #fff;
+}
+.uni-logo-box img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+}
+.uni-code {
+    font-size: 3.2rem;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: 2px;
+    margin-bottom: 0;
+    margin-right: 32px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.uni-title {
+    font-size: 2.1rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 12px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.uni-header-bar {
+    background: #0033a0;
+    color: #fff;
+    font-size: 1.25rem;
+    font-weight: 700;
+    padding: 20px 60px;
+    border-radius: 0 0 8px 8px;
+    margin-top: 0;
+    letter-spacing: 1px;
+    padding-left: 240px;
+}
+
+.uni-main {
+    display: flex;
+    gap: 24px;
+    margin: 32px 0 0 0;
+}
+.uni-main-left {
+    flex: 2;
+    /* background: #fff; */
+    border-radius: 8px;
+    /* box-shadow: 0 2px 12px rgba(0,0,0,0.07); */
+    /* padding: 0 0 24px 0; */
+    gap: 18px;
+    
+}
+.uni-section-title {
+    background: #0033a0;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding: 10px 20px;
+    border-radius: 8px 8px 0 0;
+    margin-bottom: 0;
+   
+}
+.uni-main-content {
+    padding: 20px 24px 20px 24px;
+    font-size: 1rem;
+    color: #222;
+    position: relative;
+    max-height: none !important;
+    overflow: visible !important;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+}
+.uni-main-content.expanded {
+    max-height: none !important;
+    overflow: visible !important;
+}
+.uni-main-content a.toggle-desc {
+    color: #0033a0;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    display: inline-block;
+    margin-top: 8px;
+}
+.uni-main-content ul {
+    margin: 10px 0 0 0;
+    padding-left: 18px;
+}
+.uni-main-content li {
+    margin-bottom: 6px;
+}
+.uni-main-content .desc-extra {
+    display: none;
+    margin-top: 8px;
+}
+.uni-main-content.expanded .desc-extra {
+    display: block;
+}
+.uni-main-content.expanded .desc-short {
+    display: none;
+}
+.uni-main-content .desc-short {
+    display: block;
+}
+.uni-main-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+.uni-box {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    min-height: 90px;
+    padding-bottom: 10px;
+}
+.uni-box-title {
+    background: #0033a0;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.05rem;
+    padding: 8px 18px;
+    border-radius: 8px 8px 0 0;
+    margin-bottom: 0;
+}
+.uni-box-content {
+    padding: 12px 18px 0 18px;
+    font-size: 0.97rem;
+    color: #222;
+}
+
+.uni-majors-section {
+    margin-top: 32px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    padding-bottom: 32px;
+}
+.uni-majors-title {
+    background: #0033a0;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding: 10px 20px;
+    border-radius: 8px 8px 0 0;
+    margin-bottom: 0;
+}
+.majors-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    padding: 24px 24px 0 24px;
+}
+.major-card {
+    background: #f5f7fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    padding: 18px 18px 12px 18px;
+    min-width: 220px;
+    flex: 1 1 220px;
+    max-width: 260px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    border-left: 5px solid #ffb300;
+    transition: box-shadow 0.2s;
+}
+.major-card:hover {
+    box-shadow: 0 6px 24px rgba(0,51,160,0.13);
+    border-left: 5px solid #0033a0;
+}
+.major-title {
+    font-weight: 700;
+    color: #0033a0;
+    font-size: 1.08rem;
+    margin-bottom: 6px;
+}
+.major-code {
+    font-size: 0.98rem;
+    color: #ffb300;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+.major-desc {
+    font-size: 0.95rem;
+    color: #222;
+    margin-bottom: 6px;
+}
+.major-tuition {
+    font-size: 0.95rem;
+    color: #065be2;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+@media (max-width: 900px) {
+    .uni-main { flex-direction: column; }
+    .uni-main-right { flex-direction: row; gap: 18px; }
+    .uni-main-left, .uni-box { min-width: 0; }
+}
+@media (max-width: 600px) {
+    .uni-header-inner { flex-direction: column; align-items: flex-start; padding: 24px 10px 0 10px; }
+    .uni-logo-box { margin-bottom: 0; margin-right: 0; }
+    .uni-title, .uni-code { font-size: 1.2rem; }
+    .uni-header-bar { font-size: 1rem; padding: 8px 10px; }
+    .uni-main-content, .uni-box-content { padding: 10px 8px 0 8px; }
+    .majors-grid { padding: 12px 8px 0 8px; }
+}
+.uni-social-icons {
+    display: flex;
+    gap: 16px;
+    margin-top: 8px;
+}
+.uni-social-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+    border: 1.5px solid #e5e7eb;
+}
+.uni-social-icon:hover {
+    background: #e0e7ef;
+}
+.uni-social-icon svg {
+    width: 22px;
+    height: 22px;
+    display: block;
+}
+.uni-map-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: #059669;
+    margin-bottom: 8px;
+    font-size: 1.05rem;
+}
+.uni-map-title svg {
+    width: 22px;
+    height: 22px;
+    color: #059669;
+}
+.uni-map-iframe {
+    width: 100%;
+    height: 200px;
+    border: none;
+    border-radius: 8px;
+    margin-top: 8px;
+}
+.uni-map-address {
+    font-size: 0.98rem;
+    color: #222;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.uni-map-address svg {
+    width: 18px;
+    height: 18px;
+    color: #10b981;
+}
+.uni-map-link {
+    color: #2563eb;
+    font-size: 0.97rem;
+    text-decoration: underline;
+    margin-top: 4px;
+    display: inline-block;
+}
+
+/* Hình ảnh trường */
+.uni-images-section {
+    margin: 24px auto;
+    max-width: 1200px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    padding-bottom: 24px;
+}
+.uni-images-title {
+    background: #0033a0;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding: 10px 20px;
+    border-radius: 8px 8px 0 0;
+    margin-bottom: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.uni-images-toggle {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 0.9rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+.uni-images-toggle:hover {
+    background: rgba(255,255,255,0.1);
+}
+.uni-images-content {
+    padding: 20px;
+    display: none;
+}
+.uni-images-content.active {
+    display: block;
+}
+.uni-images-slider {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+.uni-images-container {
+    display: flex;
+    transition: transform 0.3s ease;
+}
+.uni-image-item {
+    min-width: 100%;
+    height: 300px;
+    position: relative;
+}
+.uni-image-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.uni-slider-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    transition: background 0.2s;
+}
+.uni-slider-nav:hover {
+    background: rgba(0,0,0,0.7);
+}
+.uni-slider-prev {
+    left: 10px;
+}
+.uni-slider-next {
+    right: 10px;
+}
+.uni-slider-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
+}
+.uni-slider-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ddd;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.uni-slider-dot.active {
+    background: #0033a0;
+}
+
+/* Điểm chuẩn */
+.uni-admission-section {
+    margin-top: 18px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    padding-bottom: 20px;
+}
+.uni-admission-title {
+    background: #0033a0;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.05rem;
+    padding: 8px 18px;
+    border-radius: 8px 8px 0 0;
+    margin-bottom: 0;
+}
+.uni-admission-content {
+    padding: 16px 18px 0 18px;
+}
+.uni-admission-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.uni-admission-btn {
+    padding: 8px 16px;
+    border: 2px solid #0033a0;
+    background: #fff;
+    color: #0033a0;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+.uni-admission-btn:hover {
+    background: #0033a0;
+    color: #fff;
+}
+.uni-admission-btn.current {
+    background: #ffb300;
+    border-color: #ffb300;
+    color: #fff;
+}
+.uni-admission-btn.current:hover {
+    background: #e19e01;
+    border-color: #e19e01;
+}
+
+@media (max-width: 600px) {
+    .uni-images-title {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+    }
+    .uni-admission-buttons {
+        flex-direction: column;
+    }
+    .uni-admission-btn {
+        text-align: center;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="uni-container">
+<div class="uni-header">
+    <div class="uni-header-inner">
+        <div class="uni-logo-box">
+            <img src="/static/images/logo/6.jpg" alt="Đại học Mở TP.HCM">
+        </div>
+        <!-- <div>
+            <div class="uni-code">HCMCOU</div>
+            <div class="uni-title">TRƯỜNG ĐẠI HỌC MỞ TP. HỒ CHÍ MINH</div>
+        </div> -->
+    </div>
+    <div class="uni-header-bar">HO CHI MINH OPEN UNIVERSITY</div>
+</div>
+<div class="uni-main">
+    <div class="uni-main-left">
+        
+        <div class="uni-section-title">Giới thiệu về trường</div>
+        <div class="uni-main-content" id="descBox">
+            <div class="desc-short">
+                Loại hình giáo dục: Công lập<br>
+                Địa chỉ liên lạc: Số 97 Võ Văn Tần, Phường Võ Thị Sáu, Quận 3, TP. Hồ Chí Minh<br>
+                Điện thoại: (028) 3930 0210<br>
+                Fax: (028) 3930 0083<br>
+                E-mail: ou@ou.edu.vn<br>
+                Website: <a href="https://www.ou.edu.vn" target="_blank">www.ou.edu.vn</a><br>
+                <ul>
+                    <!-- <li>Đượthành lập vào năm 1990 và trở thành trường đại học công lập từ năm 2006, đến nay Trường Đại học Mở Thành phố Hồ Chí Minh là trường đại học đa ngành trực thuộc Bộ.</li> -->
+                </ul>
+            </div>
+            <div class="desc-extra" style="margin-top:8px;">
+                <ul>
+                    <li><strong>Lịch sử phát triển:</strong> Trường Đại học Mở TP.HCM được thành lập năm 1990, là một trong những trường đại học công lập đầu tiên triển khai mô hình đào tạo mở, linh hoạt, đáp ứng nhu cầu học tập suốt đời của xã hội hiện đại.</li>
+                    <li><strong>Quy mô đào tạo:</strong> Hiện trường có hơn 45.000 sinh viên, học viên theo học các hệ chính quy, vừa làm vừa học, đào tạo từ xa, liên thông, văn bằng hai và sau đại học.</li>
+                    <li><strong>Đội ngũ giảng viên:</strong> Gồm hơn 500 giảng viên, trong đó nhiều người là giáo sư, phó giáo sư, tiến sĩ, thạc sĩ, có kinh nghiệm thực tiễn và nghiên cứu khoa học sâu rộng.</li>
+                    <li><strong>Cơ sở vật chất:</strong> Trường sở hữu nhiều cơ sở hiện đại tại TP.HCM, với hệ thống phòng học thông minh, thư viện điện tử, phòng thí nghiệm, khu thể thao, ký túc xá, khu tự học và không gian sáng tạo cho sinh viên.</li>
+                    <li><strong>Chương trình đào tạo:</strong> Đa dạng các ngành như Kinh tế, Quản trị kinh doanh, Công nghệ thông tin, Luật, Ngôn ngữ Anh, Kế toán, Tài chính - Ngân hàng, Xã hội học, Công tác xã hội, Quản trị nhân lực, Quản trị du lịch, v.v.</li>
+                    <li><strong>Liên kết quốc tế:</strong> Trường hợp tác với nhiều trường đại học, tổ chức quốc tế tại Mỹ, Úc, Pháp, Nhật Bản, Hàn Quốc... tạo cơ hội trao đổi sinh viên, học bổng, thực tập và nghiên cứu quốc tế.</li>
+                    <li><strong>Thành tích nổi bật:</strong> Nhiều năm liền đạt danh hiệu Tập thể Lao động xuất sắc, nhận bằng khen của Thủ tướng Chính phủ, Bộ Giáo dục & Đào tạo, đạt chuẩn kiểm định chất lượng giáo dục quốc gia.</li>
+                    <li><strong>Hoạt động sinh viên:</strong> Đoàn - Hội sinh viên năng động, nhiều câu lạc bộ học thuật, kỹ năng, thể thao, nghệ thuật, tình nguyện, tạo môi trường phát triển toàn diện cho sinh viên.</li>
+                    <li><strong>Học phí và học bổng:</strong> Học phí hợp lý, nhiều chính sách miễn giảm, học bổng khuyến khích học tập, học bổng doanh nghiệp và hỗ trợ sinh viên khó khăn.</li>
+                    <li><strong>Địa điểm thuận lợi:</strong> Các cơ sở đều nằm ở trung tâm thành phố, thuận tiện di chuyển, gần các khu vực dịch vụ, giải trí, thư viện, công viên.</li>
+                    <li><strong>Cam kết chất lượng:</strong> Đào tạo gắn liền thực tiễn, chú trọng kỹ năng mềm, ngoại ngữ, công nghệ thông tin, đáp ứng nhu cầu thị trường lao động trong nước và quốc tế.</li>
+                    <li><strong>Hỗ trợ sinh viên:</strong> Trung tâm hỗ trợ sinh viên, tư vấn hướng nghiệp, giới thiệu việc làm, hỗ trợ khởi nghiệp, chăm sóc sức khỏe và đời sống tinh thần cho sinh viên.</li>
+                    <li><strong>Hoạt động nghiên cứu khoa học:</strong> Sinh viên được khuyến khích tham gia các đề tài nghiên cứu, dự án đổi mới sáng tạo, cuộc thi học thuật trong và ngoài nước.</li>
+                    <li><strong>Chính sách học tập linh hoạt:</strong> Cho phép sinh viên đăng ký học phần linh hoạt, học vượt, học song ngành, chuyển đổi ngành học phù hợp với năng lực và định hướng cá nhân.</li>
+                    <li><strong>Đội ngũ cựu sinh viên thành đạt:</strong> Nhiều cựu sinh viên giữ vị trí lãnh đạo, chuyên gia tại các doanh nghiệp, tổ chức lớn trong và ngoài nước.</li>
+                    <li><strong>Định hướng phát triển:</strong> Trở thành trường đại học đa ngành, đa lĩnh vực, hội nhập quốc tế, tiên phong trong đổi mới sáng tạo và phục vụ cộng đồng.</li>
+                </ul>
+            </div>
+            <a class="toggle-desc" id="toggleDesc">&gt;&gt; Xem thêm</a>
+        </div>
+
+        <div class="uni-images-section">
+            <div class="uni-images-title">
+                Hình ảnh trường
+                <button class="uni-images-toggle" id="toggleImages">Hiện ảnh</button>
+            </div>
+            <div class="uni-images-content" id="imagesContent">
+                <div class="uni-images-slider">
+                    <div class="uni-images-container" id="imagesContainer">
+                        <div class="uni-image-item">
+                            <img src="/static/images/daihoc/ou/image copy 1.png" alt="Cơ sở 1 - Đại học Mở TP.HCM">
+                        </div>
+                        <div class="uni-image-item">
+                            <img src="/static/images/daihoc/ou/image copy 2.png" alt="Thư viện trường">
+                        </div>
+                        <div class="uni-image-item">
+                            <img src="/static/images/daihoc/ou/image copy 3.png" alt="Phòng học thông minh">
+                        </div>
+                        <div class="uni-image-item">
+                            <img src="/static/images/daihoc/ou/image copy 4.png" alt="Khu thể thao">
+                        </div>
+                        <div class="uni-image-item">
+                            <img src="/static/images/daihoc/ou/image copy 5.png" alt="Khuôn viên trường">
+                        </div>
+                    </div>
+                    <button class="uni-slider-nav uni-slider-prev" id="prevBtn">&lt;</button>
+                    <button class="uni-slider-nav uni-slider-next" id="nextBtn">&gt;</button>
+                </div>
+                <div class="uni-slider-dots" id="dotsContainer">
+                    <div class="uni-slider-dot active"></div>
+                    <div class="uni-slider-dot"></div>
+                    <div class="uni-slider-dot"></div>
+                    <div class="uni-slider-dot"></div>
+                    <div class="uni-slider-dot"></div>
+                </div>
+            </div>
+        </div>
+
+       
+        
+    </div>
+    
+    <div class="uni-main-right">
+        <div class="uni-box">
+            <div class="uni-box-title">Mạng xã hội</div>
+            <div class="uni-box-content">
+                <div class="uni-social-icons">
+                    <a class="uni-social-icon" href="https://www.facebook.com/TruongDaiHocMoTPHCM" target="_blank" title="Facebook">
+                        <svg fill="#1877f3" viewBox="0 0 24 24"><path d="M22.675 0h-21.35C.595 0 0 .592 0 1.326v21.348C0 23.406.595 24 1.325 24h11.495v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.797.143v3.24l-1.918.001c-1.504 0-1.797.715-1.797 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116C23.406 24 24 23.406 24 22.674V1.326C24 .592 23.406 0 22.675 0"/></svg>
+                    </a>
+                    <a class="uni-social-icon" href="https://www.youtube.com/@ouhcm" target="_blank" title="YouTube">
+                        <svg fill="#ff0000" viewBox="0 0 24 24"><path d="M23.498 6.186a2.994 2.994 0 0 0-2.112-2.12C19.425 3.5 12 3.5 12 3.5s-7.425 0-9.386.566A2.994 2.994 0 0 0 .502 6.186C0 8.148 0 12 0 12s0 3.852.502 5.814a2.994 2.994 0 0 0 2.112 2.12C4.575 20.5 12 20.5 12 20.5s7.425 0 9.386-.566a2.994 2.994 0 0 0 2.112-2.12C24 15.852 24 12 24 12s0-3.852-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                    </a>
+                    <a class="uni-social-icon" href="https://www.linkedin.com/school/open-university-hcmc/" target="_blank" title="LinkedIn">
+                        <svg fill="#0a66c2" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.327-.027-3.037-1.849-3.037-1.851 0-2.132 1.445-2.132 2.939v5.667H9.358V9h3.414v1.561h.049c.476-.899 1.637-1.849 3.37-1.849 3.602 0 4.267 2.369 4.267 5.455v6.285zM5.337 7.433a2.062 2.062 0 1 1 0-4.124 2.062 2.062 0 0 1 0 4.124zM7.119 20.452H3.554V9h3.565v11.452z"/></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="uni-box">
+            <div class="uni-box-title">Bản đồ và đánh giá</div>
+            <div class="uni-box-content">
+                <div class="uni-map-title">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 20l-5.447-2.724A2 2 0 0 1 2 15.382V6.618a2 2 0 0 1 1.553-1.894l5.447-1.724a2 2 0 0 1 1.262 0l5.447 1.724A2 2 0 0 1 18 6.618v8.764a2 2 0 0 1-1.553 1.894L11 20a2 2 0 0 1-1.262 0z"/></svg>
+                    Xem bản đồ
+                </div>
+                <div class="uni-map-address">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a2 2 0 0 1-2.828 0l-4.243-4.243a8 8 0 1 1 11.314 0z"/><circle cx="12" cy="11" r="3"/></svg>
+                    97 Võ Văn Tần, Quận 3, TP.HCM
+                </div>
+                <iframe class="uni-map-iframe" src="https://www.google.com/maps?q=97+V%C3%B5+V%C4%83n+T%E1%BA%A7n,+Qu%E1%BA%ADn+3,+TP.HCM&output=embed" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                <a class="uni-map-link" href="https://www.google.com/maps/place/97+V%C3%B5+V%C4%83n+T%E1%BA%A7n,+Qu%E1%BA%ADn+3,+TP.HCM" target="_blank">Xem bản đồ lớn hơn</a>
+            </div>
+        </div>
+        
+        <!-- Phần điểm chuẩn -->
+        <div class="uni-admission-section">
+            <div class="uni-admission-title">Điểm chuẩn xét tuyển</div>
+            <div class="uni-admission-content">
+                <div class="uni-admission-buttons">
+                    <a href="/diem-chuan/2023" class="uni-admission-btn">2023</a>
+                    <a href="/diem-chuan/2024" class="uni-admission-btn">2024</a>
+                    <a href="/diem-chuan/2025" class="uni-admission-btn current">2025</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Phần hình ảnh trường -->
+
+    
+    
+   
+        
+       
+<div class="uni-majors-section">
+    <div class="uni-majors-title">Ngành đào tạo</div>
+    <div class="majors-grid">
+        {% set majors = [
+            { 'code': '7340101', 'name': 'Quản trị kinh doanh', 'desc': 'Đào tạo kiến thức quản trị, kinh doanh hiện đại.', 'tuition': '28 triệu/năm' },
+            { 'code': '7340201', 'name': 'Tài chính - Ngân hàng', 'desc': 'Chuyên sâu về tài chính, ngân hàng, đầu tư.', 'tuition': '28 triệu/năm' },
+            { 'code': '7340301', 'name': 'Kế toán', 'desc': 'Kiến thức kế toán, kiểm toán, thuế.', 'tuition': '28 triệu/năm' },
+            { 'code': '7480201', 'name': 'Công nghệ thông tin', 'desc': 'Lập trình, hệ thống thông tin, AI, dữ liệu.', 'tuition': '32 triệu/năm' },
+            { 'code': '7220201', 'name': 'Ngôn ngữ Anh', 'desc': 'Tiếng Anh thương mại, biên phiên dịch.', 'tuition': '30 triệu/năm' },
+            { 'code': '7380101', 'name': 'Luật', 'desc': 'Luật kinh tế, dân sự, hành chính.', 'tuition': '28 triệu/năm' },
+        ] %}
+        {% for major in majors %}
+        <div class="major-card">
+            <div class="major-title">{{ major.name }}</div>
+            <div class="major-code">Mã ngành: {{ major.code }}</div>
+            <div class="major-desc">{{ major.desc }}</div>
+            <div class="major-tuition">Học phí: {{ major.tuition }}</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+</div>
+</div>
+
+<script>
+// Mô tả trường
+const descBox = document.getElementById('descBox');
+const descExtra = descBox.querySelector('.desc-extra');
+const toggleBtn = document.getElementById('toggleDesc');
+descExtra.style.display = 'none';
+toggleBtn.onclick = function(e) {
+    e.preventDefault();
+    if(descExtra.style.display === 'none') {
+        descExtra.style.display = 'block';
+        toggleBtn.innerHTML = '&lt;&lt; Thu gọn';
+    } else {
+        descExtra.style.display = 'none';
+        toggleBtn.innerHTML = '&gt;&gt; Xem thêm';
+    }
+};
+
+// Hình ảnh trường
+const toggleImagesBtn = document.getElementById('toggleImages');
+const imagesContent = document.getElementById('imagesContent');
+const imagesContainer = document.getElementById('imagesContainer');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const dotsContainer = document.getElementById('dotsContainer');
+const dots = dotsContainer.querySelectorAll('.uni-slider-dot');
+
+let currentSlide = 0;
+const totalSlides = dots.length;
+
+toggleImagesBtn.onclick = function() {
+    if(imagesContent.classList.contains('active')) {
+        imagesContent.classList.remove('active');
+        toggleImagesBtn.textContent = 'Hiện ảnh';
+    } else {
+        imagesContent.classList.add('active');
+        toggleImagesBtn.textContent = 'Ẩn ảnh';
+    }
+};
+
+function updateSlider() {
+    imagesContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
+    dots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === currentSlide);
+    });
+}
+
+prevBtn.onclick = function() {
+    currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+    updateSlider();
+};
+
+nextBtn.onclick = function() {
+    currentSlide = (currentSlide + 1) % totalSlides;
+    updateSlider();
+};
+
+dots.forEach((dot, index) => {
+    dot.onclick = function() {
+        currentSlide = index;
+        updateSlider();
+    };
+});
+</script>
+{% endblock %}

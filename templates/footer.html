@@ -1,0 +1,731 @@
+{% block stylesheets %}
+<style>
+.footer-container {
+    background: #d3d3d3;
+    padding: 20px 0 0 0;
+    font-family: 'SF Compact Rounded', sans-serif;
+}
+
+.footer-header {
+    max-width: 1200px;
+    margin: 40px auto 30px auto;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.footer-header-icon {
+    width: 60px;
+    height: 60px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.footer-header-icon::before {
+   
+    font-size: 24px;
+    position: absolute;
+    top: 8px;
+    left: 8px;
+}
+
+.footer-header-icon::after {
+    
+    font-size: 16px;
+    color: #fbbf24;
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    font-weight: bold;
+}
+
+.footer-header-text {
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: #0a4191;
+    line-height: 1.2;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.footer-column h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0a4191;
+    margin-bottom: 15px;
+}
+
+.footer-column ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-column li {
+    margin-bottom: 8px;
+}
+
+.footer-column a {
+    color: #4a5568;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: color 0.2s;
+}
+
+.footer-column a:hover {
+    color: #0a4191;
+}
+
+.footer-contact {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 20px;
+    border-top: 1px solid #e2e8f0;
+    display: grid;
+    grid-template-columns:1fr 3fr 2fr;
+    gap: 30px;
+    align-items: center;
+}
+
+.qr-section {
+    text-align: center;
+}
+
+.qr-code {
+    width: 120px;
+    height: 120px;
+    background: #fff;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    margin: 0 auto 10px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: #666;
+}
+
+.qr-text {
+    font-size: 0.9rem;
+    color: #4a5568;
+    font-weight: 500;
+}
+
+.contact-section h4 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0a4191;
+    margin-bottom: 15px;
+}
+
+.social-icons {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.social-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px;
+    text-decoration: none;
+    transition: transform 0.2s;
+}
+
+.social-icon:hover {
+    transform: scale(1.1);
+}
+
+.social-facebook { background: #1877f2; }
+.social-instagram { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+.social-youtube { background: #ff0000; }
+.social-tiktok { background: #000000; }
+
+.contact-info {
+    font-size: 0.95rem;
+    color: #4a5568;
+    line-height: 1.6;
+}
+
+.partnership-section h4 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0a4191;
+    margin-bottom: 10px;
+}
+
+.partnership-text {
+    font-size: 0.9rem;
+    color: #64684a;
+    line-height: 1.5;
+    margin-bottom: 15px;
+}
+
+.contact-btn {
+    background: #0a4191;
+    color: #fbbf24;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.contact-btn:hover {
+    background: #1e40af;
+}
+
+.footer-bottom {
+    background: #0a4191;
+    color: white;
+    text-align: center;
+    padding: 15px 0;
+    font-size: 0.9rem;
+}
+
+.right-nav {
+    position: fixed;
+    right: 20px;
+    top: 80%;
+    transform: translateY(-50%);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.nav-btn {
+    width: 50px;
+    height: 50px;
+    background: #0a4191;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-btn:hover {
+    background: #1e40af;
+    transform: scale(1.1);
+}
+
+.nav-btn.tim:hover {
+    background: #0a4191;
+    transform: scale(1.1);
+    color: #fb2424;
+}
+
+.nav-btn.chat:hover {
+    background: #0a4191;
+    transform: scale(1.1);
+    color: #03d703;
+}
+
+.nav-btn.dangki:hover {
+    background: #0a4191;
+    transform: scale(1.1);
+    color: #03bbd7;
+}
+
+/* Magic Social Share */
+.magic-share {
+    position: fixed;
+    bottom: 7%;
+    left: 20px;
+    z-index: 1000;
+}
+
+.share-btn {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(45deg, #0a4191, #1e40af);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(10, 65, 145, 0.3);
+    position: relative;
+}
+
+.share-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(255, 186, 88, 0.393);
+    border: 2px solid #f09433;
+}
+
+.share-btn.active {
+    background: linear-gradient(45deg, #1e40af, #0a4191);
+    transform: rotate(45deg);
+}
+
+.social-options {
+    position: absolute;
+    bottom: 70px;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+}
+
+.magic-share:hover .social-options {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.social-option {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    transform: scale(0);
+    animation: socialPop 0.3s ease forwards;
+}
+
+.social-option:nth-child(1) { animation-delay: 0.1s; }
+.social-option:nth-child(2) { animation-delay: 0.15s; }
+.social-option:nth-child(3) { animation-delay: 0.2s; }
+.social-option:nth-child(4) { animation-delay: 0.25s; }
+.social-option:nth-child(5) { animation-delay: 0.3s; }
+.social-option:nth-child(6) { animation-delay: 0.35s; }
+.social-option:nth-child(7) { animation-delay: 0.4s; }
+
+@keyframes socialPop {
+    to {
+        transform: scale(1);
+    }
+}
+
+.social-option:hover {
+    transform: scale(1.2);
+    box-shadow: 0 5px 15px rgba(255, 186, 88, 0.393);
+    border: 1px solid #f09433;
+}
+
+.social-facebook { background: #1877f2; }
+.social-instagram { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+.social-tiktok { background: #000000; }
+.social-twitter { background: #1da1f2; }
+.social-zalo { background: #0068ff; }
+.social-sms { background: #25d366; }
+.social-telegram { background: #0088cc; }
+.social-copy { background: #6c757d; }
+
+/* Toast notification */
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #333;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    z-index: 10000;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.3s ease;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+@media (max-width: 900px) {
+    .footer-content {
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+    
+    .footer-contact {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    
+    .right-nav {
+        right: 10px;
+    }
+    
+    .nav-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 16px;
+    }
+    
+    .magic-share {
+        bottom: 15px;
+        left: 15px;
+    }
+    
+    .share-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 18px;
+    }
+    
+    .social-option {
+        width: 40px;
+        height: 40px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 600px) {
+    .footer-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .footer-header-text {
+        font-size: 1.4rem;
+    }
+    
+    .right-nav {
+        display: none;
+    }
+    
+    .magic-share {
+        bottom: 10px;
+        left: 10px;
+    }
+    
+    .share-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 16px;
+    }
+    
+    .social-option {
+        width: 35px;
+        height: 35px;
+        font-size: 12px;
+    }
+    
+    .social-options {
+        bottom: 60px;
+        gap: 8px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="footer-container">
+    <!-- Header -->
+    <div class="footer-header">
+        <div class="footer-header-icon"><img src="/static/images/logo12.png" alt="logo" style="width: 100%; height: 100%;"></div>
+        <div class="footer-header-text">Đăng ký tìm trường cùng chúng tôi</div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="footer-content">
+        <div class="footer-column">
+            <h3>Về TimTruongHoc.vn</h3>
+            <ul>
+                <li><a href="#">Giới Thiệu</a></li>
+                <li><a href="#">Tin tức</a></li>
+                <li><a href="#">Liên hệ</a></li>
+                <li><a href="#">Hỏi đáp</a></li>
+            </ul>
+        </div>
+        
+        <div class="footer-column">
+            <h3>Khám Phá Bản Thân</h3>
+            <ul>
+                <li><a href="#">Trắc nghiệm tính cách MBTI</a></li>
+                <li><a href="#">Thần số học</a></li>
+                <li><a href="#">Cung hoàng đạo</a></li>
+                <li><a href="#">Xu hướng nghề nghiệp</a></li>
+            </ul>
+        </div>
+        
+        <div class="footer-column">
+            <h3>Chương Trình Tuyển Sinh</h3>
+            <ul>
+                <li><a href="#">Tuyển sinh Đại Học</a></li>
+                <li><a href="#">Tuyển sinh Cao Đẳng</a></li>
+                <li><a href="#">Tuyển sinh từ lớp 1-12</a></li>
+                <li><a href="#">Tuyển sinh Học Nghề</a></li>
+            </ul>
+        </div>
+        
+        <div class="footer-column">
+            <h3>Chính Sách Đối Tác</h3>
+            <ul>
+                <li><a href="#">Chính sách bảo mật</a></li>
+                <li><a href="#">Quy chế hoạt động</a></li>
+                <li><a href="#">Điều khoản dịch vụ</a></li>
+                <li><a href="#">Tuyển dụng</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Contact Section -->
+    <div class="footer-contact">
+        <div class="qr-section">
+            <div class="qr-code">QR Code</div>
+            <div class="qr-text">timtruonghoc.vn</div>
+        </div>
+        
+        <div class="contact-section">
+            <h4>Thông tin liên hệ timtruonghoc.vn</h4>
+            <div class="social-icons">
+                <a href="#" class="social-icon social-facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="social-icon social-instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="social-icon social-youtube"><i class="fab fa-youtube"></i></a>
+                <a href="#" class="social-icon social-tiktok"><i class="fab fa-tiktok"></i></a>
+           
+            </div>
+            <div class="contact-info">
+                Hotline: 0384.90.98.10<br>
+                Email: buddy.brand@gmail.com <br>
+                <p style="font-size: 10px; color: #4a5568;">Trang thông tin này cung cấp nội dung tham khảo, để đảm bảo tính chính xác nhất<br> bạn có thể liên hệ trực tiếp với đơn vị mà bạn đang quan tâm.</p>
+            </div>
+        </div>
+        
+        <div class="partnership-section">
+            <h4>Hợp Tác Tuyển Sinh</h4>
+            <div class="partnership-text">
+                Nếu bạn có nhu cầu hợp tác với chúng tôi. Hãy để lại lời nhắn bằng cách nhận nút liên hệ bên dưới.
+            </div>
+            <button class="contact-btn">Liên Hệ</button>
+        </div>
+    </div>
+</div>
+
+<!-- Footer Bottom -->
+<div class="footer-bottom">
+    2025 © All rights reserved by timtruonghoc.vn
+</div>
+
+
+
+<!-- Right Navigation -->
+<div class="right-nav">
+    <button class="nav-btn dangki"><i class="fas fa-edit"></i></button>
+    <button class="nav-btn tim"><i class="fas fa-heart"></i></button>
+    <button class="nav-btn chat"><i class="fas fa-comment-dots"></i></button>
+    <button class="nav-btn" id="scroll-to-top"><i class="fas fa-chevron-up"></i></button>
+</div>
+
+<!-- Magic Social Share -->
+<div class="magic-share">
+    <button class="share-btn" id="shareBtn">
+        <i class="fas fa-share-alt"></i>
+    </button>
+    <div class="social-options">
+        <button class="social-option social-facebook" data-platform="facebook">
+            <i class="fab fa-facebook-f"></i>
+        </button>
+        <button class="social-option social-instagram" data-platform="instagram">
+            <i class="fab fa-instagram"></i>
+        </button>
+        <button class="social-option social-tiktok" data-platform="tiktok">
+            <i class="fab fa-tiktok"></i>
+        </button>
+        <button class="social-option social-twitter" data-platform="twitter">
+            <i class="fab fa-twitter"></i>
+        </button>
+        <button class="social-option social-zalo" data-platform="zalo">
+            <i class="fas fa-comments"></i>
+        </button>
+        <button class="social-option social-sms" data-platform="sms">
+            <i class="fas fa-sms"></i>
+        </button>
+        <button class="social-option social-telegram" data-platform="telegram">
+            <i class="fab fa-telegram-plane"></i>
+        </button>
+        <button class="social-option social-copy" data-platform="copy">
+            <i class="fas fa-copy"></i>
+        </button>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div class="toast" id="toast"></div>
+
+<script>
+// Scroll to top functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const scrollToTopBtn = document.getElementById('scroll-to-top');
+    
+    // Hiển thị/ẩn nút dựa trên vị trí scroll
+    window.addEventListener('scroll', function() {
+        if (window.pageYOffset > 300) {
+            scrollToTopBtn.style.display = 'flex';
+        } else {
+            scrollToTopBtn.style.display = 'none';
+        }
+    });
+    
+    // Scroll to top khi click
+    scrollToTopBtn.addEventListener('click', function() {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+    
+    // Ẩn nút ban đầu
+    scrollToTopBtn.style.display = 'none';
+});
+
+// Magic Social Share functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const shareBtn = document.getElementById('shareBtn');
+    const socialOptions = document.querySelectorAll('.social-option');
+    const toast = document.getElementById('toast');
+    
+    // Get current page URL and title
+    const currentUrl = window.location.href;
+    const currentTitle = document.title;
+    const shareText = `Khám phá ${currentTitle} trên TimTruongHoc.vn`;
+    
+    // Share functions for different platforms
+    const shareFunctions = {
+        facebook: () => {
+            const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`;
+            window.open(url, '_blank', 'width=600,height=400');
+        },
+        
+        instagram: () => {
+            // Instagram doesn't support direct sharing via URL, so copy to clipboard
+            copyToClipboard(`${shareText}\n${currentUrl}`);
+            showToast('Đã copy link! Bạn có thể paste vào Instagram Story');
+        },
+        
+        tiktok: () => {
+            // TikTok doesn't support direct sharing via URL, so copy to clipboard
+            copyToClipboard(`${shareText}\n${currentUrl}`);
+            showToast('Đã copy link! Bạn có thể paste vào TikTok');
+        },
+        
+        twitter: () => {
+            const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(currentUrl)}`;
+            window.open(url, '_blank', 'width=600,height=400');
+        },
+        
+        zalo: () => {
+            const url = `https://zalo.me/share?u=${encodeURIComponent(currentUrl)}&t=${encodeURIComponent(shareText)}`;
+            window.open(url, '_blank');
+        },
+        
+        sms: () => {
+            const url = `sms:?body=${encodeURIComponent(shareText + ' ' + currentUrl)}`;
+            window.open(url);
+        },
+        
+        telegram: () => {
+            const url = `https://t.me/share/url?url=${encodeURIComponent(currentUrl)}&text=${encodeURIComponent(shareText)}`;
+            window.open(url, '_blank');
+        },
+        
+        copy: () => {
+            copyToClipboard(`${shareText}\n${currentUrl}`);
+            showToast('Đã copy link vào bộ nhớ tạm!');
+        }
+    };
+    
+    // Copy to clipboard function
+    function copyToClipboard(text) {
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(() => {
+                console.log('Copied to clipboard');
+            });
+        } else {
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                console.log('Copied to clipboard');
+            } catch (err) {
+                console.error('Failed to copy: ', err);
+            }
+            document.body.removeChild(textArea);
+        }
+    }
+    
+    // Show toast notification
+    function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add('show');
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3000);
+    }
+    
+    // Add click events to social options
+    socialOptions.forEach(option => {
+        option.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const platform = this.getAttribute('data-platform');
+            
+            if (shareFunctions[platform]) {
+                shareFunctions[platform]();
+            }
+        });
+    });
+    
+    // Add hover effect to share button
+    shareBtn.addEventListener('mouseenter', function() {
+        this.classList.add('active');
+    });
+    
+    shareBtn.addEventListener('mouseleave', function() {
+        this.classList.remove('active');
+    });
+});
+</script>
+{% endblock %}

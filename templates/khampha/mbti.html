@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBTI Test</title>
+    {% block stylesheet %}
+    <style>
+        /* CSS của bạn giữ nguyên */
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body{
+            background-color: #D2D2D2;
+            background-image:
+            repeating-linear-gradient(
+                to right, transparent 0 100px,
+                #25283b22 100px 101px
+            ),
+            repeating-linear-gradient(
+                to bottom, transparent 0 100px,
+                #25283b22 100px 101px
+            );
+        }
+        
+        body::before{
+            position: absolute;
+            width: min(1400px, 90vw);
+            top: 10%;
+            left: 50%;
+            height: 90%;
+            transform: translateX(-50%);
+            content: '';
+            /* background-image: url(images/bg.png); */
+            background-size: 100%;
+            background-repeat: no-repeat;
+            background-position: top center;
+            pointer-events: none;
+        }
+        @import url('https://fonts.cdnfonts.com/css/ica-rubrik-black');
+        @import url('https://fonts.cdnfonts.com/css/poppins');
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap'); /* Added Montserrat for the new section */
+
+
+        .banner{
+            width: 100%;
+            height: 100vh;
+            text-align: center;
+            overflow: hidden;
+            position: relative;
+        }
+        .banner .slider{
+            position: absolute;
+            width: 200px;
+            height: 250px;
+            top: 10%;
+            left: calc(50% - 100px);
+            transform-style: preserve-3d;
+            transform: perspective(1000px) rotateX(-16deg) rotateY(0deg); /* Initial state */
+            animation: autoRun 20s linear infinite;
+            z-index: 2;
+            transition: animation-play-state 0.2s, transform 0.7s cubic-bezier(.77,0,.18,1); /* Added transform transition for smooth rotation change */
+        }
+        .banner .slider.paused {
+            animation-play-state: paused !important;
+        }
+        /* .banner .slider.to-grid { removed, handled by JS now for more control } */
+
+        @keyframes autoRun{
+            from{
+                transform: perspective(1000px) rotateX(-16deg) rotateY(0deg);
+            }to{
+                transform: perspective(1000px) rotateX(-16deg) rotateY(360deg);
+            }
+        }
+
+        .banner .slider .item{
+            position: absolute;
+            inset: 0 0 0 0;
+            /* Base 3D transform is always here */
+            transform: 
+                rotateY(calc( (var(--position) - 1) * (360 / var(--quantity)) * 1deg))
+                translateZ(550px);
+            transition: box-shadow 0.2s, transform 0.7s cubic-bezier(.77,0,.18,1), z-index 0.2s, opacity 0.6s; /* Added opacity */
+            z-index: 1;
+            cursor: pointer;
+        }
+        .banner .slider .item:hover {
+            box-shadow: 0 0 32px 8px #f7b500cc, 0 0 0 4px #fff8;
+            transform: 
+                rotateY(calc( (var(--position) - 1) * (360 / var(--quantity)) * 1deg))
+                translateZ(550px) scale(1.13);
+            z-index: 10;
+        }
+        
+        .banner .slider .item img{
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px solid #ffffff8c;
+            background: #fff;
+        }
+        .banner .content{
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: min(1400px, 100vw);
+            height: max-content;
+            padding-bottom: 100px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1;
+        }
+        .banner .content h1{
+            font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 16em;
+            line-height: 1em;
+            color: #25283B;
+            position: relative;
+        }
+        .banner .content h1::after{
+            position: absolute;
+            inset: 0 0 0 0;
+            content: attr(data-content);
+            z-index: 2;
+            -webkit-text-stroke: 2px #d2d2d2;
+            color: transparent;
+        }
+        .banner .content .author{
+            font-family: Poppins;
+            text-align: right;
+            max-width: 200px;
+        }
+        .banner .content h2{
+            font-size: 1.3em;
+            font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        }
+        p{
+            font-size: 1em;
+            font-family:Verdana, Geneva, Tahoma, sans-serif;
+        }   
+        .banner .content .model{
+            background-image: url(/static/images/mbti/trungtam1.gif);
+            width: 100%;
+            height: 65vh;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            background-size: auto 130%;
+            background-repeat: no-repeat;
+            background-position: top center;
+            z-index: 1000000;
+        }
+        @media screen and (max-width: 1023px) {
+            .banner .slider{
+                width: 160px;
+                height: 200px;
+                left: calc(50% - 80px);
+            }
+            .banner .slider .item{
+                transform: 
+                    rotateY(calc( (var(--position) - 1) * (360 / var(--quantity)) * 1deg))
+                    translateZ(300px);
+            }
+            .banner .content h1{
+                text-align: center;
+                width: 100%;
+                text-shadow: 0 10px 20px #000;
+                font-size: 7em;
+            }
+            .banner .content .author{
+                color: #fff;
+                padding: 20px;
+                text-shadow: 0 10px 20px #000;
+                z-index: 2;
+                max-width: unset;
+                width: 100%;
+                text-align: center;
+                padding: 0 30px;
+            }
+        }
+        @media screen and (max-width: 767px) {
+            .banner .slider{
+                width: 100px;
+                height: 150px;
+                left: calc(50% - 50px);
+            }
+            .banner .slider .item{
+                transform: 
+                    rotateY(calc( (var(--position) - 1) * (360 / var(--quantity)) * 1deg))
+                    translateZ(180px);
+            }
+            .banner .content h1{
+                font-size: 5em;
+            }
+        }
+    </style>
+    {% endblock %}
+</head>
+<body>
+
+    <div class="banner">
+        <div class="slider" style="--quantity: 10">
+            <div class="item" style="--position: 1"><img src="/static/images/mbti/estp.png" alt="ESTP MBTI Type"></div>
+            <div class="item" style="--position: 2"><img src="/static/images/mbti/intj.png" alt="INTJ MBTI Type"></div>
+            <div class="item" style="--position: 3"><img src="/static/images/mbti/infj.png" alt="INFJ MBTI Type"></div>
+            <div class="item" style="--position: 4"><img src="/static/images/mbti/istj.png" alt="ISTJ MBTI Type"></div>
+            <div class="item" style="--position: 5"><img src="/static/images/mbti/istp.png" alt="ISTP MBTI Type"></div>
+            <div class="item" style="--position: 6"><img src="/static/images/mbti/intp.png" alt="INTP MBTI Type"></div>
+            <div class="item" style="--position: 7"><img src="/static/images/mbti/infp.png" alt="INFP MBTI Type"></div>
+            <div class="item" style="--position: 8"><img src="/static/images/mbti/isfj.png" alt="ISFJ MBTI Type"></div>
+            <div class="item" style="--position: 9"><img src="/static/images/mbti/isfp.png" alt="ISFP MBTI Type"></div>
+            <div class="item" style="--position: 10"><img src="/static/images/mbti/entj.png" alt="ENTJ MBTI Type"></div>
+
+            </div>
+        <div class="content">
+            <h1 data-content="MBTI TEST">
+                MBTI TEST
+            </h1> 
+            <div class="author">
+                <h2>Bài Test Tính Cách</h2>
+                <p>Bạn đã biết bản thân mình là kiểu tính cách nào chưa? Hãy thử làm bài test tính cách MBTI để tìm ra bản thân mình nhé!</p>
+               
+            </div>
+            <div class="model"></div>
+        </div>
+    </div>
+    <script>
+    // Pause autoRun when hover, resume when mouseleave
+    const slider = document.querySelector('.slider');
+    let isPaused = false;
+    let autoRunAnimationName = 'autoRun'; // Name of your CSS animation
+
+    slider.addEventListener('mouseenter', () => {
+        slider.classList.add('paused');
+        isPaused = true;
+    });
+    slider.addEventListener('mouseleave', () => {
+        slider.classList.remove('paused');
+        isPaused = false;
+    });
+
+    // Improved drag to rotate (like a real wheel)
+    let dragging = false, lastAngle = 0, currentRotation = 0, velocity = 0;
+    
+    const center = () => {
+        const rect = slider.getBoundingClientRect();
+        return {
+            x: rect.left + rect.width / 2,
+            y: rect.top + rect.height / 2
+        };
+    };
+    function getAngle(x, y) {
+        const c = center();
+        return Math.atan2(y - c.y, x - c.x) * 180 / Math.PI;
+    }
+    function setRotation(angle) {
+        slider.style.animation = 'none'; // Temporarily disable CSS animation for manual control
+        slider.style.transform = `perspective(1000px) rotateX(-16deg) rotateY(${angle}deg)`;
+    }
+    
+    // Function to extract current Y rotation from computed style (simplified for this context)
+    function getCurrentYRotation() {
+        const st = window.getComputedStyle(slider);
+        const transformMatrix = st.transform || st.webkitTransform || st.mozTransform;
+        if (transformMatrix && transformMatrix !== 'none') {
+            // This is a simplified approach, direct parsing of matrix3d can be complex.
+            // Assuming rotateY is the primary varying transform here.
+            const match = transformMatrix.match(/rotateY\((-?\d+\.?\d*)deg\)/);
+            if (match && match[1]) {
+                return parseFloat(match[1]);
+            }
+        }
+        return 0; // Default if no transform
+    }
+
+    slider.addEventListener('mousedown', (e) => {
+        isPaused = true;
+        slider.classList.add('paused');
+        dragging = true;
+        lastAngle = getAngle(e.clientX, e.clientY);
+        currentRotation = getCurrentYRotation(); // Get actual rotation
+    });
+    document.addEventListener('mousemove', (e) => {
+        if (!dragging) return;
+        const angle = getAngle(e.clientX, e.clientY);
+        let delta = angle - lastAngle;
+        if (delta > 180) delta -= 360;
+        if (delta < -180) delta += 360;
+        currentRotation += delta;
+        setRotation(currentRotation);
+        velocity = delta;
+        lastAngle = angle;
+    });
+    document.addEventListener('mouseup', () => {
+        if (!dragging) return;
+        dragging = false;
+        let inertia = velocity * 0.8; // Reduce initial inertia slightly
+        function animateInertia() {
+            if (Math.abs(inertia) < 0.05) {
+                // Re-enable CSS animation if not paused by user
+                if (!isPaused) slider.style.animation = `${autoRunAnimationName} 20s linear infinite`;
+                else slider.style.animation = 'none'; // Ensure it stays none if manually paused
+                return;
+            }
+            currentRotation += inertia;
+            setRotation(currentRotation);
+            inertia *= 0.95;
+            requestAnimationFrame(animateInertia);
+        }
+        animateInertia();
+    });
+
+    // Touch support
+    slider.addEventListener('touchstart', (e) => {
+        isPaused = true;
+        slider.classList.add('paused');
+        dragging = true;
+        lastAngle = getAngle(e.touches[0].clientX, e.touches[0].clientY);
+        currentRotation = getCurrentYRotation(); // Get actual rotation
+        e.preventDefault(); // Prevent default touch behavior (like scrolling)
+    });
+    slider.addEventListener('touchmove', (e) => {
+        if (!dragging) return;
+        const angle = getAngle(e.touches[0].clientX, e.touches[0].clientY);
+        let delta = angle - lastAngle;
+        if (delta > 180) delta -= 360;
+        if (delta < -180) delta += 360;
+        currentRotation += delta;
+        setRotation(currentRotation);
+        velocity = delta;
+        lastAngle = angle;
+        e.preventDefault(); // Prevent default touch behavior (like scrolling)
+    });
+    slider.addEventListener('touchend', () => {
+        if (!dragging) return;
+        dragging = false;
+        let inertia = velocity * 0.8; // Reduce initial inertia slightly
+        function animateInertia() {
+            if (Math.abs(inertia) < 0.05) {
+                if (!isPaused) slider.style.animation = `${autoRunAnimationName} 20s linear infinite`;
+                else slider.style.animation = 'none';
+                return;
+            }
+            currentRotation += inertia;
+            setRotation(currentRotation);
+            inertia *= 0.95;
+            requestAnimationFrame(animateInertia);
+        }
+        animateInertia();
+    });
+
+    // EFFECT: Animation when scrolling
+    const items = Array.from(document.querySelectorAll('.slider .item'));
+    let activeAnimation = false; // Flag to prevent multiple animations
+    let gridMode = false; // Indicates if items are in "hidden/grid" state after fading out
+
+    function toRightAndFade() {
+        if (activeAnimation || gridMode) return; // Don't re-trigger if already animating or in grid mode
+        activeAnimation = true;
+        gridMode = true; // Set to gridMode immediately at the start of fade-out
+
+        slider.classList.add('paused'); // Pause auto-rotation
+        slider.style.animation = 'none'; // Stop current animation for precise control
+
+        items.forEach((item, i) => {
+            const rect = item.getBoundingClientRect();
+            item.style.position = 'fixed'; // Fix position relative to viewport
+            item.style.left = rect.left + 'px';
+            item.style.top = rect.top + 'px';
+            item.style.width = rect.width + 'px';
+            item.style.height = rect.height + 'px';
+            item.style.zIndex = '1000'; // Bring to front
+            item.style.opacity = '1';
+            item.style.transform = 'none'; // Clear any 3D transforms for linear movement
+            item.style.transition = 'none'; // Clear existing transitions
+        });
+
+        // Animate them flying to the right and fading out
+        setTimeout(() => {
+            items.forEach((item, i) => {
+                const screenWidth = window.innerWidth;
+                item.style.transition = `transform 1.2s cubic-bezier(.77,0,.18,1), opacity 0.8s ease-in-out`;
+                item.style.transform = `translateX(${screenWidth + 300}px)`; // Move far right off screen
+                item.style.opacity = '0'; // Fade out
+                item.style.transitionDelay = (i * 70) + 'ms'; // Staggered delay
+            });
+        }, 50); // Small delay to apply initial styles
+
+        // Clean up after animation
+        setTimeout(() => {
+            items.forEach((item) => {
+                item.style.display = 'none'; // Hide completely
+                // Reset all inline styles so CSS can take over cleanly later
+                item.style.cssText = ''; 
+                // Ensure --position is re-applied as cssText = '' removes it
+                item.style.setProperty('--position', item.dataset.position); 
+            });
+            activeAnimation = false;
+        }, 1200 + items.length * 70 + 100); // Wait for all animations to complete + buffer
+    }
+
+    function toCircleAppearFromLeft() {
+        if (activeAnimation || !gridMode) return; // Don't re-trigger if already animating or not in grid mode
+        activeAnimation = true;
+        gridMode = false; // Set to not gridMode immediately at the start of fade-in
+
+        slider.style.animation = 'none'; // Stop auto-rotation for smooth transition in
+        slider.classList.add('paused'); 
+
+        items.forEach((item, i) => {
+            // Reset to initial state for animation from left
+            item.style.display = 'block'; // Make visible
+            item.style.opacity = '0'; // Start invisible
+            item.style.position = 'absolute'; // Restore absolute position within slider
+            item.style.left = '0';
+            item.style.top = '0';
+            item.style.width = '100%';
+            item.style.height = '100%';
+            item.style.zIndex = '1'; // Reset z-index
+
+            // Initial position: far left, scale nhỏ, shadow mờ
+            item.style.transform = `translateX(-${window.innerWidth * 0.8}px) scale(0.8)`;
+            item.style.boxShadow = '0 0 0px 0px #f7b50000';
+            item.style.transition = 'none'; // No transition initially
+            item.style.setProperty('--position', item.dataset.position); // Ensure --position is set
+        });
+
+        // Animate: fly from left to original 3D circular position and fade in, scale, glow
+        setTimeout(() => {
+            items.forEach((item, i) => {
+                const quantity = items.length;
+                const position = parseInt(item.dataset.position);
+                const rotateYValue = (position - 1) * (360 / quantity);
+                const translateZValue = 550;
+                // 1. Bay vào, scale lớn nhẹ, glow mạnh
+                setTimeout(() => {
+                    item.style.transition = 'transform 0.7s cubic-bezier(.77,0,.18,1), opacity 0.5s, box-shadow 0.5s';
+                    item.style.transform = `rotateY(${rotateYValue}deg) translateZ(${translateZValue}px) scale(1.08)`;
+                    item.style.opacity = '1';
+                    item.style.boxShadow = '0 0 32px 8px #f7b500cc, 0 0 0 4px #fff8';
+                }, i * 90 + 10);
+                // 2. Sau đó scale về 1, shadow dịu lại
+                setTimeout(() => {
+                    item.style.transition = 'transform 0.3s, box-shadow 0.4s';
+                    item.style.transform = `rotateY(${rotateYValue}deg) translateZ(${translateZValue}px) scale(1)`;
+                    item.style.boxShadow = '0 4px 24px #0002';
+                }, i * 90 + 10 + 600);
+            });
+        }, 50);
+
+        // Clean up and re-enable autoRun animation
+        setTimeout(() => {
+            items.forEach((item) => {
+                item.style.cssText = ''; 
+                item.style.setProperty('--position', item.dataset.position); // Re-set original custom property
+            });
+            slider.classList.remove('paused'); // Allow autoRun animation
+            slider.style.animation = `${autoRunAnimationName} 20s linear infinite`; // Re-enable CSS animation
+            activeAnimation = false;
+        }, 1000 + items.length * 90 + 400);
+    }
+
+    // Initial setup: Store --position for later use if style.cssText = '' wipes it
+    items.forEach(item => {
+        item.dataset.position = item.style.getPropertyValue('--position');
+        // Add alt text for accessibility as well if not already there
+        if (!item.querySelector('img').alt) {
+            item.querySelector('img').alt = 'MBTI Type Card'; // Generic alt text
+        }
+    });
+
+    // --- Cập nhật logic kiểm tra cuộn chuột ---
+    let lastScrollTop = 0; // Biến để lưu vị trí cuộn trước đó
+    const scrollThreshold = 10; // Ngưỡng cuộn (pixels) để kích hoạt hiệu ứng
+
+    window.addEventListener('scroll', () => {
+        // Chỉ xử lý nếu không có animation nào đang chạy
+        if (activeAnimation) return; 
+
+        const currentScrollTop = window.scrollY || document.documentElement.scrollTop;
+
+        // Cuộn xuống
+        if (currentScrollTop > lastScrollTop + scrollThreshold) { 
+            toRightAndFade();
+        } 
+        // Cuộn lên
+        else if (currentScrollTop < lastScrollTop - scrollThreshold) { 
+            toCircleAppearFromLeft();
+        }
+        
+        lastScrollTop = currentScrollTop; // Cập nhật vị trí cuộn cuối cùng
+    });
+    </script>
+</body>
+</html>

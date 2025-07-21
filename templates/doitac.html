@@ -1,0 +1,235 @@
+{% block stylesheets %}
+<style>
+      html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+        }
+.doitac-section {
+    max-width: 1200px;
+    margin: 48px auto 32px auto;
+    padding: 0 12px;
+}
+.doitac-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #0a4191;
+    margin-bottom: 0.8em;
+    text-align: left;
+    letter-spacing: 0.01em;
+}
+.doitac-slider-wrap {
+    width: 100vw;
+    left: 50%;
+    transform: translateX(-50%);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 40px;
+}
+.doitac-slider-marquee {
+    display: flex;
+    align-items: center;
+    gap: 36px;
+    animation: doitac-marquee 32s linear infinite;
+    will-change: transform;
+}
+.doitac-logo-card {
+    background: #fff;
+    border-radius: 22px;
+    box-shadow: 0 4px 24px rgba(10,65,145,0.09);
+    min-width: 220px;
+    max-width: 260px;
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    border: 2px solid #e5e7eb;
+    transition: box-shadow 0.2s, border 0.2s;
+    flex-shrink: 0;
+}
+.doitac-logo-card:hover {
+    box-shadow: 0 8px 32px #0a419133;
+    border: 2px solid #0a4191;
+}
+.doitac-logo-img {
+    max-width: 160px;
+    max-height: 90px;
+    object-fit: contain;
+}
+.doitac-top-badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    background: #1ecb8b;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 700;
+    border-radius: 6px;
+    padding: 4px 6px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.doitac-float-logos {
+    position: relative;
+    width: 100vw;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 250px;
+    margin-top: 48px;
+    overflow: hidden;
+    background: none;
+  
+}
+.doitac-float-logo {
+    position: absolute;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 4px 24px #0a41911a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: box-shadow 0.2s, border 0.2s, transform 0.2s;
+    border: 2.5px solid #e5e7eb;
+    animation: doitac-float-move 22s linear infinite;
+    will-change: transform;
+    cursor: pointer;
+    overflow: hidden;
+}
+.doitac-float-logo:hover {
+    border: 3.5px solid #0a4191;
+    box-shadow: 0 8px 32px #0a419133;
+    transform: scale(1.12);
+    z-index: 2;
+}
+.doitac-float-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+}
+@keyframes doitac-marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+@keyframes doitac-float-move {
+    0% { left: -120px; }
+    100% { left: 100vw; }
+}
+@media (max-width: 900px) {
+    .doitac-section { padding: 0 2vw; }
+    .doitac-float-logos { height: 120px; }
+    .doitac-float-logo { border-width: 2px; }
+    .doitac-logo-card { min-width: 140px; max-width: 180px; height: 90px; }
+    .doitac-logo-img { max-width: 90px; max-height: 50px; }
+    .doitac-top-badge { font-size: 0.9rem; padding: 2px 10px; border-radius: 8px; }
+}
+@media (max-width: 600px) {
+    .doitac-section { padding: 0 1vw; }
+    .doitac-title { font-size: 1.1rem; }
+    .doitac-float-logos { height: 70px; }
+    .doitac-logo-card { min-width: 80px; max-width: 100px; height: 40px; }
+    .doitac-logo-img { max-width: 30px; max-height: 20px; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="doitac-section">
+    <div class="doitac-title">Các trường nổi bật</div>
+    <div class="doitac-slider-wrap">
+        <div class="doitac-slider-marquee" id="doitac-slider-marquee">
+            <!-- Logo nổi bật sẽ render ở đây -->
+        </div>
+    </div>
+    <div class="doitac-float-logos" id="doitac-float-logos">
+        <!-- Logo tròn sẽ render ở đây -->
+    </div>
+</div>
+<script>
+// Dữ liệu logo nổi bật (slider)
+const doitacSliderData = [
+    { img: '/static/images/logo/1.jpg', top: true, link: '#' },
+    { img: '/static/images/logo/2.jpg', top: true, link: '#' },
+    { img: '/static/images/logo/3.jpg', top: true, link: '#' },
+    { img: '/static/images/logo/4.jpg', top: true, link: '#' },
+    { img: '/static/images/logo/1.jpg', top: true, link: '#' },
+    { img: '/static/images/logo/2.jpg', top: true, link: '#' },
+    { img: '/static/images/logo/3.jpg', top: true, link: '#' },
+    { img: '/static/images/logo/4.jpg', top: true, link: '#' },
+    { img: '/static/images/logo/1.jpg', top: true, link: '#' },
+    { img: '/static/images/logo/2.jpg', top: true, link: '#' },
+    { img: '/static/images/logo/3.jpg', top: true, link: '#' },
+    { img: '/static/images/logo/4.jpg', top: true, link: '#' }
+];
+// Dữ liệu logo tròn lơ lửng (ít logo, mỗi logo có link)
+const doitacFloatData = [
+    { img: '/static/images/logo/1.jpg', link: '#' },
+    { img: '/static/images/logo/2.jpg', link: '#' },
+    { img: '/static/images/logo/3.jpg', link: '#' },
+    { img: '/static/images/logo/4.jpg', link: '#' },
+    { img: '/static/images/logo/1.jpg', link: '#' },
+    { img: '/static/images/logo/2.jpg', link: '#' },
+    { img: '/static/images/logo/3.jpg', link: '#' },
+    { img: '/static/images/logo/4.jpg', link: '#' },
+    { img: '/static/images/logo/1.jpg', link: '#' },
+    { img: '/static/images/logo/2.jpg', link: '#' },
+    { img: '/static/images/logo/3.jpg', link: '#' },
+    { img: '/static/images/logo/4.jpg', link: '#' }
+];
+// Render slider logo nổi bật (auto-scroll marquee)
+const marquee = document.getElementById('doitac-slider-marquee');
+function renderMarqueeLogos() {
+    marquee.innerHTML = '';
+    // Lặp 2 lần để tạo hiệu ứng lặp vô hạn
+    for (let k = 0; k < 2; k++) {
+        doitacSliderData.forEach(item => {
+            const card = document.createElement('a');
+            card.className = 'doitac-logo-card';
+            card.href = item.link;
+            card.target = '_blank';
+            card.innerHTML = `${item.top ? '<span class="doitac-top-badge">TOP</span>' : ''}<img src="${item.img}" class="doitac-logo-img" alt="logo">`;
+            marquee.appendChild(card);
+        });
+    }
+}
+renderMarqueeLogos();
+// Render logo tròn lơ lửng (ít, không chồng chéo, random size, có link)
+const floatLogos = document.getElementById('doitac-float-logos');
+const usedTops = [];
+function random(min, max) { return Math.random() * (max - min) + min; }
+function getNonOverlapTop(size) {
+    // Chia vùng top thành các dải, mỗi logo 1 dải, tránh chồng
+    const total = doitacFloatData.length;
+    const band = (floatLogos.offsetHeight || 220) / total;
+    let idx = usedTops.length;
+    let base = band * idx + band/2 - size/2;
+    usedTops.push(base);
+    // Đảm bảo logo không bị cắt trên/dưới
+    if (base < 0) base = 0;
+    if (base + size > (floatLogos.offsetHeight || 220)) base = (floatLogos.offsetHeight || 220) - size;
+    return base;
+}
+function createFloatLogo(item, idx) {
+    const size = random(60, 90);
+    const div = document.createElement('a');
+    div.className = 'doitac-float-logo';
+    div.href = item.link;
+    div.target = '_blank';
+    div.style.width = div.style.height = size + 'px';
+    div.style.top = getNonOverlapTop(size) + 'px';
+    div.style.animationDuration = random(16, 28) + 's';
+    div.style.animationDelay = (-1 * random(0, 20)) + 's';
+    div.innerHTML = `<img src="${item.img}" alt="logo">`;
+    floatLogos.appendChild(div);
+}
+// Render mỗi logo 1 lần, không chồng chéo, random size
+usedTops.length = 0;
+for (let i = 0; i < doitacFloatData.length; i++) {
+    createFloatLogo(doitacFloatData[i], i);
+}
+</script>
+{% endblock %} 

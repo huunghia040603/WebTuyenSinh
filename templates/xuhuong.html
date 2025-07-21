@@ -1,0 +1,267 @@
+{% block stylesheets %}
+<style>
+.xuhuong-section {
+    max-width: 1200px;
+    margin: 48px auto 32px auto;
+    padding: 0 12px;
+}
+.xuhuong-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #0a4191;
+    margin-bottom: 0.2em;
+    text-align: center;
+    letter-spacing: 0.01em;
+}
+.xuhuong-subtitle {
+    text-align: center;
+    color: #444;
+    font-size: 1.08rem;
+    margin-bottom: 1.5em;
+}
+.xuhuong-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 28px 24px;
+    min-height: 420px;
+    position: relative;
+}
+.xuhuong-box {
+    background: #f7fbff;
+    border-radius: 22px;
+    box-shadow: 0 2px 16px rgba(10,65,145,0.07);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 18px 28px 18px;
+    min-height: 180px;
+    transition: box-shadow 0.25s, transform 0.25s, border 0.25s, opacity 0.4s, left 0.4s, right 0.4s;
+    border: 2.5px solid transparent;
+    opacity: 0;
+    transform: translateY(40px);
+    position: relative;
+}
+ .xuhuong-box:hover {
+    border: 2.5px solid #0a4191;
+    box-shadow: 0 4px 32px 0 #0a419133, 0 0 0 4px #eaf6ff;
+    transform: translateY(-8px) scale(1.04);
+    z-index: 2;
+}
+.xuhuong-icon {
+    font-size: 2.6rem;
+    margin-bottom: 0.7em;
+    color: #0a4191;
+    background: #eaf6ff;
+    border-radius: 16px;
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px #0a41911a;
+    transition: background 0.2s, color 0.2s;
+}
+.xuhuong-box.active .xuhuong-icon, .xuhuong-box:hover .xuhuong-icon {
+    background: #0a4191;
+    color: #fff;
+}
+.xuhuong-name {
+    font-size: 1.13rem;
+    font-weight: 700;
+    color: #0a4191;
+    margin-bottom: 0.3em;
+    text-align: center;
+    white-space: pre-line;
+}
+.xuhuong-count {
+    color: #1ecb8b;
+    font-size: 1.01rem;
+    font-weight: 600;
+    margin-top: 0.2em;
+}
+.xuhuong-nav {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.7em;
+    margin-top: 1.2em;
+}
+.xuhuong-btn-nav {
+    background: #fff;
+    border: 2px solid #0a4191;
+    color: #0a4191;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border 0.2s;
+    box-shadow: 0 2px 8px #0a41911a;
+}
+.xuhuong-btn-nav:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+.xuhuong-btn-nav:hover:not(:disabled) {
+    background: #0a4191;
+    color: #fff;
+}
+/* Animation for slide out/in */
+.xuhuong-box.slide-out-right {
+    animation: xhSlideOutRight 0.5s forwards;
+}
+.xuhuong-box.slide-in-left {
+    animation: xhSlideInLeft 0.5s forwards;
+}
+.xuhuong-box.slide-out-left {
+    animation: xhSlideOutLeft 0.5s forwards;
+}
+.xuhuong-box.slide-in-right {
+    animation: xhSlideInRight 0.5s forwards;
+}
+@keyframes xhSlideOutRight {
+    to { opacity: 0; left: 80px; pointer-events: none; }
+}
+@keyframes xhSlideInLeft {
+    from { opacity: 0; left: -80px; }
+    to { opacity: 1; left: 0; }
+}
+@keyframes xhSlideOutLeft {
+    to { opacity: 0; right: 80px; pointer-events: none; }
+}
+@keyframes xhSlideInRight {
+    from { opacity: 0; right: -80px; }
+    to { opacity: 1; right: 0; }
+}
+@media (max-width: 900px) {
+    .xuhuong-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px 14px;
+        min-height: 0;
+    }
+    .xuhuong-section { padding: 0 2vw; }
+}
+@media (max-width: 600px) {
+    .xuhuong-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    .xuhuong-section { padding: 0 1vw; }
+    .xuhuong-title { font-size: 1.25rem; }
+    .xuhuong-box { padding: 18px 8px 16px 8px; border-radius: 12px; }
+    .xuhuong-icon { font-size: 2rem; padding: 10px; border-radius: 10px; }
+    .xuhuong-name { font-size: 1rem; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="xuhuong-section" style="margin-top: 102px;">
+    <div class="xuhuong-title">Top ngành nghề đào tạo xu hướng</div>
+    <div class="xuhuong-subtitle">Khám phá các lĩnh vực đào tạo nổi bật, phù hợp với nhu cầu thị trường và định hướng tương lai của bạn.</div>
+    <div class="xuhuong-grid" id="xuhuong-grid">
+        <!-- Box sẽ được render bằng JS -->
+    </div>
+    <div class="xuhuong-nav">
+        <button class="xuhuong-btn-nav" id="xh-prev"><i class="fas fa-chevron-left"></i></button>
+        <button class="xuhuong-btn-nav" id="xh-next"><i class="fas fa-chevron-right"></i></button>
+    </div>
+</div>
+<!-- Font Awesome CDN -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+<script>
+const xuhuongData = [
+    { icon: 'fas fa-briefcase', name: 'Kinh doanh - Quản trị', count: '1.112 thí sinh' },
+    { icon: 'fas fa-bullhorn', name: 'Marketing - Truyền thông', count: '845 thí sinh' },
+    { icon: 'fas fa-headset', name: 'Chăm sóc khách hàng', count: '552 thí sinh' },
+    { icon: 'fas fa-user-tie', name: 'Nhân sự - Hành chính', count: '854 thí sinh' },
+    { icon: 'fas fa-laptop-code', name: 'Công nghệ Thông tin', count: '709 thí sinh' },
+    { icon: 'fas fa-university', name: 'Tài chính - Ngân hàng', count: '468 thí sinh' },
+    { icon: 'fas fa-building', name: 'Xây dựng - Bất động sản', count: '601 thí sinh' },
+    { icon: 'fas fa-calculator', name: 'Kế toán - Kiểm toán', count: '976 thí sinh' },
+    { icon: 'fas fa-stethoscope', name: 'Y dược - Sức khỏe', count: '1.002 thí sinh' },
+    { icon: 'fas fa-graduation-cap', name: 'Giáo dục - Đào tạo', count: '1.210 thí sinh' },
+    { icon: 'fas fa-leaf', name: 'Nông - Lâm - Ngư nghiệp', count: '312 thí sinh' },
+    { icon: 'fas fa-plane-departure', name: 'Du lịch - Nhà hàng', count: '420 thí sinh' },
+    { icon: 'fas fa-gavel', name: 'Luật - Pháp lý', count: '210 thí sinh' },
+    { icon: 'fas fa-brain', name: 'Tâm lý học', count: '180 thí sinh' },
+    { icon: 'fas fa-paint-brush', name: 'Thiết kế - Nghệ thuật', count: '320 thí sinh' },
+    { icon: 'fas fa-globe', name: 'Ngoại ngữ - Quốc tế', count: '540 thí sinh' },
+];
+const PAGE_SIZE = 8;
+let page = 0;
+const grid = document.getElementById('xuhuong-grid');
+const prevBtn = document.getElementById('xh-prev');
+const nextBtn = document.getElementById('xh-next');
+
+function renderXuhuongPage() {
+    grid.innerHTML = '';
+    // Lấy 8 ngành cho trang hiện tại
+    const start = page * PAGE_SIZE;
+    const end = start + PAGE_SIZE;
+    const items = xuhuongData.slice(start, end);
+    // Render 2 hàng, mỗi hàng 4 box
+    items.forEach((item, idx) => {
+        const box = document.createElement('div');
+        box.className = 'xuhuong-box';
+        if (page === 0 && idx === 0) box.classList.add('active1');
+        box.innerHTML = `<div class="xuhuong-icon"><i class="${item.icon}"></i></div>
+            <div class="xuhuong-name">${item.name}</div>
+            <div class="xuhuong-count">${item.count}</div>`;
+        // Hiệu ứng xuất hiện từng box
+        setTimeout(() => {
+            box.style.opacity = 1;
+            box.style.transform = 'translateY(0)';
+        }, idx * 90);
+        grid.appendChild(box);
+    });
+    // Disable nút nếu ở đầu/cuối
+    prevBtn.disabled = page === 0;
+    nextBtn.disabled = end >= xuhuongData.length;
+}
+
+function animateXuhuongTransition(next) {
+    const boxes = Array.from(grid.children);
+    // Hàng 1: idx 0-3, Hàng 2: idx 4-7
+    boxes.forEach((box, idx) => {
+        if (idx < 4) {
+            // Hàng 1: slide-out-right nếu next, slide-out-left nếu prev
+            box.classList.add(next ? 'slide-out-right' : 'slide-out-left');
+        } else {
+            // Hàng 2: slide-out-left nếu next, slide-out-right nếu prev
+            box.classList.add(next ? 'slide-out-left' : 'slide-out-right');
+        }
+    });
+    setTimeout(() => {
+        renderXuhuongPage();
+    }, 500);
+}
+
+prevBtn.onclick = () => {
+    if (page > 0) {
+        animateXuhuongTransition(false);
+        page--;
+    }
+};
+nextBtn.onclick = () => {
+    if ((page + 1) * PAGE_SIZE < xuhuongData.length) {
+        animateXuhuongTransition(true);
+        page++;
+    }
+};
+
+// Hiệu ứng xuất hiện lần đầu khi scroll
+function animateXuhuongBoxes() {
+    const rect = grid.getBoundingClientRect();
+    if (rect.top < window.innerHeight * 0.92) {
+        renderXuhuongPage();
+        window.removeEventListener('scroll', animateXuhuongBoxes);
+    }
+}
+window.addEventListener('scroll', animateXuhuongBoxes);
+window.addEventListener('load', animateXuhuongBoxes);
+</script>
+{% endblock %}

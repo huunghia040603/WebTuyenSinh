@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %} Tư Vấn Hướng Nghiệp {% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" xintegrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0V4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+
+ <link rel="icon" type="image/x-icon" href="/static/images/logo12.png">
+    {% block stylesheets %}
+   
+   
+    {% endblock %}
+    <style>
+        /* Dark Mode Styles */
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f8f8;
+            --text-primary: #0a4191;
+            --text-secondary: #4a5568;
+            --border-color: #e5e7eb;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --card-bg: #ffffff;
+            --navbar-bg: #ffffff;
+            --footer-bg: #d3d3d3;
+            --footer-bottom-bg: #0a4191;
+            --footer-text: #4a5568;
+            --footer-title: #0a4191;
+            --link-hover: #1e40af;
+            --button-bg: #0a4191;
+            --button-text: #ffffff;
+            --button-hover: #1e40af;
+            --input-bg: #ffffff;
+            --input-border: #e2e8f0;
+            --input-text: #4a5568;
+        }
+
+        .dark-mode {
+            --bg-primary: #1e1e2e;
+            --bg-secondary: #2d2d44;
+            --text-primary: #e2e8f0;
+            --text-secondary: #a1a1aa;
+            --border-color: #3f3f5f;
+            --shadow-color: rgba(0, 0, 0, 0.2);
+            --card-bg: #2d2d44;
+            --navbar-bg: #1e1e2e;
+            --footer-bg: #2d2d44;
+            --footer-bottom-bg: #1e1e2e;
+            --footer-text: #a1a1aa;
+            --footer-title: #e2e8f0;
+            --link-hover: #fbbf24;
+            --button-bg: #fbbf24;
+            --button-text: #1e1e2e;
+            --button-hover: #f59e0b;
+            --input-bg: #2d2d44;
+            --input-border: #3f3f5f;
+            --input-text: #e2e8f0;
+        }
+
+        /* Apply CSS variables to elements */
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Ensure main content area also changes */
+        main {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Header dark mode styles */
+        .dark-mode .main-navbar-bg {
+            background-color: var(--navbar-bg);
+            box-shadow: 0 4px 6px -1px var(--shadow-color);
+        }
+
+        .dark-mode .logo-text {
+            color: var(--text-primary);
+        }
+
+        .dark-mode .logo-subtext {
+            color: var(--text-secondary);
+        }
+
+        .dark-mode .desktop-menu > li > a {
+            color: #ffffff;
+        }
+
+        .dark-mode .desktop-menu > li > a:hover {
+            background:#1e1e2e;
+            color: #ffffff;
+            padding: 0;
+        }
+
+        .dark-mode .desktop-menu > li:hover > a {
+            background:#1e1e2e;
+            color: #ffffff;
+            
+        }
+
+        .dark-mode .submenu {
+            background: #000000;
+            box-shadow: 0 8px 32px var(--shadow-color);
+            border-color: var(--border-color);
+        }
+
+        .dark-mode .submenu a {
+            background: #1e1e2e;
+            color: #ffffff;
+        }
+
+        .dark-mode .desktop-menu .submenu {
+            background:#2d2d44;
+            color: #ffffff;
+            padding:0;
+            border:none;
+        }
+
+        .dark-mode .submenu a:hover {
+            background:#2d2d44;
+            color: #ffffff;
+        }
+
+        /* Footer dark mode styles */
+        .dark-mode .footer-container {
+            background: var(--footer-bg);
+        }
+
+        .dark-mode .footer-header-text {
+            color: var(--footer-title);
+        }
+
+        .dark-mode .footer-column h3 {
+            color: var(--footer-title);
+        }
+
+        .dark-mode .footer-column a {
+            color: var(--footer-text);
+        }
+
+        .dark-mode .footer-column a:hover {
+            color: var(--link-hover);
+        }
+
+        .dark-mode .footer-bottom {
+            background: var(--footer-bottom-bg);
+        }
+
+        .dark-mode .contact-btn {
+            background: var(--button-bg);
+            color: var(--button-text);
+        }
+
+        .dark-mode .contact-btn:hover {
+            background: var(--button-hover);
+        }
+
+        .dark-mode .nav-btn {
+            background: var(--button-bg);
+            color: var(--button-text);
+        }
+
+        .dark-mode .nav-btn:hover {
+            background: var(--button-hover);
+        }
+
+        /* Magic share dark mode */
+        .dark-mode .share-btn {
+            background: linear-gradient(45deg, var(--button-bg), var(--button-hover));
+        }
+
+        .dark-mode .social-option {
+            box-shadow: 0 3px 10px var(--shadow-color);
+        }
+
+        .dark-mode .social-option:hover {
+            box-shadow: 0 5px 15px var(--shadow-color);
+        }
+
+        /* Top bar dark mode */
+        .dark-mode .top-hotline-auth-bar {
+            background: var(--navbar-bg);
+            border-bottom-color: var(--border-color);
+        }
+
+        .dark-mode .hotline-label {
+            color: var(--text-primary);
+        }
+
+        .dark-mode .auth-btn {
+            background: var(--card-bg);
+            color: var(--text-primary);
+            border-color: var(--border-color);
+        }
+
+        .dark-mode .auth-btn:hover {
+            background: var(--button-bg);
+            color: var(--button-text);
+        }
+
+        .dark-mode .auth-btn-post {
+            background: var(--button-bg);
+            color: var(--button-text);
+        }
+
+        .dark-mode .auth-btn-post:hover {
+            background: var(--button-hover);
+        }
+
+        /* Smooth transitions for all elements */
+        * {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Additional dark mode styles for better coverage */
+        .dark-mode .top-section-wrapper {
+            background-color: var(--navbar-bg);
+        }
+
+        .dark-mode .top-bar-left {
+            color: var(--text-primary);
+        }
+
+        .dark-mode .search-input {
+            background-color: var(--input-bg);
+            border-color: var(--input-border);
+            color: var(--input-text);
+        }
+
+        .dark-mode .search-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .dark-mode .search-button {
+            color: var(--text-primary);
+        }
+
+        .dark-mode .search-button:hover {
+            background-color: var(--bg-secondary);
+        }
+
+        /* Ensure all text elements use CSS variables */
+        .dark-mode h1, .dark-mode h2, .dark-mode h3, .dark-mode h4, .dark-mode h5, .dark-mode h6 {
+            color: var(--text-primary);
+        }
+
+        /* Specific overrides for better readability */
+        .dark-mode .top-hotline-auth-bar {
+            background: var(--navbar-bg);
+        }
+
+        .dark-mode .main-navbar-bg {
+            background: var(--navbar-bg);
+        }
+
+        .dark-mode .footer-container {
+            background: var(--footer-bg);
+        }
+
+        .dark-mode .footer-bottom {
+            background: var(--footer-bottom-bg);
+        }
+
+        /* Dark mode for any additional elements */
+        .dark-mode .qr-code {
+            background: var(--card-bg);
+            border-color: var(--border-color);
+        }
+
+        .dark-mode .qr-text {
+            color: var(--text-secondary);
+        }
+
+        .dark-mode .contact-info {
+            color: var(--text-secondary);
+        }
+
+        .dark-mode .partnership-text {
+            color: var(--text-secondary);
+        }
+
+        /* Additional dark mode improvements */
+        .dark-mode .top-section-wrapper {
+            background-color: var(--navbar-bg);
+        }
+
+        .dark-mode .top-bar-left {
+            color: var(--text-primary);
+        }
+
+        .dark-mode .top-bar-left .social-icons a {
+            color: var(--text-primary);
+        }
+
+        .dark-mode .top-bar-left .social-icons a:hover {
+            color: var(--link-hover);
+        }
+
+        /* Dark mode specific improvements */
+        .dark-mode .top-hotline-auth-bar {
+            background: var(--navbar-bg);
+            border-bottom-color: var(--border-color);
+        }
+
+        .dark-mode .hotline-label {
+            color: var(--text-primary);
+        }
+
+        .dark-mode .auth-btn {
+            background: var(--card-bg);
+            color: var(--text-primary);
+            border-color: var(--border-color);
+        }
+
+        .dark-mode .auth-btn:hover {
+            background: var(--button-bg);
+            color: var(--button-text);
+        }
+
+        .dark-mode .auth-btn-post {
+            background: var(--button-bg);
+            color: var(--button-text);
+        }
+
+        .dark-mode .auth-btn-post:hover {
+            background: var(--button-hover);
+        }
+
+        /* Mobile menu dark mode */
+        .dark-mode .mobile-menu {
+            background: var(--card-bg);
+            box-shadow: -2px 0 16px var(--shadow-color);
+        }
+
+        .dark-mode .mobile-menu-item {
+            color: var(--text-primary);
+        }
+
+        .dark-mode .mobile-menu-item:hover {
+            background: transparent;
+        }
+
+        .dark-mode .mobile-submenu a {
+            color: var(--text-primary);
+        }
+
+        .dark-mode .mobile-submenu a:hover {
+            background: transparent;
+            color: var(--link-hover);
+        }
+
+        /* Search input dark mode */
+        .dark-mode .search-input {
+            background-color: var(--input-bg);
+            border-color: var(--input-border);
+            color: var(--input-text);
+        }
+
+        .dark-mode .search-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .dark-mode .search-button {
+            color: var(--text-primary);
+        }
+
+        .dark-mode .search-button:hover {
+            background-color: var(--bg-secondary);
+        }
+    </style>
+
+
+</head>
+
+<body>
+
+    {# Include the header section #}
+    {% include 'header.html' %}
+
+    <main>
+        {% block content %}
+        {# Nội dung cụ thể của từng trang sẽ được đặt ở đây #}
+        {% endblock %}
+    </main>
+
+
+    {# Include the footer section #}
+    {% include 'footer.html' %}
+
+    {% block scripts %}
+    {# Các script riêng của từng trang có thể được thêm ở đây #}
+    {% endblock %}
+</body>
+
+</html>

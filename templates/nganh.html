@@ -1,0 +1,407 @@
+{% block stylesheets %}
+<style>
+    .suggestion-bar {
+        background: #f7fbff;
+        border: 1px solid #dbeafe;
+        color: #0a4191;
+        font-size: 1rem;
+        padding: 0.7rem 1.2rem;
+        border-radius: 10px;
+        margin-bottom: 18px;
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+    }
+    .suggestion-bar i {
+        color: #0a4191;
+        font-size: 1.2rem;
+    }
+    .majors-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 18px;
+        margin-bottom: 18px;
+    }
+    .major-card {
+        background: #fff;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        padding: 1.1rem 1.2rem 1.1rem 1.2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.7rem;
+        position: relative;
+        transition: box-shadow 0.2s;
+    }
+    .major-card:hover {
+        box-shadow: 0 4px 16px rgba(10,65,145,0.10);
+        border-color: #0a4191;
+        background:     #e9f1ff;
+    }
+    .major-card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+    }
+    .major-logo {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        object-fit: contain;
+        background: #f7fbff;
+        border: 1px solid #e5e7eb;
+    }
+    .major-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #0a4191;
+        margin-bottom: 2px;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+    .major-title:hover {
+        color: #0440af;
+        text-decoration: underline;
+    }
+    .major-school {
+        font-size: 0.98rem;
+        color: #444;
+        font-weight: 500;
+        margin-bottom: 0;
+    }
+    .major-info-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    .major-fee, .major-location, .major-diem {
+        background: #f7fbff;
+        color: #0a4191;
+        font-size: 0.85rem;
+        border-radius: 7px;
+        padding: 0.18rem 0.3rem;
+        font-weight: 600;
+    }
+    .major-location {
+        background: #eaf6ff;
+        color: #0440af;
+    }
+    .major-diem {
+        background: #eaf6ff;
+        color: #0440af;
+    }
+    .major-label {
+        background: #ffb703;
+        color: #fff;
+        font-size: 0.85rem;
+        font-weight: 700;
+        border-radius: 6px;
+        padding: 0.15rem 0.7rem;
+        margin-right: 0.5rem;
+        display: inline-block;
+    }
+    .major-label.conglap {
+        background: #1ecb8b;
+    }
+    .major-label.top {
+        background: #1ecb8b;
+    }
+    .major-fav-btn {
+        position: absolute;
+        top: 1.1rem;
+        right: 1.1rem;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #0a4191;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s;
+    }
+    .major-fav-btn:hover {
+        background: #eaf6ff;
+        color: #ffb703;
+        border-color: #ffb703;
+    }
+    .pagination-bar {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1.2rem;
+        margin: 18px 0 10px 0;
+    }
+    .pagination-btn, .pagination-current {
+        background: #fff;
+        border: 1.5px solid #0a4191;
+        color: #0a4191;
+        border-radius: 8px;
+        padding: 0.3rem 1.1rem;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s;
+    }
+    .pagination-btn:hover {
+        background: #0a4191;
+        color: #fff;
+    }
+    .pagination-current {
+        background: #0a4191;
+        color: #fff;
+        cursor: default;
+    }
+    @media (max-width: 700px) {
+        .majors-grid {
+            grid-template-columns: 1fr;
+        }
+        .major-card {
+            padding: 0.7rem 0.7rem 0.7rem 0.7rem;
+        }
+        .suggestion-bar {
+            font-size: 0.95rem;
+            padding: 0.5rem 0.7rem;
+        }
+    }
+    .majors-section {
+        background: #eaeaea;
+        border-radius: 18px;
+        box-shadow: 0 4px 24px rgba(10,65,145,0.07);
+        max-width: 1200px;
+        margin: 0 auto;
+        margin-top: 0px;
+        padding: 32px 18px 24px 18px;
+    }
+    @media (max-width: 700px) {
+        .majors-section {
+            padding: 12px 2vw 18px 2vw;
+            margin-top: 16px;
+            border-radius: 8px;
+        }
+    }
+    </style>
+{% endblock %}
+    
+    <div class="majors-section">
+        <div class="suggestion-bar">
+            <i class="fas fa-info-circle"></i>
+            Gợi ý: Di chuột vào tiêu đề ngành để xem thêm thông tin chi tiết
+        </div>
+        <div class="majors-grid">
+            <!-- Card mẫu, lặp lại với dữ liệu ngành -->
+            <div class="major-card">
+                <div class="major-card-header">
+                    <img src="/static/images/logo/1.jpg" class="major-logo" alt="logo trường">
+                    <div>
+                        <div class="major-title">Công nghệ thông tin</div>
+                        <div class="major-school">Đại học Bách Khoa TP.HCM</div>
+                    </div>
+                </div>
+                <div class="major-info-row">
+                    <span class="major-fee">25 - 30 triệu</span>
+                    <span class="major-location">TP.HCM</span>
+                    <span class="major-label conglap">Công lập</span>
+                </div>
+                <button class="major-fav-btn" title="Yêu thích"><i class="far fa-heart"></i></button>
+            </div>
+            <div class="major-card">
+                <div class="major-card-header">
+                    <img src="/static/images/logo/2.jpg" class="major-logo" alt="logo trường">
+                    <div>
+                        <div class="major-title">Quản trị kinh doanh</div>
+                        <div class="major-school">Đại học Kinh tế Quốc dân</div>
+                    </div>
+                </div>
+                <div class="major-info-row">
+                    <span class="major-fee">20 - 28 triệu</span>
+                    <span class="major-location">TP.HCM</span> 
+                    <span class="major-diem"> 18 điểm</span>
+                    <span class="major-label conglap">Công lập</span>
+                   
+                </div>
+                <button class="major-fav-btn" title="Yêu thích"><i class="far fa-heart"></i></button>
+            </div>
+            <div class="major-card">
+                <div class="major-card-header">
+                    <img src="/static/images/logo/3.jpg" class="major-logo" alt="logo trường">
+                    <div>
+                        <div class="major-title">Y khoa</div>
+                        <div class="major-school">Đại học Y Dược TP.HCM</div>
+                    </div>
+                </div>
+                <div class="major-info-row">
+                    <span class="major-fee">35 - 50 triệu</span>
+                    <span class="major-location">TP.HCM</span>
+                </div>
+                <button class="major-fav-btn" title="Yêu thích"><i class="far fa-heart"></i></button>
+            </div>
+            <div class="major-card">
+                <div class="major-card-header">
+                    <img src="/static/images/logo/4.jpg" class="major-logo" alt="logo trường">
+                    <div>
+                        <div class="major-title">Sư phạm Toán học</div>
+                        <div class="major-school">Đại học Sư phạm TPHCM</div>
+                    </div>
+                </div>
+                <div class="major-info-row">
+                    <span class="major-fee">Miễn phí</span>
+                    <span class="major-location">TP.HCM</span>
+                </div>
+                <button class="major-fav-btn" title="Yêu thích"><i class="far fa-heart"></i></button>
+            </div>
+            <!-- Thêm nhiều card ngành khác ở đây -->
+
+            <div class="major-card">
+                <div class="major-card-header">
+                    <img src="/static/images/logo/1.jpg" class="major-logo" alt="logo trường">
+                    <div>
+                        <div class="major-title">Công nghệ thông tin</div>
+                        <div class="major-school">Đại học Bách Khoa TP.HCM</div>
+                    </div>
+                </div>
+                <div class="major-info-row">
+                    <span class="major-fee">25 - 30 triệu</span>
+                    <span class="major-location">TP.HCM</span>
+                    <span class="major-label top">TOP</span>
+                </div>
+                <button class="major-fav-btn" title="Yêu thích"><i class="far fa-heart"></i></button>
+            </div>
+            <div class="major-card">
+                <div class="major-card-header">
+                    <img src="/static/images/logo/2.jpg" class="major-logo" alt="logo trường">
+                    <div>
+                        <div class="major-title">Quản trị kinh doanh</div>
+                        <div class="major-school">Đại học Kinh tế Quốc dân</div>
+                    </div>
+                </div>
+                <div class="major-info-row">
+                    <span class="major-fee">20 - 28 triệu</span>
+                    <span class="major-location">TP.HCM</span>
+                    <span class="major-label">Nổi bật</span>
+                </div>
+                <button class="major-fav-btn" title="Yêu thích"><i class="far fa-heart"></i></button>
+            </div>
+            <div class="major-card">
+                <div class="major-card-header">
+                    <img src="/static/images/logo/3.jpg" class="major-logo" alt="logo trường">
+                    <div>
+                        <div class="major-title">Y khoa</div>
+                        <div class="major-school">Đại học Y Dược TP.HCM</div>
+                    </div>
+                </div>
+                <div class="major-info-row">
+                    <span class="major-fee">35 - 50 triệu</span>
+                    <span class="major-location">TP.HCM</span>
+                </div>
+                <button class="major-fav-btn" title="Yêu thích"><i class="far fa-heart"></i></button>
+            </div>
+            <div class="major-card">
+                <div class="major-card-header">
+                    <img src="/static/images/logo/4.jpg" class="major-logo" alt="logo trường">
+                    <div>
+                        <div class="major-title">Sư phạm Toán học</div>
+                        <div class="major-school">Đại học Sư phạm TPHCM</div>
+                    </div>
+                </div>
+                <div class="major-info-row">
+                    <span class="major-fee">Miễn phí</span>
+                    <span class="major-location">TP.HCM</span>
+
+                </div>
+                <button class="major-fav-btn" title="Yêu thích"><i class="far fa-heart"></i></button>
+            </div>
+
+             <!-- Thêm nhiều card ngành khác ở đây -->
+
+             <div class="major-card">
+                <div class="major-card-header">
+                    <img src="/static/images/logo/1.jpg" class="major-logo" alt="logo trường">
+                    <div>
+                        <div class="major-title">Công nghệ thông tin</div>
+                        <div class="major-school">Đại học Bách Khoa TP.HCM</div>
+                    </div>
+                </div>
+                <div class="major-info-row">
+                    <span class="major-fee">25 - 30 triệu</span>
+                    <span class="major-location">TP.HCM</span>
+                    <span class="major-label conglap">Công lập</span>
+                </div>
+                <button class="major-fav-btn" title="Yêu thích"><i class="far fa-heart"></i></button>
+            </div>
+            <div class="major-card">
+                <div class="major-card-header">
+                    <img src="/static/images/logo/2.jpg" class="major-logo" alt="logo trường">
+                    <div>
+                        <div class="major-title">Quản trị kinh doanh</div>
+                        <div class="major-school">Đại học Kinh tế Quốc dân</div>
+                    </div>
+                </div>
+                <div class="major-info-row">
+                    <span class="major-fee">20 - 28 triệu</span>
+                    <span class="major-location">TP.HCM</span>
+                    <span class="major-label">Nổi bật</span>
+                </div>
+                <button class="major-fav-btn" title="Yêu thích"><i class="far fa-heart"></i></button>
+            </div>
+            <div class="major-card">
+                <div class="major-card-header">
+                    <img src="/static/images/logo/3.jpg" class="major-logo" alt="logo trường">
+                    <div>
+                        <div class="major-title">Y khoa</div>
+                        <div class="major-school">Đại học Y Dược TP.HCM</div>
+                    </div>
+                </div>
+                <div class="major-info-row">
+                    <span class="major-fee">35 - 50 triệu</span>
+                    <span class="major-location">TP.HCM</span>
+                </div>
+                <button class="major-fav-btn" title="Yêu thích"><i class="far fa-heart"></i></button>
+            </div>
+            <div class="major-card">
+                <div class="major-card-header">
+                    <img src="/static/images/logo/4.jpg" class="major-logo" alt="logo trường">
+                    <div>
+                        <div class="major-title">Sư phạm Toán học</div>
+                        <div class="major-school">Đại học Sư phạm TPHCM</div>
+                    </div>
+                </div>
+                <div class="major-info-row">
+                    <span class="major-fee">Miễn phí</span>
+                    <span class="major-location">TP.HCM</span>
+                </div>
+                <button class="major-fav-btn" title="Yêu thích"><i class="far fa-heart"></i></button>
+            </div>
+             <!-- Thêm nhiều card ngành khác ở đây -->
+
+            
+            
+            
+        </div>
+        </div>
+        
+        </div>
+
+        
+
+
+
+        
+        <div class="pagination-bar">
+            <button class="pagination-btn">&lt;</button>
+            <span class="pagination-current">1</span>
+            <button class="pagination-btn">2</button>
+            <button class="pagination-btn">3</button>
+            <span style="color:#aaa;">...</span>
+            <button class="pagination-btn">10</button>
+            <button class="pagination-btn">&gt;</button>
+        </div>
+    </div>
+    <!-- Font Awesome CDN nếu chưa có -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    

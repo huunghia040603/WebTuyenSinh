@@ -1,0 +1,290 @@
+{% block stylesheets %}
+<style>
+.nhomnganh-section {
+    max-width: 1200px;
+    margin: 48px auto 32px auto;
+    padding: 0 12px;
+}
+.nhomnganh-title {
+    font-size: 2.1rem;
+    font-weight: 800;
+    color: #23235b;
+    background: #eaf0fa;
+    border-radius: 18px;
+    padding: 32px 24px 24px 32px;
+    margin-bottom: 24px;
+    text-align: left;
+    letter-spacing: 0.01em;
+    border: 2px solid #0a4191;
+}
+.nhomnganh-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px 24px;
+}
+.nhomnganh-box {
+    border-radius: 18px;
+    color: #fff;
+    padding: 32px 28px 32px 32px;
+    position: relative;
+    overflow: hidden;
+    min-height: 170px;
+    box-shadow: 0 4px 24px rgba(10,65,145,0.07);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: box-shadow 0.22s, transform 0.22s;
+   
+}
+.nhomnganh-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 100%);
+    z-index: 1;
+    background-image: url('/static/images/nennganh.png');
+    background-size:auto;
+    background-position: left;
+    background-repeat: no-repeat;
+  
+}
+.nhomnganh-box > * {
+    position: relative;
+    z-index: 2;
+}
+.nhomnganh-box:hover {
+    box-shadow: 0 8px 32px #0a419133;
+    transform: translateY(-4px) scale(1.05);
+    z-index: 2;
+    box-shadow: 0 8px 32px #1b00cd8f;
+    
+}
+.nhomnganh-name {
+    font-size: 1.35rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.01em;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.nhomnganh-desc {
+    font-size: 1.05rem;
+    font-weight: 400;
+    margin-bottom: 1.2rem;
+    line-height: 1.5;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.nhomnganh-btn {
+    background: rgba(255,255,255,0.18);
+    color: #fff;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1.6rem;
+    font-size: 1.05rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.nhomnganh-box:hover .nhomnganh-btn {
+    background: #fff;
+    color: #23235b;
+}
+.nhomnganh-bg-1 { background: linear-gradient(120deg, #0a4191 80%, #3e5ba9 100%); }
+.nhomnganh-bg-5 { background: linear-gradient(120deg, #f7b500 80%, #f9d976 100%); color: #23235b; }
+.nhomnganh-bg-8 { background: linear-gradient(120deg, #1e3a8a 80%, #6366f1 100%); }
+.nhomnganh-bg-7 { background: linear-gradient(120deg, #f97316 80%, #fbbf24 100%); color: #23235b; }
+.nhomnganh-bg-2 { background: linear-gradient(120deg, #06b6d4 80%, #22d3ee 100%); }
+.nhomnganh-bg-9 { background: linear-gradient(120deg, #059669 80%, #34d399 100%); }
+.nhomnganh-bg-11 { background: linear-gradient(120deg, #f43f5e 80%, #fca5a5 100%); }
+.nhomnganh-bg-3 { background: linear-gradient(120deg, #a21caf 80%, #f472b6 100%); }
+.nhomnganh-bg-6 { background: linear-gradient(120deg, #2563eb 80%, #60a5fa 100%); }
+.nhomnganh-bg-10 { background: linear-gradient(120deg, #f59e42 80%, #fbbf24 100%); color: #23235b; }
+.nhomnganh-bg-4 { background: linear-gradient(120deg, #64748b 80%, #a3a3a3 100%); }
+.nhomnganh-bg-12 { background: linear-gradient(120deg, #aa0906 80%, #ff5672 100%); }
+@media (max-width: 900px) {
+    .nhomnganh-section { padding: 0 2vw; }
+    .nhomnganh-title { font-size: 1.3rem; padding: 18px 10px 12px 18px; }
+    .nhomnganh-grid { grid-template-columns: 1fr; gap: 18px; }
+    .nhomnganh-box { padding: 18px 10px 18px 14px; min-height: 120px; }
+    .nhomnganh-name { font-size: 1.1rem; }
+    .nhomnganh-desc { font-size: 0.98rem; }
+}
+.modal-nganh-overlay {
+  position: fixed; left: 0; top: 0; width: 100vw; height: 100vh;
+  background: rgba(30,41,59,0.32); z-index: 10000;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+}
+.modal-nganh-content {
+  background: #fff; border-radius: 18px; max-width: 540px; width: 96vw;
+  padding: 32px 28px 24px 28px; box-shadow: 0 8px 48px #0a419144;
+  position: relative; animation: modalShow 0.25s cubic-bezier(.77,0,.18,1);
+  max-height: 90vh; overflow-y: auto;
+}
+@keyframes modalShow { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.modal-nganh-close {
+  position: absolute; top: 18px; right: 18px; background: none; border: none;
+  font-size: 2.2rem; color: #0a4191; cursor: pointer; font-weight: 700;
+  transition: color 0.2s;
+}
+.modal-nganh-close:hover { color: #f43f5e; }
+.modal-nganh-title {
+  font-size: 1.35rem; font-weight: 800; color: #0a4191; margin-bottom: 0.2em;
+}
+.modal-nganh-desc {
+  font-size: 1.05rem; color: #444; margin-bottom: 1.1em;
+}
+.modal-nganh-list {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0.8em 1.5em;
+  font-size: 1.05rem; color: #23235b;
+}
+.modal-nganh-list-item { 
+  padding-top: 0.3em;
+  padding-bottom: 0.6em;
+  border-bottom: 1px solid #e5e7eb; 
+  font-weight: 500;
+  line-height: 1.4;
+}
+@media (max-width: 600px) {
+  .modal-nganh-content { padding: 16px 6px 12px 6px; }
+  .modal-nganh-title { font-size: 1.05rem; }
+  .modal-nganh-list { grid-template-columns: 1fr; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="nhomnganh-section" id="nhomnganh">
+    <div class="nhomnganh-title">Bạn quan tâm <br><span style="color:#fff; background:#23235b; border-radius:10px; padding:0 12px;">NHÓM NGÀNH NÀO?</span></div>
+    <div class="nhomnganh-grid">
+        <div class="nhomnganh-box nhomnganh-bg-1">
+            <div class="nhomnganh-name">Kinh doanh - Quản lý </div>
+            <div class="nhomnganh-desc">Nơi phát triển tư duy lãnh đạo, kỹ năng quản trị xây dựng nền tảng thành công bền vững cho tương lai.</div>
+            <button class="nhomnganh-btn">Ngành đào tạo  <span>&rarr;</span></button>
+        </div>
+        <div class="nhomnganh-box nhomnganh-bg-2">
+            <div class="nhomnganh-name">Sức khỏe</div>
+            <div class="nhomnganh-desc">Chăm sóc, bảo vệ và nâng cao sức khỏe cộng đồng, nơi hội tụ những trái tim nhân ái và kiến thức y học tiên tiến.</div>
+            <button class="nhomnganh-btn">Ngành đào tạo  <span>&rarr;</span></button>
+        </div>
+        <div class="nhomnganh-box nhomnganh-bg-3">
+            <div class="nhomnganh-name">Truyền thông - Nghệ thuật - Nhân văn</div>
+            <div class="nhomnganh-desc">Khơi nguồn sáng tạo, lan tỏa cảm hứng, kết nối cộng đồng và phát triển giá trị nhân văn qua nghệ thuật và truyền thông hiện đại.</div>
+            <button class="nhomnganh-btn">Ngành đào tạo  <span>&rarr;</span></button>
+        </div>
+        <div class="nhomnganh-box nhomnganh-bg-4">
+            <div class="nhomnganh-name">Toán - Công nghệ thông tin - Máy tính</div>
+            <div class="nhomnganh-desc">Chinh phục thế giới số, phát triển tư duy logic, sáng tạo giải pháp công nghệ và làm chủ tương lai kỹ thuật số.</div>
+            <button class="nhomnganh-btn">Ngành đào tạo  <span>&rarr;</span></button>
+        </div>
+        <div class="nhomnganh-box nhomnganh-bg-5">
+            <div class="nhomnganh-name">Khoa học - Kỹ thuật - Công nghệ</div>
+            <div class="nhomnganh-desc">Khám phá, sáng tạo và ứng dụng khoa học kỹ thuật vào cuộc sống, góp phần xây dựng xã hội hiện đại và phát triển bền vững.</div>
+            <button class="nhomnganh-btn">Ngành đào tạo  <span>&rarr;</span></button>
+        </div>
+        <div class="nhomnganh-box nhomnganh-bg-6">
+            <div class="nhomnganh-name">Xã hội - Giáo dục </div>
+            <div class="nhomnganh-desc">Nơi đào tạo những nhà giáo, nhà nghiên cứu, nhà lãnh đạo xã hội góp phần xây dựng cộng đồng văn minh, tiến bộ.</div>
+            <button class="nhomnganh-btn">Ngành đào tạo  <span>&rarr;</span></button> 
+        </div>
+        <div class="nhomnganh-box nhomnganh-bg-7">
+            <div class="nhomnganh-name">Xây dựng - Môi trường</div>
+            <div class="nhomnganh-desc">Kiến tạo không gian sống hiện đại, phát triển bền vững và bảo vệ môi trường cho thế hệ tương lai.</div>
+            <button class="nhomnganh-btn">Ngành đào tạo  <span>&rarr;</span></button>
+        </div>
+        <div class="nhomnganh-box nhomnganh-bg-8">
+            <div class="nhomnganh-name">Vận tải - Du lịch - Thể thao</div>
+            <div class="nhomnganh-desc">Khám phá thế giới, kết nối văn hóa, phát triển thể chất và tinh thần qua các ngành vận tải, du lịch, thể thao năng động.</div>
+            <button class="nhomnganh-btn">Ngành đào tạo  <span>&rarr;</span></button>
+        </div>
+        <div class="nhomnganh-box nhomnganh-bg-9">
+            <div class="nhomnganh-name">Thú y - Nông, Lâm, Ngư nghiệp</div>
+            <div class="nhomnganh-desc">Gắn bó với thiên nhiên, phát triển nông nghiệp bền vững, bảo vệ môi trường và chăm sóc sức khỏe động vật.</div>
+            <button class="nhomnganh-btn">Ngành đào tạo  <span>&rarr;</span></button>
+        </div>
+        <div class="nhomnganh-box nhomnganh-bg-10">
+            <div class="nhomnganh-name">Sản xuất - Chế biến</div>
+            <div class="nhomnganh-desc">Nơi hội tụ công nghệ, sáng tạo và kỹ năng sản xuất, chế biến hiện đại, đáp ứng nhu cầu phát triển công nghiệp hóa.</div>
+            <button class="nhomnganh-btn">Ngành đào tạo  <span>&rarr;</span></button>
+        </div>
+        <div class="nhomnganh-box nhomnganh-bg-11">
+            <div class="nhomnganh-name">An ninh - Quốc phòng</div>
+            <div class="nhomnganh-desc">Bảo vệ Tổ quốc, giữ gìn an ninh, trật tự xã hội, góp phần xây dựng đất nước hòa bình, ổn định và phát triển.</div>
+            <button class="nhomnganh-btn">Ngành đào tạo  <span>&rarr;</span></button>
+        </div>
+        <div class="nhomnganh-box nhomnganh-bg-12">
+            <div class="nhomnganh-name">Chính trị và Luật</div>
+            <div class="nhomnganh-desc">Trang bị kiến thức pháp luật, kỹ năng phân tích, tư duy phản biện và bản lĩnh chính trị để trở thành công dân toàn cầu, góp phần xây dựng xã hội công bằng, văn minh.</div>
+            <button class="nhomnganh-btn">Ngành đào tạo  <span>&rarr;</span></button>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div id="modal-nganh" class="modal-nganh-overlay" style="display:none;">
+  <div class="modal-nganh-content">
+    <button class="modal-nganh-close" id="modal-nganh-close">&times;</button>
+    <div class="modal-nganh-title" id="modal-nganh-title"></div>
+    <div class="modal-nganh-desc" id="modal-nganh-desc"></div>
+    <div class="modal-nganh-list" id="modal-nganh-list"></div>
+  </div>
+</div>
+<script>
+// Dữ liệu ngành chi tiết cho từng nhóm ngành
+const nganhData = {
+  'Kinh doanh - Quản lý': {
+    desc: 'Nơi phát triển tư duy lãnh đạo, kỹ năng quản trị xây dựng nền tảng thành công bền vững cho tương lai.',
+    list: [
+      ['7340101', 'Quản trị kinh doanh'],
+      ['7340114', 'Digital Marketing'],
+      ['7340115', 'Marketing'],
+      ['7340116', 'Bất động sản'],
+      ['7340120', 'Kinh doanh quốc tế'],
+      ['7340121', 'Kinh doanh thương mại'],
+      ['7340122', 'Thương mại điện tử'],
+      ['7340123', 'Kinh doanh thời trang và dệt may'],
+      ['7340201', 'Tài chính - Ngân hàng'],
+      ['7340204', 'Bảo hiểm'],
+      ['7340205', 'Công nghệ tài chính'],
+      ['7340301', 'Kế toán'],
+      ['7340302', 'Kiểm toán'],
+      ['7340401', 'Khoa học quản lý'],
+      ['7340403', 'Quản lý công'],
+      ['7340404', 'Quản trị nhân lực'],
+      ['7340405', 'Hệ thống thông tin quản lý'],
+      ['7340406', 'Quản trị văn phòng'],
+      ['7340408', 'Quan hệ lao động'],
+      ['7340409', 'Quản lý dự án']
+    ]
+  }
+  // Có thể thêm các nhóm ngành khác ở đây
+};
+// Sự kiện mở modal
+const modal = document.getElementById('modal-nganh');
+const modalTitle = document.getElementById('modal-nganh-title');
+const modalDesc = document.getElementById('modal-nganh-desc');
+const modalList = document.getElementById('modal-nganh-list');
+const closeBtn = document.getElementById('modal-nganh-close');
+// Gán sự kiện cho box đầu tiên (Kinh doanh - Quản lý)
+document.querySelector('.nhomnganh-box.nhomnganh-bg-1').onclick = function() {
+  const data = nganhData['Kinh doanh - Quản lý'];
+  modalTitle.textContent = 'Kinh doanh - Quản lý';
+  modalDesc.textContent = data.desc;
+  modalList.innerHTML = data.list.map(([ma, ten]) => `<div class='modal-nganh-list-item'>${ten}</div>`).join('');
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+};
+closeBtn.onclick = function() {
+  modal.style.display = 'none';
+  document.body.style.overflow = '';
+};
+modal.onclick = function(e) {
+  if (e.target === modal) { modal.style.display = 'none'; document.body.style.overflow = ''; }
+};
+</script>
+{% endblock %}

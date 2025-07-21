@@ -1,0 +1,330 @@
+{% extends 'base.html' %}
+
+{% block title %}Trang Chủ - Tư Vấn Hướng Nghiệp{% endblock %}
+
+{% block stylesheets %}
+<style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+    }
+    body {
+        min-height: 100vh;
+        position: relative;
+        background: #f7fbff;
+    }
+    .main-bg {
+        
+        background: url('/static/images/nen.png') no-repeat top center;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: top center;
+        width: 100%;
+        max-width: 100vw;
+        margin: 0;
+        padding: 0;
+        /* Có thể đặt min-height nếu muốn nền luôn đủ cao */
+    }
+    .main-title {
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #0a4191;
+        margin-top: 0px !important;
+        margin-bottom: 5px;
+        padding-top: 22px;
+        /* letter-spacing: 1px; */
+        /* text-transform: uppercase; */
+    }
+    .search-bar-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+    .search-bar {
+        background: #f7fbff;
+        border-radius: 38px;
+        display: flex;
+        align-items: center;
+        padding: 0.5rem 1.5rem;
+        width: 100vw;
+        max-width: 1050px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+        border: 2px solid #0440af;
+    }
+    .search-bar input {
+        flex: 1;
+        border: none;
+        outline: none;
+        background: transparent;
+        color: #0440af;
+        font-size: 1.3rem;
+        padding: 0.7rem 0.5rem;
+    }
+    .search-bar input::placeholder {
+        color: #000f20;
+        font-size: 1.1rem;
+        opacity: 0.5;
+    }
+    .search-bar button {
+        background:#0a4191;
+        color: #fff;
+        border: none;
+        border-radius: 30px;
+        font-size: 1.2rem;
+        font-weight: 600;
+        padding: 0.7rem 2.2rem 0.7rem 2.7rem;
+        margin-left: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        transition: background 0.2s, color 0.2s;
+    }
+    .search-bar button:hover {
+        background: #0440af;
+    }
+    .search-bar button i {
+        font-size: 1.3rem;
+    }
+    .main-image-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 12px;
+        margin-top: 12px;
+    }
+    .main-image {
+        width: 90vw;
+        max-width: 1100px;
+        height: 320px;
+        background: #eaf6ff;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4rem;
+        font-weight: 700;
+        color: #222;
+        position: relative;
+        overflow: hidden;
+    }
+    .main-image img {
+        width: 100%;
+        object-fit: contain;
+    }
+    .info-bar {
+        display: flex;
+        justify-content: center;
+        align-items: stretch;
+        gap: 0.5rem;
+        margin: 0 auto 0 auto;
+        width: 90vw;
+        
+        position: relative;
+        z-index: 2;
+        flex-wrap: wrap;
+    }
+    .info-box {
+        background: #eaecee;
+        color: #0a4191;
+        border-radius: 20px;
+        padding: 0.6rem 1.8rem;
+        font-size: 1rem;
+        font-weight: 500;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        flex: 0 0 270px;
+        gap: 0.8rem;
+        border: 2px solid #0440af;
+        /* min-width: 200px; */
+        margin-bottom: 0.5rem;
+    }
+    .info-box-label {
+        white-space: nowrap;
+    }
+    .info-box select {
+        border-radius: 8px;
+        border: none;
+        padding: 0.3rem 1rem;
+        font-size: 1rem;
+        color: #fff;
+        background: #0a4191;
+        font-weight: 300;
+        min-width: 140px;
+    }
+    @media (max-width: 900px) {
+        .main-title { font-size: 1.1rem; }
+        .main-image { height: 120px; font-size: 1.2rem; border-radius: 12px; }
+        .info-bar { flex-direction: column; gap: 0.5rem; align-items: stretch; }
+        .info-box { min-width: unset; width: 100%; box-sizing: border-box; flex: 1 1 100%; border-radius: 12px; padding: 0.5rem 1rem; }
+    }
+    @media (max-width: 500px) {
+        .main-title { font-size: 0.95rem; margin-top: 10px; }
+        .main-image { height: 70px; font-size: 0.8rem; border-radius: 8px; }
+        .info-box { font-size: 0.9rem; border-radius: 8px; padding: 0.3rem 0.5rem; }
+        .info-box select { font-size: 0.85rem; min-width: 80px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="main-bg">
+<body>
+<div class="main-title">
+     Tìm đúng trường, học đúng ngành
+</div>
+<div class="main-image-container" style="margin-bottom: 22px;">
+    <div class="main-image">
+        <img src="/static/images/banner1.png" alt="logo">
+    </div>
+</div>
+<div class="search-bar-container" >
+    <form class="search-bar">
+        <input type="text" placeholder="Nhập ngành học hoặc tên trường..." />
+        <button type="submit"><i class="fas fa-search"></i> Tìm kiếm</button>
+    </form>
+</div>
+<div class="info-bar">
+    <div class="info-box">
+        <span class="info-box-label">Học phí năm</span>
+        <select>
+            <option value="all">Tất cả</option>
+            <option value="low">Dưới 10 triệu</option>
+            <option value="mid1">Từ 10-20 triệu</option>
+            <option value="mid2">Từ 20-30 triệu</option>
+            <option value="high">Từ 30-40 triệu</option>
+            <option value="veryhigh">Trên 40 triệu</option>
+
+        </select>
+    </div>
+    <div class="info-box">
+        <span class="info-box-label">Bậc học</span>
+        <select>
+            <option value="all">Tất cả</option>
+            <option value="dh">Đại học</option>
+            <option value="cd">Cao đẳng</option>
+            <option value="tc">Học nghề</option>
+            <option value="l12">Lớp 1-12</option>
+        </select>
+    </div>
+    <div class="info-box">
+        <span class="info-box-label">Khu vực</span>
+        <select>
+            <option value="all">Tất cả</option>
+            <option value="tp">TP.HCM</option>
+            <option value="hn">Hà Nội</option>
+            <option value="mb">Miền Bắc</option>
+            <option value="mt">Miền Trung</option>
+            <option value="mn">Miền Nam</option>
+        </select>
+    </div>
+    <div class="info-box">
+        <span class="info-box-label">Điểm sàn </span>
+        <select>
+            <option value="all">Tất cả</option>
+            <option value="low">Từ 15-18 điểm</option>
+            <option value="medium">Từ 18-20 điểm</option>
+            <option value="high">Từ 20-22 điểm</option>
+            <option value="veryhigh">Trên 22 điểm</option>
+            
+        </select>
+    </div>
+</div>
+</body>
+<!-- <img src="/static/images/robot.png" alt="robot" class="robot-img" /> -->
+{% include 'nganh.html' %}
+{% include 'nhomnganh.html' %}
+{% include 'xuhuong.html' %}
+{% include 'tracnghiem.html' %}
+{% include 'doitac.html' %}
+{% include 'tv.html' %}
+<!-- Audio tự động phát -->
+<audio id="background-audio" autoplay muted preload="auto">
+    <source src="/static/mp3/amthanh.mp3" type="audio/mpeg">
+    Trình duyệt của bạn không hỗ trợ phát âm thanh.
+</audio>
+
+<!-- Nút phát âm thanh -->
+<div id="audio-control" style="display: none; position: fixed; top: 150px; right: 20px; z-index: 1000; background: #0a4191; color: white; border: none; border-radius: 50px; padding: 12px 20px; cursor: pointer; font-size: 14px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: all 0.3s;">
+    <i class="fas fa-volume-up" style="margin-right: 8px;"></i>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const audio = document.getElementById('background-audio');
+    const audioControl = document.getElementById('audio-control');
+    let hasPlayed = false;
+    
+    // Thử autoplay ngay khi trang load
+    function tryAutoplay() {
+        audio.muted = false;
+        audio.play().then(function() {
+            console.log('Autoplay thành công!');
+            hasPlayed = true;
+            audioControl.style.display = 'none';
+        }).catch(function(error) {
+            console.log('Autoplay thất bại:', error);
+            // Thử lại sau 1 giây
+            setTimeout(tryAutoplay, 1000);
+        });
+    }
+    
+    // Thử autoplay ngay lập tức
+    tryAutoplay();
+    
+    // Xử lý nút bật âm thanh
+    audioControl.addEventListener('click', function() {
+        audio.muted = false;
+        audio.play().then(function() {
+            console.log('Âm thanh đã phát thành công');
+            hasPlayed = true;
+            audioControl.style.display = 'none';
+        }).catch(function(error) {
+            console.log('Không thể phát âm thanh:', error);
+        });
+    });
+    
+    // Thử phát khi user tương tác với trang
+    function tryPlayOnInteraction() {
+        if (!hasPlayed) {
+            audio.muted = false;
+            audio.play().then(function() {
+                console.log('Âm thanh đã phát thành công sau khi tương tác');
+                hasPlayed = true;
+                audioControl.style.display = 'none';
+            }).catch(function(error) {
+                console.log('Không thể phát âm thanh sau khi tương tác:', error);
+            });
+        }
+    }
+    
+    // Thử phát khi click
+    document.addEventListener('click', tryPlayOnInteraction, { once: true });
+    
+    // Thử phát khi scroll
+    window.addEventListener('scroll', tryPlayOnInteraction, { once: true });
+    
+    // Thử phát khi keypress
+    document.addEventListener('keydown', tryPlayOnInteraction, { once: true });
+    
+    // Thử phát khi touch (mobile)
+    document.addEventListener('touchstart', tryPlayOnInteraction, { once: true });
+    
+    // Dừng âm thanh khi kết thúc
+    audio.addEventListener('ended', function() {
+        audio.pause();
+        audio.currentTime = 0;
+        hasPlayed = false;
+        console.log('Âm thanh đã kết thúc');
+    });
+});
+</script>
+
+</div>
+{% endblock %}

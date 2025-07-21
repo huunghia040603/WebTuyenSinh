@@ -1,0 +1,256 @@
+{% block stylesheets %}
+<style>
+    .main-title {
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #0a4191;
+        margin-top: 42px;
+        margin-bottom: 15px;
+        /* letter-spacing: 1px; */
+        /* text-transform: uppercase; */
+    }
+.tracnghiem-grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    gap: 24px 24px;
+    max-width: 1400px;
+    margin: 24px auto;
+    background: none;
+}
+.tracnghiem-img-cell, .tracnghiem-text-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.7s cubic-bezier(.77,0,.18,1), transform 0.7s cubic-bezier(.77,0,.18,1);
+    box-shadow: none;
+    border: none;
+}
+.tracnghiem-img-cell {
+    padding: 0; border-radius: 15px;
+}
+.tracnghiem-img-cell.orange {}
+.tracnghiem-text-cell {
+    flex-direction: column;
+    padding: 0;
+    background: #edefff;
+    text-align: center;
+    justify-content: center;
+    box-shadow: none;
+}
+.tracnghiem-text-cell:hover {
+    transform: translateY(-4px) scale(1.15);
+    z-index: 2;
+    box-shadow: 0 8px 32px #cdbc008f;
+}
+
+
+.tracnghiem-text-cell.blue {}
+.tracnghiem-img {
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+    border-radius: 18px;
+    display: block;
+    margin: 0;
+}
+.tracnghiem-content {
+    width: 100%;
+    padding: 24px 8px 24px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.tracnghiem-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    color: #0a4191;
+    letter-spacing: 0.01em;
+}
+.tracnghiem-title.orange { color: #F7B500; }
+.tracnghiem-desc {
+    font-size: 1.01rem;
+    color: #444;
+    margin-bottom: 1.1rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+}
+.tracnghiem-btn {
+    background: #0a4191;
+    color: #fff;
+    font-weight: 700;
+    border: none;
+    border-radius: 10px;
+    padding: 0.8rem 2.5rem;
+    font-size: 1.15rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    margin-top: 1.2rem;
+    display: inline-block;
+    box-shadow: none;
+}
+.tracnghiem-btn.orange {
+    background: #F7B500;
+    color: #fff;
+}
+.tracnghiem-btn.orange:hover {
+    background: #ffd166;
+    color: #0a4191;
+}
+.tracnghiem-btn.blue {
+    /* background: #2d4fff; */
+    color: #fff;
+}
+.tracnghiem-btn.blue:hover {
+    background: #0855c8;
+    color: #fff;
+}
+@keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-80px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(80px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+.tracnghiem-img-cell.slide-in-left, .tracnghiem-text-cell.slide-in-left {
+    opacity: 1;
+    transform: translateX(0);
+    animation: slideInLeft 1.8s cubic-bezier(.77,0,.18,1) forwards;
+}
+.tracnghiem-img-cell.slide-in-right, .tracnghiem-text-cell.slide-in-right {
+    opacity: 1;
+    transform: translateX(0);
+    animation: slideInRight 1.8s cubic-bezier(.77,0,.18,1) forwards;
+}
+.tracnghiem-grid > .tracnghiem-img-cell, .tracnghiem-grid > .tracnghiem-text-cell {
+    min-height: 200px;
+    max-height: 260px;
+    border: none;
+}
+
+/* Tablet: 601px - 900px */
+@media (max-width: 900px) {
+    .tracnghiem-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: none;
+        gap: 18px;
+        padding: 0 2vw;
+        max-width: 98vw;
+    }
+    .tracnghiem-img-cell, .tracnghiem-text-cell {
+        min-height: unset;
+        max-height: unset;
+        padding: 0;
+        border-radius: 18px;
+    }
+    .tracnghiem-img {
+        height: 200px;
+        border-radius: 16px;
+    }
+    .tracnghiem-content {
+        padding: 18px 4px 18px 4px;
+    }
+    .tracnghiem-title {
+        font-size: 1.18rem;
+    }
+    .tracnghiem-btn {
+        font-size: 1.05rem;
+        padding: 0.7rem 2rem;
+    }
+}
+/* Mobile: ≤ 600px */
+@media (max-width: 600px) {
+    .tracnghiem-grid {
+        gap: 10px;
+        padding: 0 1vw;
+        max-width: 100vw;
+    }
+    .tracnghiem-img-cell, .tracnghiem-text-cell {
+        border-radius: 12px;
+    }
+    .tracnghiem-img {
+        height: 140px;
+        border-radius: 10px;
+    }
+    .tracnghiem-content {
+        padding: 10px 2px 10px 2px;
+    }
+    .tracnghiem-title {
+        font-size: 1.01rem;
+    }
+    .tracnghiem-btn {
+        font-size: 0.98rem;
+        padding: 0.6rem 1.2rem;
+        border-radius: 8px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="main-title">
+    Tìm ngành nghề phù hợp cùng TimTruongHoc.vn
+</div>
+<div class="tracnghiem-grid" id="tracnghiem-section">
+    <!-- Hàng 1: MBTI -->
+    <div class="tracnghiem-img-cell" data-animate="left" style="grid-row: 1; grid-column: 1;">
+        <img src="/static/images/test/41.png" class="tracnghiem-img" alt="MBTI">
+    </div>
+    <div class="tracnghiem-text-cell" data-animate="right" style="grid-row: 1; grid-column: 2;">
+        <div class="tracnghiem-content">
+            <div class="tracnghiem-title" style=" font-size:1.35rem;">Trắc nghiệm<br>tính cách MBTI</div>
+            <div class="tracnghiem-desc">Khám phá tiềm năng bản thân<br>Toả sáng năng lực nghề nghiệp</div>
+            <button class="tracnghiem-btn orange">Test ngay</button>
+        </div>
+    </div>
+    <!-- Hàng 2: Thần số học -->
+    <div class="tracnghiem-text-cell blue" data-animate="left" style="grid-row: 2; grid-column: 1;">
+        <div class="tracnghiem-content">
+            <div class="tracnghiem-title orange" style="font-size:1.35rem;">Thần số học</div>
+            <div class="tracnghiem-desc" style="">Giải mã tiềm năng, thấu hiểu định mệnh,<br>kiến tạo cuộc đời ý nghĩa.</div>
+            <button class="tracnghiem-btn blue">Test ngay</button>
+        </div>
+    </div>
+    <div class="tracnghiem-img-cell orange" data-animate="right" style="grid-row: 2; grid-column: 2;">
+        <img src="/static/images/test/42.png" class="tracnghiem-img" alt="Thần số học">
+    </div>
+    <!-- Hàng 3: Cung hoàng đạo -->
+    <div class="tracnghiem-img-cell orange" data-animate="left" style="grid-row: 3; grid-column: 1;">
+        <img src="/static/images/test/43.png" class="tracnghiem-img" alt="Cung hoàng đạo">
+    </div>
+    <div class="tracnghiem-text-cell" data-animate="right" style="grid-row: 3; grid-column: 2;">
+        <div class="tracnghiem-content">
+            <div class="tracnghiem-title" style=" font-size:1.35rem;">Cung hoàng đạo</div>
+            <div class="tracnghiem-desc">Hiểu sâu sắc bản thân, nắm bắt tiềm năng,<br>sống hạnh phúc mỗi ngày.</div>
+            <button class="tracnghiem-btn orange">Test ngay</button>
+        </div>
+    </div>
+</div>
+<script>
+// Hiệu ứng slide-in khi scroll đến section
+function animateTracNghiemBoxes() {
+    const boxes = document.querySelectorAll('.tracnghiem-img-cell, .tracnghiem-text-cell');
+    const trigger = window.innerHeight * 0.85;
+    boxes.forEach((box, idx) => {
+        const rect = box.getBoundingClientRect();
+        if (rect.top < trigger) {
+            if (box.dataset.animate === 'left') {
+                box.classList.add('slide-in-left');
+            } else {
+                box.classList.add('slide-in-right');
+            }
+        }
+    });
+}
+window.addEventListener('scroll', animateTracNghiemBoxes);
+window.addEventListener('load', animateTracNghiemBoxes);
+</script>
+{% endblock %}

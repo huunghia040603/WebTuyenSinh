@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>16 nhóm tính cách MBTI</title>
+    <style>
+        body {
+            background: linear-gradient(180deg, #ffffff 0%, #dfe8ff 100%);
+            min-height: 100vh;
+            font-family: 'Montserrat', Arial, sans-serif;
+            margin: 0;
+        }
+        .mbti16-title {
+            text-align: center;
+            color: #000000;
+            font-size: 2.6rem;
+            font-weight: bold;
+            margin-top: 32px;
+            margin-bottom: 24px;
+            letter-spacing: 1px;
+        }
+        .mbti16-group-title {
+            text-align: center;
+            font-size: 1.4rem;
+            font-weight: 500;
+            margin: 48px 0 24px 0;
+            letter-spacing: 1.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            position: relative;
+            line-height: 1.2;
+            text-shadow: 0 4px 32px #fff4, 0 2px 12px #0002;
+            cursor: pointer;
+            transition: filter 0.3s;
+        }
+        .mbti16-group-title .mbti16-group-icon {
+            font-size: 2.2rem;
+            filter: drop-shadow(0 2px 8px #fff8);
+            margin-right: 8px;
+        }
+        .mbti16-group-analyst {
+            background: linear-gradient(90deg, #565656 30%, #00e0ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        }
+        .mbti16-group-diplomat {
+            background: linear-gradient(90deg, #565656 30%, #00ffb8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+
+        }
+        .mbti16-group-sentinel {
+            background: linear-gradient(90deg, #565656 30%, #ffe066 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+
+        }
+        .mbti16-group-explorer {
+            background: linear-gradient(90deg, #565656 30%, #ffb199 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+
+        }
+        .mbti16-group-title::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 4px;
+            border-radius: 2px;
+            margin: 12px auto 0 auto;
+            background: currentColor;
+            opacity: 0.25;
+            transition: width 0.3s, opacity 0.3s;
+        }
+        .mbti16-group-title::after:hover {
+            color:rgb(255, 155, 84);
+        }
+
+
+        .mbti16-group-title:hover::after {
+            width: 920px;
+            opacity: 0.7;
+            color: #03009e;
+        }
+        .mbti16-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-gap: 48px 36px;
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 32px;
+        }
+        @media (max-width: 1100px) {
+            .mbti16-row { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 700px) {
+            .mbti16-row { grid-template-columns: 1fr; }
+        }
+        .mbti-card {
+            perspective: 1400px;
+            width: 100%;
+            min-height: 340px;
+            height: 400px;
+            background: none;
+            display: flex;
+            align-items: stretch;
+            justify-content: stretch;
+        }
+        .mbti-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.7s cubic-bezier(.77,0,.18,1);
+            transform-style: preserve-3d;
+        }
+        .mbti-card:hover .mbti-card-inner,
+        .mbti-card:focus-within .mbti-card-inner {
+            transform: rotateY(180deg);
+        }
+        .mbti-card-front, .mbti-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 28px;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+        .mbti-card-front {
+            z-index: 2;
+            padding: 0;
+            transition: box-shadow 0.3s, filter 0.3s;
+        }
+        .mbti-card-front img {
+            width: 100%;
+            height: 450px;
+        }
+        .mbti-card:hover .mbti-card-front img {
+            filter: drop-shadow(0 0 32px #00e0ffcc) brightness(1.1);
+        }
+        .mbti-card-back {
+            transform: rotateY(180deg);
+            background: linear-gradient(135deg, #0a4191, #00e0ff 100%);
+            box-shadow: 0 8px 40px #00e0ff33, 0 0 0 4px #fff8;
+            justify-content: center;
+        }
+        .mbti-card-back .mbti-type {
+            font-size: 2.2rem;
+            font-family: 'Segoe UI', 'Montserrat', Arial, sans-serif;
+            font-weight: bold;
+            color: #fff;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            text-align: center;
+            text-shadow: 0 2px 12px #1fa36b99;
+        }
+        .mbti-card-back .mbti-short {
+            font-size: 1.15rem;
+            color: #e0fffa;
+            margin-bottom: 18px;
+            text-align: center;
+            font-weight: 500;
+        }
+        .mbti-card-back .mbti-desc {
+            font-size: 1.08rem;
+            color: #fff;
+            text-align: center;
+            line-height: 1.6;
+            font-family: 'Montserrat', Arial, sans-serif;
+            margin:0 10px; margin-bottom: 28px;
+        }
+        .mbti-card-back .mbti-more-btn {
+            background: linear-gradient(90deg, #00e0ff 0%, #1fa36b 100%);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 32px;
+            font-size: 1.08rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 2px 12px #00e0ff55;
+            letter-spacing: 1px;
+            transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+        }
+        .mbti-card-back .mbti-more-btn:hover {
+            background: linear-gradient(90deg, #edc937 0%, #00e0ff 100%);
+            box-shadow: 0 4px 24px #00e0ff99;
+            transform: scale(1.07);
+        }
+    </style>
+</head>
+<body>
+    <div class="mbti16-title">Các loại tính cách</div>
+    <div class="mbti16-group-title mbti16-group-analyst"><span class="mbti16-group-icon">🧠</span>Nhóm Nhà Phân Tích</div>
+    <div class="mbti16-row">
+        <!-- INTJ -->
+        <div class="mbti-card"> <div class="mbti-card-inner"> <div class="mbti-card-front"><img src="/static/images/mbti/intj.png" alt="INTJ"></div><div class="mbti-card-back"><div class="mbti-type">INTJ</div><div class="mbti-short">Người kiến tạo</div><div class="mbti-desc">INTJ là người chiến lược, độc lập, có tầm nhìn xa và luôn lên kế hoạch rõ ràng. Họ thích phân tích, sáng tạo giải pháp mới và rất quyết đoán.</div><button class="mbti-more-btn" onclick="window.location.href='/mbti/intj'">Xem thêm</button></div></div></div>
+        <!-- INTP -->
+        <div class="mbti-card"> <div class="mbti-card-inner"> <div class="mbti-card-front"><img src="/static/images/mbti/intp.png" alt="INTP"></div><div class="mbti-card-back"><div class="mbti-type">INTP</div><div class="mbti-short">Nhà tư duy</div><div class="mbti-desc">INTP là người phân tích, tò mò, thích tìm hiểu nguyên lý và ý tưởng mới. Họ độc lập, sáng tạo và thường có tư duy logic xuất sắc.</div><button class="mbti-more-btn" onclick="window.location.href='/mbti/intp'">Xem thêm</button></div></div></div>
+        <!-- ENTJ -->
+        <div class="mbti-card"> <div class="mbti-card-inner"> <div class="mbti-card-front"><img src="/static/images/mbti/entj.png" alt="ENTJ"></div><div class="mbti-card-back"><div class="mbti-type">ENTJ</div><div class="mbti-short">Nhà chỉ huy</div><div class="mbti-desc">ENTJ là người quyết đoán, có khả năng lãnh đạo, tư duy chiến lược và luôn hướng tới mục tiêu lớn. Họ mạnh mẽ, tự tin và thích tổ chức, quản lý.</div><button class="mbti-more-btn" onclick="window.location.href='/mbti/entj'">Xem thêm</button></div></div></div>
+        <!-- ENTP -->
+        <div class="mbti-card"> <div class="mbti-card-inner"> <div class="mbti-card-front"><img src="/static/images/mbti/entp.png" alt="ENTP"></div><div class="mbti-card-back"><div class="mbti-type">ENTP</div><div class="mbti-short">Người đàm phán</div><div class="mbti-desc">ENTP là người thích tranh luận, sáng tạo, linh hoạt và luôn tìm kiếm giải pháp mới. Họ thích thử thách, không ngại thay đổi và có tư duy phản biện tốt.</div><button class="mbti-more-btn" onclick="window.location.href='/mbti/entp'">Xem thêm</button></div></div></div>
+    </div>
+    <div class="mbti16-group-title mbti16-group-diplomat"><span class="mbti16-group-icon">🌿</span>Nhóm Nhà Ngoại Giao</div>
+    <div class="mbti16-row">
+        <!-- INFJ -->
+        <div class="mbti-card"> <div class="mbti-card-inner"> <div class="mbti-card-front"><img src="/static/images/mbti/infj.png" alt="INFJ"></div><div class="mbti-card-back"><div class="mbti-type">INFJ</div><div class="mbti-short">Người cố vấn</div><div class="mbti-desc">INFJ là người sâu sắc, giàu lòng trắc ẩn, luôn muốn giúp đỡ và truyền cảm hứng cho người khác. Họ sống nội tâm, có lý tưởng và trực giác mạnh mẽ.</div><button class="mbti-more-btn" onclick="window.location.href='/mbti/infj'">Xem thêm</button></div></div></div>
+        <!-- INFP -->
+        <div class="mbti-card"> <div class="mbti-card-inner"> <div class="mbti-card-front"><img src="/static/images/mbti/infp.png" alt="INFP"></div><div class="mbti-card-back"><div class="mbti-type">INFP</div><div class="mbti-short">Người hoà giải</div><div class="mbti-desc">INFP là người giàu cảm xúc, lý tưởng, sáng tạo và luôn hướng tới giá trị cá nhân. Họ đồng cảm, chân thành và mong muốn giúp đỡ người khác.</div><button class="mbti-more-btn" onclick="window.location.href='/mbti/infp'">Xem thêm</button></div></div></div>
+        <!-- ENFJ -->
+        <div class="mbti-card"> <div class="mbti-card-inner"> <div class="mbti-card-front"><img src="/static/images/mbti/enfj.png" alt="ENFJ"></div><div class="mbti-card-back"><div class="mbti-type">ENFJ</div><div class="mbti-short">Người hướng dẫn</div><div class="mbti-desc">ENFJ là người lãnh đạo tự nhiên, giàu cảm xúc, luôn quan tâm và thúc đẩy người khác phát triển. Họ giỏi giao tiếp, truyền cảm hứng và xây dựng cộng đồng.</div><button class="mbti-more-btn" onclick="window.location.href='/mbti/enfj'">Xem thêm</button></div></div></div>
+        <!-- ENFP -->
+        <div class="mbti-card"> <div class="mbti-card-inner"> <div class="mbti-card-front"><img src="/static/images/mbti/enfp.png" alt="ENFP"></div><div class="mbti-card-back"><div class="mbti-type">ENFP</div><div class="mbti-short">Người truyền cảm hứng</div><div class="mbti-desc">ENFP là người sáng tạo, nhiệt huyết, giàu trí tưởng tượng và luôn tìm kiếm ý nghĩa cuộc sống. Họ thân thiện, linh hoạt và thích khám phá ý tưởng mới.</div><button class="mbti-more-btn" onclick="window.location.href='/mbti/enfp'">Xem thêm</button></div></div></div>
+    </div>
+    <div class="mbti16-group-title mbti16-group-sentinel"><span class="mbti16-group-icon">🛡️</span>Nhóm Người Quan Tâm</div>
+    <div class="mbti16-row">
+        <!-- ISTJ -->
+        <div class="mbti-card"> <div class="mbti-card-inner"> <div class="mbti-card-front"><img src="/static/images/mbti/istj.png" alt="ISTJ"></div><div class="mbti-card-back"><div class="mbti-type">ISTJ</div><div class="mbti-short">Người suy luận</div><div class="mbti-desc">ISTJ là người thực tế, đáng tin cậy, có trách nhiệm cao, luôn tuân thủ quy tắc và truyền thống. Họ làm việc chăm chỉ, cẩn thận và rất trung thành.</div><button class="mbti-more-btn" onclick="window.location.href='/mbti/istj'">Xem thêm</button></div></div></div>
+        <!-- ISFJ -->
+        <div class="mbti-card"> <div class="mbti-card-inner"> <div class="mbti-card-front"><img src="/static/images/mbti/isfj.png" alt="ISFJ"></div><div class="mbti-card-back"><div class="mbti-type">ISFJ</div><div class="mbti-short">Người bảo vệ</div><div class="mbti-desc">ISFJ là người tận tâm, chu đáo, luôn quan tâm chăm sóc người khác. Họ sống tình cảm, trung thành và rất đáng tin cậy trong các mối quan hệ.</div><button class="mbti-more-btn" onclick="window.location.href='/mbti/isfj'">Xem thêm</button></div></div></div>
+        <!-- ESTJ -->
+        <div class="mbti-card"> <div class="mbti-card-inner"> <div class="mbti-card-front"><img src="/static/images/mbti/estj.png" alt="ESTJ"></div><div class="mbti-card-back"><div class="mbti-type">ESTJ</div><div class="mbti-short">Người điều hành</div><div class="mbti-desc">ESTJ là người thực tế, quyết đoán, có khả năng tổ chức và quản lý tốt. Họ thích sự rõ ràng, trật tự và luôn hướng tới hiệu quả trong công việc.</div><button class="mbti-more-btn" onclick="window.location.href='/mbti/estj'">Xem thêm</button></div></div></div>
+        <!-- ESFJ -->
+        <div class="mbti-card"> <div class="mbti-card-inner"> <div class="mbti-card-front"><img src="/static/images/mbti/esfj.png" alt="ESFJ"></div><div class="mbti-card-back"><div class="mbti-type">ESFJ</div><div class="mbti-short">Người lãnh sự</div><div class="mbti-desc">ESFJ là người thân thiện, chu đáo, luôn quan tâm và giúp đỡ người khác. Họ sống tình cảm, thích hòa đồng và xây dựng môi trường tích cực.</div><button class="mbti-more-btn" onclick="window.location.href='/mbti/esfj'">Xem thêm</button></div></div></div>
+    </div>
+    <div class="mbti16-group-title mbti16-group-explorer"><span class="mbti16-group-icon">🧭</span>Nhóm Người Khám Phá</div>
+    <div class="mbti16-row">
+        <!-- ISTP -->
+        <div class="mbti-card"> <div class="mbti-card-inner"> <div class="mbti-card-front"><img src="/static/images/mbti/istp.png" alt="ISTP"></div><div class="mbti-card-back"><div class="mbti-type">ISTP</div><div class="mbti-short">Nhà kỹ thuật</div><div class="mbti-desc">ISTP là người thực tế, thích khám phá, giải quyết vấn đề bằng hành động. Họ linh hoạt, thích tự do và thường giỏi về kỹ thuật, máy móc.</div><button class="mbti-more-btn" onclick="window.location.href='/mbti/istp'">Xem thêm</button></div></div></div>
+        <!-- ISFP -->
+        <div class="mbti-card"> <div class="mbti-card-inner"> <div class="mbti-card-front"><img src="/static/images/mbti/isfp.png" alt="ISFP"></div><div class="mbti-card-back"><div class="mbti-type">ISFP</div><div class="mbti-short">Nhà phiêu lưu</div><div class="mbti-desc">ISFP là người sống tình cảm, yêu nghệ thuật, thích tự do và trải nghiệm. Họ nhẹ nhàng, linh hoạt, sống vì hiện tại và thường có gu thẩm mỹ tốt.</div><button class="mbti-more-btn" onclick="window.location.href='/mbti/isfp'">Xem thêm</button></div></div></div>
+        <!-- ESTP -->
+        <div class="mbti-card"> <div class="mbti-card-inner"> <div class="mbti-card-front"><img src="/static/images/mbti/estp.png" alt="ESTP"></div><div class="mbti-card-back"><div class="mbti-type">ESTP</div><div class="mbti-short">Người doanh nhân</div><div class="mbti-desc">ESTP là người năng động, thích phiêu lưu, giải quyết vấn đề nhanh nhạy. Họ linh hoạt, thích thử thách và luôn sống hết mình cho hiện tại.</div><button class="mbti-more-btn" onclick="window.location.href='/mbti/estp'">Xem thêm</button></div></div></div>
+        <!-- ESFP -->
+        <div class="mbti-card"> <div class="mbti-card-inner"> <div class="mbti-card-front"><img src="/static/images/mbti/esfp.png" alt="ESFP"></div><div class="mbti-card-back"><div class="mbti-type">ESFP</div><div class="mbti-short">Người trình diễn</div><div class="mbti-desc">ESFP là người năng động, vui vẻ, thích giao tiếp và tận hưởng cuộc sống. Họ sống hết mình cho hiện tại, thích mang lại niềm vui cho mọi người xung quanh.</div><button class="mbti-more-btn" onclick="window.location.href='/mbti/esfp'">Xem thêm</button></div></div></div>
+    </div>
+</body>
+</html>
