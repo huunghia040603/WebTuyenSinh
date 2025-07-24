@@ -88,6 +88,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 introduction: uni.introduction,
                 phone_number: uni.phone_number,
                 email: uni.email,
+                country: uni.country,
                 map_link: uni.map_link,
                 majors_data: uni.majors_data,
                 tuition_fee_ranges: uni.tuition_fee_ranges,
@@ -121,15 +122,15 @@ document.addEventListener('DOMContentLoaded', function () {
             card.style.animationDelay = `${index * 0.1}s`;
 
             let location = 'Khác';
-            if (university.name_vn.includes('Hồ Chí Minh') || university.name_vn.includes('TP.HCM')) {
-                location = 'TP. Hồ Chí Minh';
-            } else if (university.name_vn.includes('Hà Nội')) {
-                location = 'Hà Nội';
-            } else if (university.name_vn.includes('Đà Nẵng')) {
-                location = 'Đà Nẵng';
+            if (university.country.includes('TPHCM')) {
+                location = 'TPHCM';
+            } else if (university.country.includes('TP.Hà Nội')) {
+                location = 'TP.Hà Nội';
+            } else if (university.country.includes('TP.Đà Nẵng')) {
+                location = 'TP.Đà Nẵng';
             }
 
-            let tuitionDisplay = 'Chưa cập nhật';
+            let tuitionDisplay = 'Chưa có';
             if (university.tuition_fee_ranges && university.tuition_fee_ranges.length > 0) {
                 const minTuition = Math.min(...university.tuition_fee_ranges.map(range => range.min_value));
                 const maxTuition = Math.max(...university.tuition_fee_ranges.map(range => range.max_value));
