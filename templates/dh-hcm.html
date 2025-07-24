@@ -2,509 +2,544 @@
 
 {% block stylesheets %}
 <style>
-@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
+    @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'SF Compact Rounded', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    min-height: 100vh;
-    padding: 20px;
-}
-
-.container {
-    max-width: 1400px;
-    margin: 0 auto;
-}
-
-/* Header Section */
-.header-section {
-    text-align: center;
-    padding-top: 40px;
-    padding-bottom: 0px;
-}
-
-.header-title {
-    font-size: 2.5rem;
-    font-weight: 800;
-    color: #1e3a8a;
-    margin-bottom: 10px;
-}
-
-.header-subtitle {
-    font-size: 1.1rem;
-    color: #6b7280;
-    margin-bottom: 30px;
-}
-
-/* Search and Filter Section */
-.search-filter-section {
-    background: white;
-    border-radius: 15px;
-    padding: 30px;
-    margin-bottom: 40px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-}
-
-.search-row {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-}
-
-.search-input {
-    flex: 1;
-    min-width: 300px;
-    position: relative;
-}
-
-.search-input input {
-    width: 100%;
-    padding: 15px 20px 15px 50px;
-    border: 2px solid #e5e7eb;
-    border-radius: 10px;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-}
-
-.search-input input:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.search-input i {
-    position: absolute;
-    left: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #9ca3af;
-    font-size: 18px;
-}
-
-.filter-row {
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
-    align-items: center;
-}
-
-.filter-label {
-    font-weight: 600;
-    color: #374151;
-    margin-right: 10px;
-}
-
-.filter-select {
-    padding: 10px 15px;
-    border: 2px solid #e5e7eb;
-    border-radius: 8px;
-    background: white;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.filter-select:focus {
-    outline: none;
-    border-color: #3b82f6;
-}
-
-/* Universities Grid */
-.universities-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-    gap: 25px;
-    margin-bottom: 40px;
-}
-
-.university-card {
-    background: white;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: pointer;
-    position: relative;
-    border: 1px solid #e5e7eb;
-}
-
-.university-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(255, 178, 11, 0.388);
-    border-color:  #065be2;
-}
-
-/* Card Layout */
-.card-content {
-    display: flex;
-    height: 185px;
-}
-
-.card-image {
-    width: 120px;
-    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    overflow: hidden;
-   
-    
-}
-img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
-
-.card-image::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    opacity: 0.3;
-    
-    
-}
-
-.card-image i {
-    font-size: 40px;
-    color: white;
-    z-index: 1;
-}
-
-.card-info {
-    flex: 1;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-.university-name {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #1e3a8a;
-    line-height: 1.3;
-    margin-bottom: 12px;
-}
-
-.info-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 12px;
-}
-
-.info-tag {
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: white;
-}
-
-.tag-public {
-    background: #1e3a8a;
-}
-
-.tag-quota {
-    background: #1e3a8a;
-}
-
-.tag-year {
-    background: #1e3a8a;
-}
-
-.tag-tuition {
-    background: #f59e0b;
-    color: white;
-}
-
-.tag-location {
-    background: #f59e0b;
-    color: white;
-}
-
-.card-action {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.see-more {
-    color: #1e3a8a;
-    font-weight: 700;
-    font-size: 1rem;
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
-
-.see-more:hover {
-    color: #3b82f6;
-    transform: translateX(5px);
-}
-
-/* Detailed Info Overlay */
-.detailed-info {
-    position: absolute;
-    top: -50px;
-    left: -50px;
-    right: -50px;
-    bottom: -50px;
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(10px);
-    padding: 40px;
-    opacity: 0;
-    transform: scale(0.8);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    pointer-events: none;
-    z-index: 100;
-    border-radius: 20px;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.25);
-    border: 3px solid #3b82f6;
-    max-height: 80vh;
-    overflow-y: auto;
-}
-
-.university-card:hover .detailed-info {
-    opacity: 1;
-    transform: scale(1);
-    pointer-events: all;
-}
-
-.detailed-title {
-    font-size: 1.6rem;
-    font-weight: 800;
-    color: #1e3a8a;
-    margin-bottom: 25px;
-    border-bottom: 3px solid #3b82f6;
-    padding-bottom: 15px;
-    line-height: 1.3;
-}
-
-.section-heading {
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: #1e3a8a;
-    margin-bottom: 18px;
-    position: relative;
-    padding-left: 18px;
-    margin-top: 25px;
-}
-
-.section-heading::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 5px;
-    background: #10b981;
-    border-radius: 3px;
-}
-
-.detailed-section {
-    margin-bottom: 20px;
-}
-
-.detailed-section h4 {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #1e3a8a;
-    margin-bottom: 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.detailed-section p {
-    font-size: 0.95rem;
-    color: #374151;
-    line-height: 1.6;
-    text-align: justify;
-}
-
-.description-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.description-list li {
-    font-size: 1rem;
-    color: #374151;
-    line-height: 1.7;
-    margin-bottom: 15px;
-    padding-left: 25px;
-    position: relative;
-    text-align: justify;
-}
-
-.description-list li::before {
-    content: '-';
-    position: absolute;
-    left: 0;
-    color: #10b981;
-    font-weight: bold;
-    font-size: 1.2rem;
-}
-
-.detailed-stats {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin: 25px 0;
-}
-
-.stat-item {
-    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-    padding: 18px;
-    border-radius: 15px;
-    text-align: center;
-    color: white;
-    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
-}
-
-.stat-value {
-    font-size: 1.4rem;
-    font-weight: 800;
-    color: white;
-    margin-bottom: 8px;
-}
-
-.stat-label {
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.9);
-    font-weight: 600;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .search-row {
-        flex-direction: column;
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
     }
-    
-    .search-input {
-        min-width: auto;
+
+    body {
+        font-family: 'SF Compact Rounded', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+        padding: 20px;
     }
-    
-    .universities-grid {
-        grid-template-columns: 1fr;
+
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
     }
-    
-    .card-content {
-        height: auto;
-        flex-direction: column;
+
+    /* Header Section */
+    .header-section {
+        text-align: center;
+        padding-top: 40px;
+        padding-bottom: 0px;
     }
-    
-    .card-image {
-        width: 100%;
-        height: 80px;
-    }
-    
+
     .header-title {
-        font-size: 2rem;
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #1e3a8a;
+        margin-bottom: 10px;
     }
-}
 
-/* Loading Animation */
-@keyframes fadeInUp {
-    from {
+    .header-subtitle {
+        font-size: 1.1rem;
+        color: #6b7280;
+        margin-bottom: 30px;
+    }
+
+    /* Search and Filter Section */
+    .search-filter-section {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 40px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .search-row {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .search-input {
+        flex: 1;
+        min-width: 300px;
+        position: relative;
+    }
+
+    .search-input input {
+        width: 100%;
+        padding: 15px 20px 15px 50px;
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .search-input input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .search-input i {
+        position: absolute;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        font-size: 18px;
+    }
+
+    .filter-row {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .filter-label {
+        font-weight: 600;
+        color: #374151;
+        margin-right: 10px;
+    }
+
+    .filter-select {
+        padding: 10px 15px;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        background: white;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .filter-select:focus {
+        outline: none;
+        border-color: #3b82f6;
+    }
+
+    /* Universities Grid */
+    .universities-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        gap: 25px;
+        margin-bottom: 40px;
+    }
+
+    .university-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        position: relative;
+        border: 1px solid #e5e7eb;
+    }
+
+    .university-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(255, 178, 11, 0.388);
+        border-color: #065be2;
+    }
+
+    /* Card Layout */
+    .card-content {
+        display: flex;
+        height: 185px;
+    }
+
+    .card-image {
+        width: 120px;
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+
+
+    }
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .card-image::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        opacity: 0.3;
+
+
+    }
+
+    .card-image i {
+        font-size: 40px;
+        color: white;
+        z-index: 1;
+    }
+
+    .card-info {
+        flex: 1;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .university-name {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #1e3a8a;
+        line-height: 1.3;
+        margin-bottom: 12px;
+    }
+
+    .info-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+
+    .info-tag {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: white;
+    }
+
+    .tag-public {
+        background: #1e3a8a;
+    }
+
+    .tag-quota {
+        background: #1e3a8a;
+    }
+
+    .tag-year {
+        background: #1e3a8a;
+    }
+
+    .tag-tuition {
+        background: #f59e0b;
+        color: white;
+    }
+
+    .tag-location {
+        background: #f59e0b;
+        color: white;
+    }
+
+    .card-action {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .see-more {
+        color: #1e3a8a;
+        font-weight: 700;
+        font-size: 1rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .see-more:hover {
+        color: #3b82f6;
+        transform: translateX(5px);
+    }
+
+    /* Detailed Info Overlay */
+    .detailed-info {
+        position: absolute;
+        top: -50px;
+        left: -50px;
+        right: -50px;
+        bottom: -50px;
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(10px);
+        padding: 40px;
         opacity: 0;
-        transform: translateY(30px);
+        transform: scale(0.8);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        pointer-events: none;
+        z-index: 100;
+        border-radius: 20px;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.25);
+        border: 3px solid #3b82f6;
+        max-height: 80vh;
+        overflow-y: auto;
     }
-    to {
+
+    .university-card:hover .detailed-info {
         opacity: 1;
-        transform: translateY(0);
+        transform: scale(1);
+        pointer-events: all;
     }
-}
 
-.university-card {
-    animation: fadeInUp 0.6s ease forwards;
-}
+    .detailed-title {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: #1e3a8a;
+        margin-bottom: 25px;
+        border-bottom: 3px solid #3b82f6;
+        padding-bottom: 15px;
+        line-height: 1.3;
+    }
 
-.university-card:nth-child(1) { animation-delay: 0.1s; }
-.university-card:nth-child(2) { animation-delay: 0.2s; }
-.university-card:nth-child(3) { animation-delay: 0.3s; }
-.university-card:nth-child(4) { animation-delay: 0.4s; }
-.university-card:nth-child(5) { animation-delay: 0.5s; }
-.university-card:nth-child(6) { animation-delay: 0.6s; }
+    .section-heading {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #1e3a8a;
+        margin-bottom: 18px;
+        position: relative;
+        padding-left: 18px;
+        margin-top: 25px;
+    }
 
-/* Modal Overlay */
-.modal-overlay {
-    display: none;
-    position: fixed;
-    z-index: 9999;
-    left: 0;
-    top: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(30, 41, 59, 0.45);
-    justify-content: center;
-    align-items: center;
-    transition: background 0.3s;
-}
-.modal-overlay.active {
-    display: flex;
-}
-.modal-content {
-    background: #fff;
-    border-radius: 22px;
-    box-shadow: 0 30px 80px rgba(30,41,59,0.25);
-    border: 3px solid #3b82f6;
-    max-width: 700px;
-    width: 95vw;
-    max-height: 90vh;
-    overflow-y: auto;
-    padding: 48px 40px 32px 40px;
-    position: relative;
-    animation: modalIn 0.3s cubic-bezier(.4,0,.2,1);
-}
-@keyframes modalIn {
-    from { transform: translateY(40px) scale(0.95); opacity: 0; }
-    to { transform: translateY(0) scale(1); opacity: 1; }
-}
-.modal-close {
-    position: absolute;
-    top: 18px;
-    right: 24px;
-    font-size: 2rem;
-    color: #3b82f6;
-    background: none;
-    border: none;
-    cursor: pointer;
-    z-index: 2;
-    transition: color 0.2s;
-}
-.modal-close:hover {
-    color: #ef4444;
-}
-@media (max-width: 600px) {
-    .modal-content { padding: 24px 8px 16px 8px; }
-}
-/* Hide old overlay in card */
-.university-card .detailed-info { display: none !important; }
+    .section-heading::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 5px;
+        background: #10b981;
+        border-radius: 3px;
+    }
+
+    .detailed-section {
+        margin-bottom: 20px;
+    }
+
+    .detailed-section h4 {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #1e3a8a;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .detailed-section p {
+        font-size: 0.95rem;
+        color: #374151;
+        line-height: 1.6;
+        text-align: justify;
+    }
+
+    .description-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .description-list li {
+        font-size: 1rem;
+        color: #374151;
+        line-height: 1.7;
+        margin-bottom: 15px;
+        padding-left: 25px;
+        position: relative;
+        text-align: justify;
+    }
+
+    .description-list li::before {
+        content: '-';
+        position: absolute;
+        left: 0;
+        color: #10b981;
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+
+    .detailed-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin: 25px 0;
+    }
+
+    .stat-item {
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        padding: 18px;
+        border-radius: 15px;
+        text-align: center;
+        color: white;
+        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+    }
+
+    .stat-value {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: white;
+        margin-bottom: 8px;
+    }
+
+    .stat-label {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 600;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .search-row {
+            flex-direction: column;
+        }
+
+        .search-input {
+            min-width: auto;
+        }
+
+        .universities-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .card-content {
+            height: auto;
+            flex-direction: column;
+        }
+
+        .card-image {
+            width: 100%;
+            height: 80px;
+        }
+
+        .header-title {
+            font-size: 2rem;
+        }
+    }
+
+    /* Loading Animation */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .university-card {
+        animation: fadeInUp 0.6s ease forwards;
+    }
+
+    .university-card:nth-child(1) {
+        animation-delay: 0.1s;
+    }
+
+    .university-card:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .university-card:nth-child(3) {
+        animation-delay: 0.3s;
+    }
+
+    .university-card:nth-child(4) {
+        animation-delay: 0.4s;
+    }
+
+    .university-card:nth-child(5) {
+        animation-delay: 0.5s;
+    }
+
+    .university-card:nth-child(6) {
+        animation-delay: 0.6s;
+    }
+
+    /* Modal Overlay */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(30, 41, 59, 0.45);
+        justify-content: center;
+        align-items: center;
+        transition: background 0.3s;
+    }
+
+    .modal-overlay.active {
+        display: flex;
+    }
+
+    .modal-content {
+        background: #fff;
+        border-radius: 22px;
+        box-shadow: 0 30px 80px rgba(30, 41, 59, 0.25);
+        border: 3px solid #3b82f6;
+        max-width: 700px;
+        width: 95vw;
+        max-height: 90vh;
+        overflow-y: auto;
+        padding: 48px 40px 32px 40px;
+        position: relative;
+        animation: modalIn 0.3s cubic-bezier(.4, 0, .2, 1);
+    }
+
+    @keyframes modalIn {
+        from {
+            transform: translateY(40px) scale(0.95);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+    }
+
+    .modal-close {
+        position: absolute;
+        top: 18px;
+        right: 24px;
+        font-size: 2rem;
+        color: #3b82f6;
+        background: none;
+        border: none;
+        cursor: pointer;
+        z-index: 2;
+        transition: color 0.2s;
+    }
+
+    .modal-close:hover {
+        color: #ef4444;
+    }
+
+    @media (max-width: 600px) {
+        .modal-content {
+            padding: 24px 8px 16px 8px;
+        }
+    }
+
+    /* Hide old overlay in card */
+    .university-card .detailed-info {
+        display: none !important;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container">
-    <!-- Header Section -->
     <div class="header-section">
         <h1 class="header-title">Danh Sách Trường Đại Học</h1>
         <p class="header-subtitle">Tìm kiếm và khám phá các trường đại học phù hợp với bạn</p>
     </div>
 
-    <!-- Search and Filter Section -->
     <div class="search-filter-section">
         <div class="search-row">
             <div class="search-input">
@@ -513,13 +548,13 @@ img {
             </div>
         </div>
         <div class="filter-row">
-           
+
             <span class="filter-label">Lọc theo:</span>
             <select class="filter-select" id="locationFilter">
                 <option value="">Tất cả địa điểm</option>
-                <option value="hcm" selected>TP. Hồ Chí Minh</option>
-                <option value="hn">Hà Nội</option>
-                <option value="dn">Đà Nẵng</option>
+                <option value="ho chi minh">TP. Hồ Chí Minh</option>
+                <option value="ha noi">Hà Nội</option>
+                <option value="da nang">Đà Nẵng</option>
                 <option value="other">Khác</option>
             </select>
             <select class="filter-select" id="tuitionFilter">
@@ -528,30 +563,27 @@ img {
                 <option value="medium">20-40 triệu</option>
                 <option value="high">Trên 40 triệu</option>
             </select>
-           
+
             <select class="filter-select" id="typeFilter">
                 <option value="">Tất cả loại trường</option>
                 <option value="public">Công lập</option>
                 <option value="private">Ngoài công lập</option>
             </select>
-           <select class="filter-select" id="typeFilter">
+            <select class="filter-select" id="admissionScoreFilter">
                 <option value="">Điểm sàn xét tuyển</option>
                 <option value="low">Từ 15-18 điểm</option>
                 <option value="medium">Từ 18-20 điểm</option>
                 <option value="high">Từ 20-22 điểm</option>
                 <option value="veryhigh">Trên 22 điểm</option>
-                
+
             </select>
         </div>
     </div>
 
-    <!-- Universities Grid -->
     <div class="universities-grid" id="universitiesGrid">
-        <!-- University cards will be generated by JavaScript -->
-    </div>
+        </div>
 </div>
 
-<!-- Modal for university detail -->
 <div class="modal-overlay" id="modalOverlay">
     <div class="modal-content" id="modalContent">
         <button class="modal-close" id="modalClose" aria-label="Đóng">&times;</button>
@@ -559,274 +591,5 @@ img {
     </div>
 </div>
 
-<script>
-// University data
-const universitiesData = [
-    {
-        id: 1,
-        name: "TRƯỜNG ĐẠI HỌC MỞ TP. HỒ CHÍ MINH",
-        logo: "/static/images/logo/6.jpg",
-        code: "OU",
-        type: "Công lập",
-        quota: "~5.500",
-        year: "1990",
-        tuition: "28tr - 46tr",
-        location: "Tp. HCM",
-        description: "Trường Đại học Mở TP.HCM là một trong những trường đại học công lập hàng đầu tại Việt Nam, chuyên đào tạo đa ngành với phương pháp học tập linh hoạt.",
-        majors: "Công nghệ thông tin, Kinh tế, Luật, Sư phạm, Ngoại ngữ",
-        acceptanceRate: "85%",
-        studentCount: "45,000+",
-        facilities: "Thư viện hiện đại, Phòng lab, Khu thể thao",
-        contact: "028.39300940",
-        href: "/truongdaihoc/ou"
-    },
-    {
-        id: 2,
-        name: "TRƯỜNG ĐẠI HỌC BÁCH KHOA TP. HỒ CHÍ MINH",
-        logo: "/static/images/logo/1.jpg",
-        code: "HCMUT",
-        type: "Công lập",
-        quota: "~4.200",
-        year: "1957",
-        tuition: "25tr - 35tr",
-        location: "Tp. HCM",
-        description: "Trường Đại học Bách khoa TP.HCM là trường đại học kỹ thuật hàng đầu Việt Nam, nổi tiếng với chất lượng đào tạo kỹ thuật và công nghệ.",
-        majors: "Kỹ thuật, Công nghệ, Kiến trúc, Quản lý công nghiệp",
-        acceptanceRate: "15%",
-        studentCount: "35,000+",
-        facilities: "Phòng thí nghiệm hiện đại, Trung tâm nghiên cứu, Khu ký túc xá",
-        contact: "028.38647256"
-    },
-    {
-        id: 3,
-        name: "TRƯỜNG ĐẠI HỌC KINH TẾ TP. HỒ CHÍ MINH",
-        logo: "/static/images/logo/2.jpg",
-        code: "UEH",
-        type: "Công lập",
-        quota: "~3.800",
-        year: "1976",
-        tuition: "30tr - 45tr",
-        location: "Tp. HCM",
-        description: "Trường Đại học Kinh tế TP.HCM là trường đại học chuyên ngành kinh tế hàng đầu, đào tạo nguồn nhân lực chất lượng cao cho lĩnh vực kinh tế - tài chính.",
-        majors: "Kinh tế, Tài chính, Kế toán, Quản trị kinh doanh, Thương mại",
-        acceptanceRate: "20%",
-        studentCount: "40,000+",
-        facilities: "Thư viện chuyên ngành, Phòng mô phỏng, Trung tâm thực hành",
-        contact: "028.38295299"
-    },
-    {
-        id: 4,
-        name: "TRƯỜNG ĐẠI HỌC FPT",
-        logo: "/static/images/logo/5.jpg",
-        code: "FPT",
-        type: "Ngoài công lập",
-        quota: "~3.500",
-        year: "2006",
-        tuition: "45tr - 65tr",
-        location: "Tp. HCM",
-        description: "Trường Đại học FPT là trường đại học tư thục hàng đầu về công nghệ thông tin, với mô hình đào tạo gắn kết chặt chẽ với doanh nghiệp.",
-        majors: "Công nghệ thông tin, Truyền thông, Thiết kế đồ họa, Quản trị kinh doanh",
-        acceptanceRate: "70%",
-        studentCount: "25,000+",
-        facilities: "Phòng lab hiện đại, Khu vực sáng tạo, Trung tâm khởi nghiệp",
-        contact: "028.73005588"
-    },
-    {
-        id: 5,
-        name: "TRƯỜNG ĐẠI HỌC SƯ PHẠM TP. HỒ CHÍ MINH",
-        logo: "/static/images/logo/4.jpg",
-        code: "HCMUE",
-        type: "Công lập",
-        quota: "~2.800",
-        year: "1976",
-        tuition: "20tr - 30tr",
-        location: "Tp. HCM",
-        description: "Trường Đại học Sư phạm TP.HCM là trường đại học chuyên đào tạo giáo viên và nghiên cứu giáo dục hàng đầu khu vực phía Nam.",
-        majors: "Sư phạm, Giáo dục, Tâm lý học, Ngôn ngữ học, Toán học",
-        acceptanceRate: "25%",
-        studentCount: "30,000+",
-        facilities: "Thư viện giáo dục, Phòng thực hành sư phạm, Khu thể thao",
-        contact: "028.38352020"
-    },
-    {
-        id: 6,
-        name: "TRƯỜNG ĐẠI HỌC Y DƯỢC TP. HỒ CHÍ MINH",
-        logo: "/static/images/logo/3.jpg",
-        code: "UMP",
-        type: "Công lập",
-        quota: "~1.200",
-        year: "1947",
-        tuition: "35tr - 50tr",
-        location: "Tp. HCM",
-        description: "Trường Đại học Y Dược TP.HCM là trường đại học y khoa hàng đầu Việt Nam, đào tạo nguồn nhân lực y tế chất lượng cao.",
-        majors: "Y khoa, Dược học, Điều dưỡng, Y tế công cộng, Răng hàm mặt",
-        acceptanceRate: "8%",
-        studentCount: "15,000+",
-        facilities: "Bệnh viện thực hành, Phòng thí nghiệm y khoa, Thư viện y học",
-        contact: "028.38552411"
-    }
-];
-
-// Initialize the page
-document.addEventListener('DOMContentLoaded', function() {
-    const universitiesGrid = document.getElementById('universitiesGrid');
-    const searchInput = document.getElementById('searchInput');
-    const tuitionFilter = document.getElementById('tuitionFilter');
-    const locationFilter = document.getElementById('locationFilter');
-    const typeFilter = document.getElementById('typeFilter');
-
-    // Render universities
-    function renderUniversities(universities) {
-        universitiesGrid.innerHTML = '';
-        
-        universities.forEach((university, index) => {
-            const card = document.createElement('div');
-            card.className = 'university-card';
-            card.style.animationDelay = `${index * 0.1}s`;
-            
-            card.innerHTML = `
-                <div class="card-content">
-                    <div class="card-image">
-                        <img src="${university.logo}" alt="${university.name}">      
-                    </div>
-                    <div class="card-info">
-                        <div>
-                            <div class="university-name">${university.name}</div>
-                            <div class="info-tags">
-                                <span class="info-tag tag-public">${university.type}</span>
-                                <span class="info-tag tag-quota">Chỉ tiêu: ${university.quota}</span>
-                                <span class="info-tag tag-year">${university.year}</span>
-                            </div>
-                            <div class="info-tags">
-                                <span class="info-tag tag-tuition">Học phí: ${university.tuition}</span>
-                                <span class="info-tag tag-location">${university.location}</span>
-                            </div>
-                        </div>
-                        <div class="card-action">
-                            <a href="${university.href}" class="see-more">>> Xem thêm</a>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            const cardImage = card.querySelector('.card-image');
-        cardImage.addEventListener('mouseenter', () => showModal(university));
-        cardImage.addEventListener('mouseleave', () => {
-            clearTimeout(modalTimeout);
-        });
-            universitiesGrid.appendChild(card);
-        });
-    }
-
-    // Modal logic
-let modalTimeout;
-function showModal(university) {
-    modalTimeout = setTimeout(() => {
-        const modalOverlay = document.getElementById('modalOverlay');
-        const modalDetail = document.getElementById('modalDetail');
-        modalDetail.innerHTML = `
-            <div class="detailed-title">${university.name}</div>
-            <div class="detailed-section">
-                <h4 class="section-heading">Giới thiệu</h4>
-                <ul class="description-list">
-                    <li>${university.description}</li>
-                    <li>Đào tạo đa ngành với phương pháp học tập hiện đại và linh hoạt</li>
-                    <li>Đội ngũ giảng viên giàu kinh nghiệm và có trình độ cao</li>
-                    <li>Môi trường học tập năng động, sáng tạo và thân thiện</li>
-                </ul>
-            </div>
-            <div class="detailed-section">
-                <h4 class="section-heading">Ngành đào tạo chính</h4>
-                <ul class="description-list">
-                    <li>${university.majors}</li>
-                    <li>Chương trình đào tạo được cập nhật theo xu hướng thị trường</li>
-                    <li>Thực hành và thực tập tại các doanh nghiệp uy tín</li>
-                </ul>
-            </div>
-            <div class="detailed-stats">
-                <div class="stat-item">
-                    <div class="stat-value">${university.acceptanceRate}</div>
-                    <div class="stat-label">Tỷ lệ trúng tuyển</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value">${university.studentCount}</div>
-                    <div class="stat-label">Sinh viên</div>
-                </div>
-            </div>
-            <div class="detailed-section">
-                <h4 class="section-heading">Cơ sở vật chất</h4>
-                <ul class="description-list">
-                    <li>${university.facilities}</li>
-                    <li>Khuôn viên rộng rãi với không gian xanh</li>
-                    <li>Hệ thống wifi miễn phí phủ sóng toàn trường</li>
-                </ul>
-            </div>
-            <div class="detailed-section">
-                <h4 class="section-heading">Liên hệ</h4>
-                <ul class="description-list">
-                    <li><strong>Điện thoại:</strong> ${university.contact}</li>
-                    <li><strong>Website:</strong> www.${university.code.toLowerCase()}.edu.vn</li>
-                    <li><strong>Email:</strong> info@${university.code.toLowerCase()}.edu.vn</li>
-                </ul>
-            </div>
-        `;
-        modalOverlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }, 500); // 2 giây delay
-}
-
-    function hideModal() {
-        document.getElementById('modalOverlay').classList.remove('active');
-        document.body.style.overflow = '';
-    }
-
-    document.getElementById('modalClose').onclick = hideModal;
-    document.getElementById('modalOverlay').onclick = function(e) {
-        if (e.target === this) hideModal();
-    };
-    document.getElementById('modalContent').addEventListener('mouseleave', hideModal);
-
-    // Filter universities
-    function filterUniversities() {
-        const searchTerm = searchInput.value.toLowerCase();
-        const tuitionValue = tuitionFilter.value;
-        const locationValue = locationFilter.value;
-        const typeValue = typeFilter.value;
-
-        let filtered = universitiesData.filter(university => {
-            // Search filter
-            const matchesSearch = university.name.toLowerCase().includes(searchTerm) || 
-                                 university.code.toLowerCase().includes(searchTerm);
-            
-            // Tuition filter
-            let matchesTuition = true;
-            if (tuitionValue) {
-                const tuition = university.tuition;
-                if (tuitionValue === 'low' && !tuition.includes('20')) matchesTuition = false;
-                if (tuitionValue === 'medium' && !tuition.includes('20') && !tuition.includes('40')) matchesTuition = false;
-                if (tuitionValue === 'high' && !tuition.includes('40')) matchesTuition = false;
-            }
-            
-            // Location filter
-            const matchesLocation = !locationValue || university.location.toLowerCase().includes(locationValue);
-            
-            // Type filter
-            const matchesType = !typeValue || university.type.toLowerCase().includes(typeValue);
-            
-            return matchesSearch && matchesTuition && matchesLocation && matchesType;
-        });
-
-        renderUniversities(filtered);
-    }
-
-    // Event listeners
-    searchInput.addEventListener('input', filterUniversities);
-    tuitionFilter.addEventListener('change', filterUniversities);
-    locationFilter.addEventListener('change', filterUniversities);
-    typeFilter.addEventListener('change', filterUniversities);
-
-    // Initial render
-    renderUniversities(universitiesData);
-});
-</script>
+<script src="/static/js/dh-hcm.js"></script>
 {% endblock %}
