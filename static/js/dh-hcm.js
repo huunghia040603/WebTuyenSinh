@@ -4,23 +4,77 @@ document.addEventListener('DOMContentLoaded', function () {
     const tuitionFilter = document.getElementById('tuitionFilter');
     const locationFilter = document.getElementById('locationFilter');
     const typeFilter = document.getElementById('typeFilter');
-    const admissionScoreFilter = document.getElementById('admissionScoreFilter'); // New filter
+    const admissionScoreFilter = document.getElementById('admissionScoreFilter');
     const modalOverlay = document.getElementById('modalOverlay');
     const modalContent = document.getElementById('modalContent');
     const modalClose = document.getElementById('modalClose');
     const modalDetail = document.getElementById('modalDetail');
 
-    let allUniversities = []; // Store all fetched universities
+    // Pagination elements
+    const prevPageButton = document.getElementById('prevPage');
+    const nextPageButton = document.getElementById('nextPage');
+    const pageNumbersContainer = document.getElementById('pageNumbers');
 
-    // Function to fetch data from API
-    async function fetchUniversities() {
+    let currentPage = 1;
+    let totalPages = 1;
+    let currentSearchTerm = '';
+    let currentTuitionFilter = '';
+    let currentLocationFilter = '';
+    let currentTypeFilter = '';
+    let currentAdmissionScoreFilter = '';
+
+    // Function to fetch data from API with pagination and filters
+    async function fetchUniversities(page = 1) {
+        universitiesGrid.innerHTML = '<p>Đang tải dữ liệu...</p>'; // Show loading message
+        currentPage = page;
+
+        const baseUrl = 'https://timtruonghoc.pythonanywhere.com/schools/';
+        const params = new URLSearchParams();
+
+        // Add search term
+        if (currentSearchTerm) {
+            params.append('search', currentSearchTerm);
+        }
+
+        // Add filters
+        if (currentTuitionFilter) {
+            // Note: Your backend tuition filter might need to be adjusted to match these values
+            // For now, client-side filtering will handle this based on fetched data if backend doesn't support
+            // If backend supports, uncomment and adjust:
+            // params.append('tuition_range', currentTuitionFilter);
+        }
+        if (currentLocationFilter) {
+            // Note: Your backend location filter might need to be adjusted
+            // If backend supports, uncomment and adjust:
+            // params.append('location', currentLocationFilter);
+        }
+        if (currentTypeFilter) {
+            params.append('school_type', currentTypeFilter);
+        }
+        if (currentAdmissionScoreFilter) {
+            // Note: Your backend admission score filter might need to be adjusted
+            // If backend supports, uncomment and adjust:
+            // params.append('admission_score_range', currentAdmissionScoreFilter);
+        }
+
+        // Add pagination parameters
+        params.append('page', currentPage);
+        // You can also add page_size if you want to control it from the frontend
+        // params.append('page_size', 10); // Example: 10 items per page
+
+        const url = `${baseUrl}?${params.toString()}`;
+
         try {
-            const response = await fetch('https://timtruonghoc.pythonanywhere.com/schools/');
+            const response = await fetch(url);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const data = await response.json();
-            allUniversities = data.map(uni => ({
+
+            // Store total pages and count from the paginated response
+            totalPages = data.total_pages;
+            // The 'results' key holds the actual university data for the current page
+            const universities = data.results.map(uni => ({
                 id: uni.id,
                 name_en: uni.name_en,
                 name_vn: uni.name_vn,
@@ -37,16 +91,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 map_link: uni.map_link,
                 majors_data: uni.majors_data,
                 tuition_fee_ranges: uni.tuition_fee_ranges,
-                // Assuming acceptance_rate and student_count would come from API if available
-                // For now, using placeholders or deriving from other data if possible
                 acceptanceRate: 'N/A', // Placeholder
                 studentCount: 'N/A', // Placeholder
-                min_admission_score: uni.min_admission_score || null // Assuming API might provide this
+                min_admission_score: uni.min_admission_score || null
             }));
-            filterAndRenderUniversities(); // Initial render after fetching
+
+            renderUniversities(universities);
+            updatePaginationControls();
+
         } catch (error) {
             console.error('Error fetching universities:', error);
             universitiesGrid.innerHTML = '<p>Không thể tải dữ liệu trường học. Vui lòng thử lại sau.</p>';
+            totalPages = 1; // Reset total pages on error
+            updatePaginationControls();
         }
     }
 
@@ -63,7 +120,6 @@ document.addEventListener('DOMContentLoaded', function () {
             card.className = 'university-card';
             card.style.animationDelay = `${index * 0.1}s`;
 
-            // Extract location from name_vn or assume based on common patterns
             let location = 'Khác';
             if (university.name_vn.includes('Hồ Chí Minh') || university.name_vn.includes('TP.HCM')) {
                 location = 'TP. Hồ Chí Minh';
@@ -73,8 +129,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 location = 'Đà Nẵng';
             }
 
-            // Determine tuition display
-            let tuitionDisplay = '';
+            let tuitionDisplay = 'Chưa cập nhật';
             if (university.tuition_fee_ranges && university.tuition_fee_ranges.length > 0) {
                 const minTuition = Math.min(...university.tuition_fee_ranges.map(range => range.min_value));
                 const maxTuition = Math.max(...university.tuition_fee_ranges.map(range => range.max_value));
@@ -85,11 +140,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
 
-
             card.innerHTML = `
                 <div class="card-content">
                     <div class="card-image">
-                        <img src="${university.logo}" alt="${university.name_vn}">
+                        <img src="${university.logo}" alt="${university.name_vn}" onerror="this.onerror=null;this.src='https://placehold.co/120x120/cccccc/333333?text=No+Logo';">
                     </div>
                     <div class="card-info">
                         <div>
@@ -124,11 +178,47 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // Update pagination controls (buttons and page numbers)
+    function updatePaginationControls() {
+        prevPageButton.disabled = currentPage === 1;
+        nextPageButton.disabled = currentPage === totalPages;
+
+        pageNumbersContainer.innerHTML = ''; // Clear previous page numbers
+
+        // Display a range of page numbers around the current page
+        const maxPageButtons = 5; // Max number of page buttons to display
+        let startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
+        let endPage = Math.min(totalPages, currentPage + Math.floor(maxPageButtons / 2));
+
+        if (endPage - startPage + 1 < maxPageButtons) {
+            startPage = Math.max(1, endPage - maxPageButtons + 1);
+        }
+        if (startPage === 1) {
+            endPage = Math.min(totalPages, maxPageButtons);
+        }
+
+
+        for (let i = startPage; i <= endPage; i++) {
+            const pageButton = document.createElement('button');
+            pageButton.className = 'page-number-button';
+            pageButton.textContent = i;
+            if (i === currentPage) {
+                pageButton.classList.add('active');
+            }
+            pageButton.addEventListener('click', () => {
+                fetchUniversities(i);
+                // Scroll to top of the grid after changing page
+                universitiesGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+            pageNumbersContainer.appendChild(pageButton);
+        }
+    }
+
     // Modal logic
     let modalTimeout;
 
     function showModal(university, location, tuitionDisplay) {
-        clearTimeout(modalTimeout); // Clear any previous timeout
+        clearTimeout(modalTimeout);
         modalTimeout = setTimeout(() => {
             modalDetail.innerHTML = `
                 <div class="detailed-title">${university.name_vn}</div>
@@ -187,11 +277,11 @@ document.addEventListener('DOMContentLoaded', function () {
             `;
             modalOverlay.classList.add('active');
             document.body.style.overflow = 'hidden';
-        }, 500); // 500ms delay
+        }, 500);
     }
 
     function hideModal() {
-        clearTimeout(modalTimeout); // Clear timeout if modal is hidden before it appears
+        clearTimeout(modalTimeout);
         modalOverlay.classList.remove('active');
         document.body.style.overflow = '';
     }
@@ -200,87 +290,38 @@ document.addEventListener('DOMContentLoaded', function () {
     modalOverlay.onclick = function (e) {
         if (e.target === this) hideModal();
     };
-    modalContent.addEventListener('mouseleave', hideModal); // Hide on mouse leave from content
+    modalContent.addEventListener('mouseleave', hideModal);
 
-    // Filter universities
-    function filterAndRenderUniversities() {
-        const searchTerm = searchInput.value.toLowerCase();
-        const tuitionFilterValue = tuitionFilter.value;
-        const locationFilterValue = locationFilter.value.toLowerCase();
-        const typeFilterValue = typeFilter.value.toLowerCase();
-        const admissionScoreFilterValue = admissionScoreFilter.value;
-
-        let filtered = allUniversities.filter(university => {
-            // Search filter
-            const matchesSearch = university.name_vn.toLowerCase().includes(searchTerm) ||
-                (university.name_en && university.name_en.toLowerCase().includes(searchTerm)) ||
-                university.short_code.toLowerCase().includes(searchTerm) ||
-                university.admission_code.toLowerCase().includes(searchTerm);
-
-            // Tuition filter
-            let matchesTuition = true;
-            if (tuitionFilterValue && university.tuition_fee_ranges && university.tuition_fee_ranges.length > 0) {
-                const minTuitionAPI = Math.min(...university.tuition_fee_ranges.map(range => range.min_value));
-                if (tuitionFilterValue === 'low' && minTuitionAPI >= 20000000) {
-                    matchesTuition = false;
-                } else if (tuitionFilterValue === 'medium' && (minTuitionAPI < 20000000 || minTuitionAPI > 40000000)) {
-                    matchesTuition = false;
-                } else if (tuitionFilterValue === 'high' && minTuitionAPI <= 40000000) {
-                    matchesTuition = false;
-                }
-            }
-
-            // Location filter
-            let matchesLocation = true;
-            if (locationFilterValue) {
-                const universityLocation = university.name_vn.toLowerCase();
-                if (locationFilterValue === 'ho chi minh' && !(universityLocation.includes('hồ chí minh') || universityLocation.includes('tp.hcm'))) {
-                    matchesLocation = false;
-                } else if (locationFilterValue === 'ha noi' && !universityLocation.includes('hà nội')) {
-                    matchesLocation = false;
-                } else if (locationFilterValue === 'da nang' && !universityLocation.includes('đà nẵng')) {
-                    matchesLocation = false;
-                } else if (locationFilterValue === 'other' && (universityLocation.includes('hồ chí minh') || universityLocation.includes('tp.hcm') || universityLocation.includes('hà nội') || universityLocation.includes('đà nẵng'))) {
-                    matchesLocation = false;
-                }
-            }
-
-            // Type filter
-            const matchesType = !typeFilterValue || university.school_type.toLowerCase() === typeFilterValue;
-
-            // Admission Score filter
-            let matchesAdmissionScore = true;
-            if (admissionScoreFilterValue && university.min_admission_score !== null) {
-                const score = parseFloat(university.min_admission_score);
-                if (isNaN(score)) { // If score is not a number, skip this filter
-                    matchesAdmissionScore = true;
-                } else if (admissionScoreFilterValue === 'low' && (score < 15 || score > 18)) {
-                    matchesAdmissionScore = false;
-                } else if (admissionScoreFilterValue === 'medium' && (score < 18 || score > 20)) {
-                    matchesAdmissionScore = false;
-                } else if (admissionScoreFilterValue === 'high' && (score < 20 || score > 22)) {
-                    matchesAdmissionScore = false;
-                } else if (admissionScoreFilterValue === 'veryhigh' && score <= 22) {
-                    matchesAdmissionScore = false;
-                }
-            } else if (admissionScoreFilterValue && university.min_admission_score === null) {
-                // If filter is active but no score data for university, it doesn't match
-                matchesAdmissionScore = false;
-            }
-
-
-            return matchesSearch && matchesTuition && matchesLocation && matchesType && matchesAdmissionScore;
-        });
-
-        renderUniversities(filtered);
+    // Filter and Pagination logic
+    function applyFiltersAndFetch(page = 1) {
+        currentSearchTerm = searchInput.value.toLowerCase();
+        currentTuitionFilter = tuitionFilter.value;
+        currentLocationFilter = locationFilter.value.toLowerCase();
+        currentTypeFilter = typeFilter.value.toLowerCase();
+        currentAdmissionScoreFilter = admissionScoreFilter.value;
+        fetchUniversities(page);
     }
 
     // Event listeners
-    searchInput.addEventListener('input', filterAndRenderUniversities);
-    tuitionFilter.addEventListener('change', filterAndRenderUniversities);
-    locationFilter.addEventListener('change', filterAndRenderUniversities);
-    typeFilter.addEventListener('change', filterAndRenderUniversities);
-    admissionScoreFilter.addEventListener('change', filterAndRenderUniversities);
+    searchInput.addEventListener('input', () => applyFiltersAndFetch(1)); // Reset to page 1 on search
+    tuitionFilter.addEventListener('change', () => applyFiltersAndFetch(1)); // Reset to page 1 on filter change
+    locationFilter.addEventListener('change', () => applyFiltersAndFetch(1));
+    typeFilter.addEventListener('change', () => applyFiltersAndFetch(1));
+    admissionScoreFilter.addEventListener('change', () => applyFiltersAndFetch(1));
+
+    prevPageButton.addEventListener('click', () => {
+        if (currentPage > 1) {
+            fetchUniversities(currentPage - 1);
+            universitiesGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    });
+
+    nextPageButton.addEventListener('click', () => {
+        if (currentPage < totalPages) {
+            fetchUniversities(currentPage + 1);
+            universitiesGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    });
 
     // Initial fetch and render
     fetchUniversities();
