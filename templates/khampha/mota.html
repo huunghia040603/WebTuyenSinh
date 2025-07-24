@@ -1,0 +1,465 @@
+{% block stylesheets %}
+    <style>
+        body {
+font-family: 'Montserrat', Arial, sans-serif;
+            color: #1a2a3a;
+            margin: 0;
+            padding: 0;
+        }
+        .mbti-mota-container {
+            max-width: 1300px;
+            margin: 0 auto 48px auto;
+            /* background: #fff; */
+            border-radius: 24px;
+            /* box-shadow: 0 8px 40px #00e0ff11, 0 0 0 4px #fff8; */
+            padding: 40px 32px 32px 32px;
+            animation: fadeInUp 1s cubic-bezier(.77,0,.18,1);
+            position: relative;
+            overflow: hidden;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(40px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+        .mbti-mota-header {
+            display: flex;
+            align-items: stretch;
+            gap: 32px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+            justify-content: space-between;
+            background: linear-gradient(90deg, #e0e7ef 60%, #c6f1ff 100%);
+            border-left: 4px solid #00e0ff;
+
+            padding: 40px;
+            border-radius: 10px;
+            
+
+
+        }
+        .mbti-mota-header-content {
+            flex: 1 1 0;
+            min-width: 260px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            /* border: 2px solid #ffffff; */
+            background-color: #ffffff52;
+            padding: 40px 40px 40px 40px;
+            border-radius: 10px;
+
+        }
+        .mbti-mota-header-content h2 {
+            font-size: 2.2rem;
+            background: linear-gradient(90deg, #0a4191 30%, #00e0ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0 0 18px 0;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 12px #00e0ff22;
+        }
+        .mbti-mota-header-content p {
+            font-size: 0.9rem;
+            color: #1a2a3a;
+            margin: 0;
+            line-height: 1.7;
+            text-align: justify;
+        }
+        .mbti-mota-header-imgbox {
+            flex: 1 1 260px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 180px;
+            min-height: 120px;
+        }
+        .mbti-mota-header-img {
+            width: 100%;
+            height: 500px;
+            border-radius: 18px;
+            object-fit: contain;
+            transition: box-shadow 0.4s, filter 0.4s;
+            position: relative;
+            z-index: 1;
+        }
+        .mbti-mota-header-img:hover {
+            filter: drop-shadow(0 0 52px #00e0ffcc) brightness(1.1);
+
+            z-index: 2;
+        }
+        h3 {
+            font-size: 1.35rem;
+            color: #0a4191;
+            margin-bottom: 12px;
+            font-weight: 800;
+        }
+        .mbti-mota-container p, .mbti-mota-container ul, .mbti-mota-container li {
+            font-size: 1.08rem;
+            line-height: 1.7;
+        }
+        .mbti-mota-container ul {
+            margin: 0 0 0 18px;
+            padding: 0;
+        }
+        .mbti-mota-container li {
+            margin-bottom: 8px;
+        }
+        .mbti-mota-highlight {
+            background: linear-gradient(90deg, #e0e7ef 60%, #c6f1ff 100%);
+            border-left: 4px solid #00e0ff;
+            padding: 18px 22px;
+            border-radius: 12px;
+            margin: 24px 0;
+            font-size: 0.8rem;
+            color: #0a4191;
+            animation: fadeInUp 1.2s 0.2s both;
+            font-style: italic;
+        }
+        .mbti-mota-list4 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px 32px;
+            margin: 24px 0 32px 0;
+        }
+        .mbti-mota-list4-item {
+            background: #0077ff40;
+            border-radius: 28px;
+            box-shadow: 0 4px 24px #00e0ff11;
+            padding: 15px 24px 24px 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            min-height: 160px;
+            position: relative;
+            overflow: hidden;
+            transition: box-shadow 0.3s, transform 0.3s;
+            text-align: justify;
+        }
+        .mbti-mota-list4-item:hover {
+            box-shadow: 0 8px 32px #00e0ff33;
+            transform: translateY(-4px) scale(1.01);
+        }
+        .mbti-mota-list4-num {
+            margin-bottom: 0;
+            margin-right: 8px;
+            flex-shrink: 0;
+            width: 34px;
+            height: 34px;
+            background: #fff;
+            color: #1fa36b;
+            border-radius: 65px;
+            font-size: 1.18rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px #00e0ff22;
+            border: 2px solid #d2f3e6;
+            margin-bottom: 10px;
+            margin-bottom: 0;
+            margin-right: 8px;
+            flex-shrink: 0;
+        
+
+        }
+        .mbti-mota-list4-title {
+            font-size: 1.18rem;
+            font-weight: 800;
+            color: #0a2a7c;
+            margin-bottom: 8px;
+            margin-top: 0;
+            letter-spacing: 0.5px;
+        }
+        .mbti-mota-list4-desc {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            color: #1a2a3a;
+            line-height: 1.6;
+            margin: 0;
+            text-align: justify;
+            font-weight: 800;
+        }
+        
+        .mbti-mota-list4-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 10px;
+        }
+        /* Card grid for MBTI benefits */
+        .mbti-mota-benefit-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px 32px;
+            margin: 32px 0 32px 0;
+        }
+        .mbti-mota-benefit-card {
+            background: linear-gradient(90deg, #e0e7ef 60%, #f8fafc 100%);
+            border-radius: 16px;
+            box-shadow: 0 2px 16px #00e0ff11;
+            padding: 22px 24px 18px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            animation: fadeInUp 0.7s;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s, transform 0.6s, box-shadow 0.4s;
+            position: relative;
+            overflow: visible;
+        }
+        .mbti-mota-benefit-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .mbti-mota-benefit-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 16px;
+            pointer-events: none;
+            z-index: 2;
+            opacity: 0;
+            transition: opacity 0.3s;
+            border: 2.5px solid transparent;
+            box-sizing: border-box;
+             border-radius: 16px;
+            /* Border-image với gradient động */
+            /* border-image: conic-gradient(
+                from 0deg,
+                #00e0ff 0deg, #00e0ff 10deg, #fff 60deg, #00e0ff 120deg, #fff 180deg, #00e0ff 240deg, #fff 300deg, #00e0ff 360deg
+            ) 1; */
+            /* animation: border-electric-rotate 1.2s linear infinite paused; */
+        }
+        .mbti-mota-benefit-card:hover {
+            box-shadow: 0 8px 32px #00e0ff33, 0 2px 24px #00e0ff22;
+        }
+        .mbti-mota-benefit-card:hover::after {
+            opacity: 1;
+            animation-play-state: running;
+        }
+        @keyframes border-electric-rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .mbti-mota-benefit-card b {
+            color: #0a4191;
+            font-size: 1.13rem;
+            margin-bottom: 4px;
+        }
+        @media (max-width: 900px) {
+            .mbti-mota-header { flex-direction: column; gap: 18px; }
+            .mbti-mota-header-imgbox { justify-content: flex-start; }
+            .mbti-mota-header-img { width: 100%; max-width: 320px; height: 140px; }
+            .mbti-mota-benefit-grid { grid-template-columns: 1fr; }
+            .mbti-mota-list4 { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 700px) {
+            .mbti-mota-container { padding: 18px 6vw; }
+        }
+        .mbti-mota-container h3, .mbti-mota-container p {
+            display: block;
+            width: 100%;
+            clear: both;
+            margin-top: 0;
+        }
+        .mbti-mota-row {
+            display: flex;
+            gap: 32px;
+            align-items: flex-start;
+            margin-bottom: 32px;
+            background: linear-gradient(90deg, #e0e7ef 60%, #c6f1ff 100%);
+            padding: 40px;
+            border-radius: 10px;
+            border-left: 4px solid #00e0ff;
+        }
+        .mbti-mota-header-content1 {
+            flex: 1 1 0;
+            min-width: 260px;
+            max-width: 44%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin-top: 15%;
+            text-align: justify;
+            /* border: 2px solid #ffffff; */
+            background-color: #ffffff52;
+            padding: 20px 20px 20px 30px;
+            border-radius: 10px;
+            
+        }
+        .mbti-mota-list4 {
+            flex: 1 1 0;
+            min-width: 260px;
+            max-width: 56%;
+        }
+       
+        @media (max-width: 900px) {
+            .mbti-header-text{
+                font-size: 1.4rem;
+            }
+            .banner{
+                height: 0;
+            }
+            .mbti-mota-header {
+                padding: 5px;
+
+                }
+            .mbti-mota-header-content{
+                background-color: #ffffff00;
+                }
+            .mbti-mota-header-content1{
+                background-color: #ffffff00;
+                }
+            .mbti-mota-row {
+                flex-direction: column;
+                gap: 18px;
+                padding: 5px;
+            }
+            .mbti-mota-header-content1, .mbti-mota-list4 {
+                max-width: 100%;
+            }
+            
+        }
+        .mbti-mota-mouse-light {
+            pointer-events: none;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 2;
+            background: radial-gradient(
+                circle at var(--x,50%) var(--y,50%),
+                rgba(0,224,255,0.22) 0%,
+                rgba(255, 249, 191, 0.306) 2%,
+                transparent 8%
+            );
+            transition: background 0.18s;
+            will-change: background;
+        }
+    </style>
+{% endblock %}
+
+    <div class="mbti-mota-container">
+        <div class="mbti-mota-mouse-light"></div>
+        <div class="mbti-mota-header">
+            <div class="mbti-mota-header-content">
+                <h2>Trắc nghiệm tính cách MBTI là gì? </h2>
+                <p>
+                    Trắc nghiệm tính cách MBTI (Myers-Briggs Type Indicator) là một phương pháp sử dụng hàng loạt các câu hỏi trắc nghiệm để phân tích tính cách con người. Kết quả trắc nghiệm MBTI chỉ ra cách con người nhận thức thế giới xung quanh và ra quyết định cho mọi vấn đề trong cuộc sống.
+
+                   <br/>Hiện nay, MBTI được coi là công cụ khám phá tính cách phổ biến và chính xác nhất trên thế giới. Trong công việc, MBTI giúp mỗi cá nhân có thêm thông tin để định hướng và lựa chọn nghề nghiệp. Nhà tuyển dụng cũng có thể sử dụng MBTI để đánh giá mức độ phù hợp của ứng viên với vị trí công việc và văn hoá doanh nghiệp.                </p>
+            </div>
+            <div class="mbti-mota-header-imgbox">
+                <img class="mbti-mota-header-img" src="/static/images/mbti/trungtam1.gif" alt="MBTI mô tả" loading="lazy">
+            </div>
+        </div>
+        <div class="mbti-mota-row">
+            <div class="mbti-mota-header-content1">
+                <h3>MBTI là gì và nó hoạt động như thế nào?</h3>
+                <p>
+                    MBTI là một công cụ đánh giá tâm lý được phát triển bởi Isabel Myers và Katharine Briggs dựa trên lý thuyết về các kiểu tâm lý của Carl Jung. Bài trắc nghiệm này phân loại tính cách của mỗi người dựa trên bốn cặp đối lập, tạo ra 16 loại tính cách khác nhau:
+                </p>
+            </div>
+            
+            <div class="mbti-mota-list4">
+                <div class="mbti-mota-list4-item">
+                    <img class="mbti-mota-list4-img" src="/static/images/mbti/1.png" alt="E/I">
+                    
+                    <!-- <div class="mbti-mota-list4-title">E - Extrovert / I - Introvert</div> -->
+                    <div class="mbti-mota-list4-desc">
+                        <div class="mbti-mota-list4-num">01</div>
+                        Cách bạn tương tác với thế giới xung quanh, tập trung sự chú ý và nạp thêm năng lượng
+                    </div>
+                </div>
+                <div class="mbti-mota-list4-item">
+                    <img class="mbti-mota-list4-img" src="/static/images/mbti/2.png" alt="S/N">
+                    
+                    <!-- <div class="mbti-mota-list4-title">S - Sensing / N - Intuition</div> -->
+                    <div class="mbti-mota-list4-desc">
+                        <div class="mbti-mota-list4-num">02</div>
+                        Cách bạn tiếp nhận thông tin, tập trung vào chi tiết cụ thể hay tư duy trừu tượng
+                    </div>
+                </div>
+                <div class="mbti-mota-list4-item">
+                    <img class="mbti-mota-list4-img" src="/static/images/mbti/2.png" alt="T/F">
+                    
+                    <!-- <div class="mbti-mota-list4-title">T - Thinking / F - Feeling</div> -->
+                    <div class="mbti-mota-list4-desc">
+                        <div class="mbti-mota-list4-num">03</div>
+                        Cách bạn đưa ra quyết định, dựa trên logic hay giá trị cảm xúc cá nhân và người khác
+                    </div>
+                </div>
+                <div class="mbti-mota-list4-item">
+                    <img class="mbti-mota-list4-img" src="/static/images/mbti/your-image-jp.png" alt="J/P">
+                    <!-- <div class="mbti-mota-list4-title">J - Judging / P - Perceiving</div> -->
+                    <div class="mbti-mota-list4-desc">
+                        <div class="mbti-mota-list4-num">04</div>
+                        Cách bạn sắp xếp cuộc sống, có kế hoạch hay tự do, tùy cơ ứng biến
+                    </div>
+                </div>
+            </div>
+        </div>
+       
+        
+        <!-- <h3>Tại sao bạn nên dành thời gian làm trắc nghiệm MBTI?</h3>
+        <div class="mbti-mota-benefit-grid" id="mbti-benefit-grid">
+            <div class="mbti-mota-benefit-card"><b>Hiểu rõ bản thân sâu sắc hơn</b>Đây là lợi ích cốt lõi. MBTI giúp bạn nhận diện những đặc điểm tính cách bẩm sinh, cách bạn tư duy, ra quyết định, tương tác với thế giới. Khi hiểu mình hơn, bạn sẽ dễ dàng chấp nhận những "khác biệt" của mình và phát huy những điểm mạnh tiềm ẩn.</div>
+            <div class="mbti-mota-benefit-card"><b>Cải thiện các mối quan hệ</b>Khi hiểu kiểu tính cách của mình và cả những người xung quanh, bạn có thể điều chỉnh cách giao tiếp, tương tác để giảm thiểu mâu thuẫn và xây dựng các mối quan hệ hòa hợp hơn, dù là trong công việc, gia đình hay bạn bè.</div>
+            <div class="mbti-mota-benefit-card"><b>Định hướng nghề nghiệp phù hợp</b>MBTI thường được sử dụng trong tư vấn hướng nghiệp. Mỗi nhóm tính cách sẽ có những đặc điểm phù hợp với một số lĩnh vực hoặc môi trường làm việc nhất định. Ví dụ, một người có tính cách INTP (Nhà tư duy logic) có thể phù hợp với nghiên cứu khoa học, trong khi một ESFP (Người làm giải trí) lại tỏa sáng trong các ngành nghề đòi hỏi sự tương tác xã hội và sáng tạo. MBTI cung cấp một góc nhìn để bạn tham khảo, từ đó đưa ra lựa chọn nghề nghiệp có tiềm năng phát triển và mang lại sự thỏa mãn cao hơn.</div>
+            <div class="mbti-mota-benefit-card"><b>Phát triển cá nhân và chuyên nghiệp</b>Khi biết mình thuộc kiểu tính cách nào, bạn có thể tập trung vào việc phát triển những kỹ năng còn yếu hoặc tận dụng tối đa những điểm mạnh của mình. Ví dụ, một người hướng nội có thể học cách thể hiện ý kiến hiệu quả hơn, hoặc một người lý trí có thể rèn luyện sự đồng cảm.</div>
+            <div class="mbti-mota-benefit-card"><b>Nâng cao hiệu quả làm việc nhóm</b>Trong môi trường làm việc, việc nhận diện các kiểu tính cách khác nhau trong nhóm giúp phân công nhiệm vụ phù hợp, tối ưu hóa sự hợp tác và giảm thiểu xung đột nội bộ.</div>
+        </div> -->
+        <!-- <h3>Làm trắc nghiệm MBTI ở đâu?</h3>
+        <p>
+            Bạn có thể tìm thấy nhiều bài trắc nghiệm MBTI trực tuyến miễn phí. Một trong những trang phổ biến và được nhiều người tin dùng là <b>16Personalities.com</b>. Bài trắc nghiệm trên trang này được thiết kế dễ hiểu, có độ tin cậy khá cao và cung cấp bản phân tích chi tiết về kiểu tính cách của bạn.
+        </p> -->
+        <div class="mbti-mota-highlight"style="font-size: 0.8rem; font-style: italic;">
+            <b >Lưu ý quan trọng:</b><br><br>
+          
+            Kết quả của bài trắc nghiệm sẽ là một mã gồm 4 chữ cái (ví dụ: INTJ, ESFP) đại diện cho kiểu tính cách của bạn.
+        
+        <br/>
+            MBTI là một công cụ hỗ trợ hiểu bản thân, không phải là một "cái nhãn" cố định. Tính cách con người rất phức tạp và có thể phát triển theo thời gian. Hãy xem MBTI như một điểm khởi đầu để bạn tiếp tục khám phá và hoàn thiện mình, thay vì để nó giới hạn tiềm năng của bạn nhé!
+        </div>
+       
+    </div>
+    <script>
+    // Hiệu ứng xuất hiện từng card benefit khi scroll tới
+    function animateBenefitCards() {
+        const cards = document.querySelectorAll('.mbti-mota-benefit-card');
+        const observer = new window.IntersectionObserver((entries, obs) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.classList.add('visible');
+                    }, entry.target.dataset.delay ? parseInt(entry.target.dataset.delay) : 0);
+                    obs.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15 });
+        cards.forEach((card, idx) => {
+            card.dataset.delay = idx * 120;
+            observer.observe(card);
+        });
+    }
+    document.addEventListener('DOMContentLoaded', animateBenefitCards);
+    // Hiệu ứng ánh sáng di chuyển theo chuột trên mbti-mota-container
+    (function() {
+        const container = document.querySelector('.mbti-mota-container');
+        const light = container.querySelector('.mbti-mota-mouse-light');
+        container.addEventListener('mousemove', function(e) {
+            const rect = container.getBoundingClientRect();
+            const x = ((e.clientX - rect.left) / rect.width) * 100;
+            const y = ((e.clientY - rect.top) / rect.height) * 100;
+            light.style.setProperty('--x', x + '%');
+            light.style.setProperty('--y', y + '%');
+        });
+        container.addEventListener('mouseleave', function() {
+            light.style.setProperty('--x', '50%');
+            light.style.setProperty('--y', '50%');
+        });
+    })();
+    </script>
+

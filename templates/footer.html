@@ -1,5 +1,10 @@
 {% block stylesheets %}
 <style>
+     html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+    }
 .footer-container {
     background: #d3d3d3;
     padding: 20px 0 0 0;
@@ -416,6 +421,12 @@
 }
 
 @media (max-width: 600px) {
+    .footer-container {
+   text-align: center;
+}
+.social-icons {
+    justify-content: center;
+}
     .footer-content {
         grid-template-columns: 1fr;
     }
@@ -425,7 +436,8 @@
     }
     
     .right-nav {
-        display: none;
+        /* display: none; */
+        
     }
     
     .magic-share {
@@ -457,7 +469,7 @@
 <div class="footer-container">
     <!-- Header -->
     <div class="footer-header">
-        <div class="footer-header-icon"><img src="/static/images/logo12.png" alt="logo" style="width: 100%; height: 100%;"></div>
+        <div class="footer-header-icon"><img src="/static/images/logo12.png" alt="logo" style=" height: 90px;"></div>
         <div class="footer-header-text">Đăng ký tìm trường cùng chúng tôi</div>
     </div>
 

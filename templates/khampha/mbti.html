@@ -4,7 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MBTI Test</title>
-    {% block stylesheet %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0V4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+
+    <link rel="icon" type="image/x-icon" href="/static/images/logo12.png">
     <style>
         /* CSS của bạn giữ nguyên */
         *{
@@ -27,7 +32,7 @@
         
         body::before{
             position: absolute;
-            width: min(1400px, 90vw);
+            width: min(1200px, 70vw);
             top: 10%;
             left: 50%;
             height: 90%;
@@ -44,17 +49,17 @@
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap'); /* Added Montserrat for the new section */
 
 
-        .banner{
+        .banner1{
             width: 100%;
-            height: 100vh;
+            height: 70vh;
             text-align: center;
             overflow: hidden;
             position: relative;
         }
-        .banner .slider{
+        .banner1 .slider1{
             position: absolute;
-            width: 200px;
-            height: 250px;
+            width: 100px;
+            height: 150px;
             top: 10%;
             left: calc(50% - 100px);
             transform-style: preserve-3d;
@@ -62,21 +67,22 @@
             animation: autoRun 20s linear infinite;
             z-index: 2;
             transition: animation-play-state 0.2s, transform 0.7s cubic-bezier(.77,0,.18,1); /* Added transform transition for smooth rotation change */
+            margin-left: 60px;
         }
-        .banner .slider.paused {
+        .banner1 .slider1.paused {
             animation-play-state: paused !important;
         }
         /* .banner .slider.to-grid { removed, handled by JS now for more control } */
 
         @keyframes autoRun{
             from{
-                transform: perspective(1000px) rotateX(-16deg) rotateY(0deg);
+                transform: perspective(1000px) rotateX(-8deg) rotateY(0deg);
             }to{
-                transform: perspective(1000px) rotateX(-16deg) rotateY(360deg);
+                transform: perspective(1000px) rotateX(-8deg) rotateY(360deg);
             }
         }
 
-        .banner .slider .item{
+        .banner1 .slider1 .item{
             position: absolute;
             inset: 0 0 0 0;
             /* Base 3D transform is always here */
@@ -87,44 +93,47 @@
             z-index: 1;
             cursor: pointer;
         }
-        .banner .slider .item:hover {
+        .banner1 .slider1 .item:hover {
             box-shadow: 0 0 32px 8px #f7b500cc, 0 0 0 4px #fff8;
             transform: 
                 rotateY(calc( (var(--position) - 1) * (360 / var(--quantity)) * 1deg))
-                translateZ(550px) scale(1.13);
+                translateZ(550px) 
+                scale(1.13)
+                rotateZ(3deg); /* ADDED THIS LINE for a subtle tilt */
             z-index: 10;
         }
         
-        .banner .slider .item img{
+        .banner1 .slider1 .item img{
             width: 100%;
             height: 100%;
             object-fit: cover;
             border-radius: 10px;
-            border: 2px solid #ffffff8c;
-            background: #fff;
+            background-color: #ffffff6e;
+            border: 1px solid #ffffff;
+            box-shadow: 0 8px 40px #00e0ff33, 0 0 0 4px #fff8;
         }
-        .banner .content{
+        .banner1 .content{
             position: absolute;
             bottom: 0;
             left: 50%;
             transform: translateX(-50%);
             width: min(1400px, 100vw);
             height: max-content;
-            padding-bottom: 100px;
+            /* padding-bottom: 100px; */
             display: flex;
             flex-wrap: wrap;
             justify-content: space-between;
             align-items: center;
             z-index: 1;
         }
-        .banner .content h1{
+        .banner1 .content h1{
             font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size: 16em;
+            font-size: 12em;
             line-height: 1em;
             color: #25283B;
             position: relative;
         }
-        .banner .content h1::after{
+        .banner1 .content h1::after{
             position: absolute;
             inset: 0 0 0 0;
             content: attr(data-content);
@@ -132,20 +141,20 @@
             -webkit-text-stroke: 2px #d2d2d2;
             color: transparent;
         }
-        .banner .content .author{
+        .banner1 .content .author{
             font-family: Poppins;
             text-align: right;
             max-width: 200px;
         }
-        .banner .content h2{
+        .banner1 .content h2{
             font-size: 1.3em;
-            font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
         }
         p{
             font-size: 1em;
             font-family:Verdana, Geneva, Tahoma, sans-serif;
         }   
-        .banner .content .model{
+        .banner1 .content .model{
             background-image: url(/static/images/mbti/trungtam1.gif);
             width: 100%;
             height: 65vh;
@@ -155,26 +164,26 @@
             background-size: auto 130%;
             background-repeat: no-repeat;
             background-position: top center;
-            z-index: 1000000;
+            z-index: 1000;
         }
         @media screen and (max-width: 1023px) {
-            .banner .slider{
+            .banner1 .slider1{
                 width: 160px;
                 height: 200px;
                 left: calc(50% - 80px);
             }
-            .banner .slider .item{
+            .banner1 .slider1 .item{
                 transform: 
                     rotateY(calc( (var(--position) - 1) * (360 / var(--quantity)) * 1deg))
                     translateZ(300px);
             }
-            .banner .content h1{
+            .banner1 .content h1{
                 text-align: center;
                 width: 100%;
                 text-shadow: 0 10px 20px #000;
                 font-size: 7em;
             }
-            .banner .content .author{
+            .banner1 .content .author{
                 color: #fff;
                 padding: 20px;
                 text-shadow: 0 10px 20px #000;
@@ -186,68 +195,250 @@
             }
         }
         @media screen and (max-width: 767px) {
-            .banner .slider{
+            .banner1 .slider1{
                 width: 100px;
                 height: 150px;
                 left: calc(50% - 50px);
             }
-            .banner .slider .item{
+            .banner1 .slider1 .item{
                 transform: 
                     rotateY(calc( (var(--position) - 1) * (360 / var(--quantity)) * 1deg))
                     translateZ(180px);
             }
-            .banner .content h1{
+            .banner1 .content h1{
                 font-size: 5em;
             }
         }
+        .mbti-header-container {
+            width: 100%;
+            min-height: 340px;
+            /* background: linear-gradient(180deg, #0a7c4e 0%, #0a5c3e 100%); */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 10px 10px 10px;
+            box-sizing: border-box;
+            text-align: center;
+            position: relative;
+            margin-bottom: 6px;
+        }
+        .mbti-header-container h1 {
+            font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(90deg, #0a4191 30%, #0065d2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 3.2rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            margin-bottom: 14px;
+            text-shadow: 0 4px 24px #0004;
+                        font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+        }
+        .mbti-header-sub {
+            color: #fff;
+            font-size: 2.1rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+        }
+        .mbti-header-icon {
+            height: 78px;
+        }
+        .mbti-header-btn {
+            display: inline-block;
+            background: linear-gradient(90deg, #00e0ff 0%, #1fa36b 100%);
+            color: #fff;
+            font-size: 1.5rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 40px;
+            padding: 18px 54px;
+            /* margin-top: 10px; */
+            margin-bottom: 20px;
+            text-decoration: none;
+            box-shadow: 0 4px 24px #00e0ff55;
+            letter-spacing: 1px;
+            transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+        }
+        .mbti-header-btn:hover {
+            background: linear-gradient(90deg, #edc937 0%, #00e0ff 100%);
+            box-shadow: 0 8px 32px #00e0ff99;
+            transform: scale(1.07);
+        }
+        @media (max-width: 700px) {
+            .mbti-header-container h1 { font-size: 2.1rem; }
+            .mbti-header-sub { font-size: 1.2rem; }
+            .mbti-header-btn { font-size: 1.1rem; padding: 12px 28px; }
+            .mbti-header-icon { width: 32px; height: 32px; }
+        }
+        .mbti-header-animate-row {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            height: 78px;
+            margin: 0 auto 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            font-size: 2.1rem;
+            font-weight: 500;
+            color: #fff;
+            overflow: hidden;
+        }
+        .mbti-header-text {
+            display: inline-block;
+            width: 100%;
+            text-align: center;
+            transition: opacity 0.4s;
+            z-index: 1;
+            font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 2.0rem;
+
+        }
+        .mbti-header-robot {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%) translateX(0);
+            height: 78px;
+            z-index: 2;
+            transition: transform 2.2s cubic-bezier(.77,0,.18,1);
+            will-change: transform;
+        }
+        .slider-mobile {
+            display: none;
+        }
+        @media (max-width: 767px) {
+            .slider {
+                display: none !important;
+            }
+            .slider-mobile {
+                display: block !important;
+                width: 100vw;
+                overflow-x: auto;
+                padding: 18px 0 12px 0;
+                background: none;
+            }
+            .slider-mobile-track {
+                display: flex;
+                gap: 18px;
+                align-items: center;
+                width: max-content;
+                padding-left: 18px;
+            }
+            .slider-mobile-item {
+                min-width: 90px;
+                max-width: 120px;
+                height: 120px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: #fff;
+                border-radius: 16px;
+                box-shadow: 0 4px 24px #00e0ff22;
+                transition: box-shadow 0.2s, transform 0.2s;
+                cursor: pointer;
+            }
+            .slider-mobile-item img {
+                width: 80px;
+                height: 80px;
+                object-fit: contain;
+                border-radius: 10px;
+            }
+            .slider-mobile-item:active {
+                box-shadow: 0 8px 32px #00e0ff55;
+                transform: scale(1.08);
+            }
+        }
     </style>
-    {% endblock %}
 </head>
 <body>
+    {% include "/header.html" %}
 
-    <div class="banner">
-        <div class="slider" style="--quantity: 10">
-            <div class="item" style="--position: 1"><img src="/static/images/mbti/estp.png" alt="ESTP MBTI Type"></div>
-            <div class="item" style="--position: 2"><img src="/static/images/mbti/intj.png" alt="INTJ MBTI Type"></div>
-            <div class="item" style="--position: 3"><img src="/static/images/mbti/infj.png" alt="INFJ MBTI Type"></div>
-            <div class="item" style="--position: 4"><img src="/static/images/mbti/istj.png" alt="ISTJ MBTI Type"></div>
-            <div class="item" style="--position: 5"><img src="/static/images/mbti/istp.png" alt="ISTP MBTI Type"></div>
-            <div class="item" style="--position: 6"><img src="/static/images/mbti/intp.png" alt="INTP MBTI Type"></div>
-            <div class="item" style="--position: 7"><img src="/static/images/mbti/infp.png" alt="INFP MBTI Type"></div>
-            <div class="item" style="--position: 8"><img src="/static/images/mbti/isfj.png" alt="ISFJ MBTI Type"></div>
-            <div class="item" style="--position: 9"><img src="/static/images/mbti/isfp.png" alt="ISFP MBTI Type"></div>
-            <div class="item" style="--position: 10"><img src="/static/images/mbti/entj.png" alt="ENTJ MBTI Type"></div>
-
-            </div>
-        <div class="content">
-            <h1 data-content="MBTI TEST">
-                MBTI TEST
-            </h1> 
-            <div class="author">
-                <h2>Bài Test Tính Cách</h2>
-                <p>Bạn đã biết bản thân mình là kiểu tính cách nào chưa? Hãy thử làm bài test tính cách MBTI để tìm ra bản thân mình nhé!</p>
-               
-            </div>
-            <div class="model"></div>
+    <div class="mbti-header-container">
+        <h1>TRẮC NGHIỆM TÍNH CÁCH MBTI</h1>
+        <div class="mbti-header-animate-row">
+            <span class="mbti-header-text">Tỏa sáng năng lực nghề nghiệp</span>
+            <img src="/static/images/gif/robot.gif" alt="robot" class="mbti-header-robot">
         </div>
+        <a href="#mbti-test" class="mbti-header-btn">Làm bài test <span style="font-size:1.3em;vertical-align:middle;"></span></a>
     </div>
+   
+    <div class="banner1">
+        <div class="slider1" style="--quantity: 16">
+            <div class="item" style="--position: 1"><img src="/static/images/mbti/enfj.png" alt="ESTP MBTI Type"></div>
+            <div class="item" style="--position: 2"><img src="/static/images/mbti/enfp.png" alt="INTJ MBTI Type"></div>
+            <div class="item" style="--position: 3"><img src="/static/images/mbti/entj.png" alt="INFJ MBTI Type"></div>
+            <div class="item" style="--position: 4"><img src="/static/images/mbti/entp.png" alt="ISTJ MBTI Type"></div>
+            <div class="item" style="--position: 5"><img src="/static/images/mbti/esfj.png" alt="ISTP MBTI Type"></div>
+            <div class="item" style="--position: 6"><img src="/static/images/mbti/esfp.png" alt="INTP MBTI Type"></div>
+            <div class="item" style="--position: 7"><img src="/static/images/mbti/estj.png" alt="INFP MBTI Type"></div>
+            <div class="item" style="--position: 8"><img src="/static/images/mbti/estp.png" alt="ISFJ MBTI Type"></div>
+            <div class="item" style="--position: 9"><img src="/static/images/mbti/infj.png" alt="ISFP MBTI Type"></div>
+            <div class="item" style="--position: 10"><img src="/static/images/mbti/infp.png" alt="ENTJ MBTI Type"></div>
+            <div class="item" style="--position: 11"><img src="/static/images/mbti/intj.png" alt="ENTP MBTI Type"></div>
+            <div class="item" style="--position: 12"><img src="/static/images/mbti/intp.png" alt="ESFJ MBTI Type"></div>
+            <div class="item" style="--position: 13"><img src="/static/images/mbti/isfj.png" alt="ESFP MBTI Type"></div>
+            <div class="item" style="--position: 14"><img src="/static/images/mbti/isfp.png" alt="ESTJ MBTI Type"></div>
+            <div class="item" style="--position: 15"><img src="/static/images/mbti/istj.png" alt="ESFJ MBTI Type"></div>
+            <div class="item" style="--position: 16"><img src="/static/images/mbti/istp.png" alt="ESFP MBTI Type"></div>
+        </div>
+        <div class="slider-mobile">
+            <div class="slider-mobile-track">
+                <div class="slider-mobile-item"><img src="/static/images/mbti/estp.png" alt="ESTP"></div>
+                <div class="slider-mobile-item"><img src="/static/images/mbti/intj.png" alt="INTJ"></div>
+                <div class="slider-mobile-item"><img src="/static/images/mbti/infj.png" alt="INFJ"></div>
+                <div class="slider-mobile-item"><img src="/static/images/mbti/istj.png" alt="ISTJ"></div>
+                <div class="slider-mobile-item"><img src="/static/images/mbti/istp.png" alt="ISTP"></div>
+                <div class="slider-mobile-item"><img src="/static/images/mbti/intp.png" alt="INTP"></div>
+                <div class="slider-mobile-item"><img src="/static/images/mbti/infp.png" alt="INFP"></div>
+                <div class="slider-mobile-item"><img src="/static/images/mbti/isfj.png" alt="ISFJ"></div>
+                <div class="slider-mobile-item"><img src="/static/images/mbti/isfp.png" alt="ISFP"></div>
+                <div class="slider-mobile-item"><img src="/static/images/mbti/entj.png" alt="ENTJ"></div>
+                <div class="slider-mobile-item"><img src="/static/images/mbti/entp.png" alt="ENTP"></div>
+                <div class="slider-mobile-item"><img src="/static/images/mbti/esfj.png" alt="ESFJ"></div>
+                <div class="slider-mobile-item"><img src="/static/images/mbti/esfp.png" alt="ESFP"></div>
+                <div class="slider-mobile-item"><img src="/static/images/mbti/estj.png" alt="ESTJ"></div>
+                <div class="slider-mobile-item"><img src="/static/images/mbti/esfj.png" alt="ESFJ"></div>
+                <div class="slider-mobile-item"><img src="/static/images/mbti/esfp.png" alt="ESFP"></div>
+            </div>
+        </div>
+        <div class="content">
+            <h1 data-content="">
+                  
+            </h1> 
+            
+            </div>
+    </div>
+    {% include "/khampha/mota.html" %}
+    {% include "/khampha/mbti16.html" %}
+    {% include "/khampha/visao.html" %}
+    {% include "/footer.html" %}
+    
+    {% block scripts %}
     <script>
     // Pause autoRun when hover, resume when mouseleave
-    const slider = document.querySelector('.slider');
+    const slider = document.querySelector('.banner1 > .slider1');
     let isPaused = false;
-    let autoRunAnimationName = 'autoRun'; // Name of your CSS animation
+    let autoRunAnimationName = 'autoRun';
 
-    slider.addEventListener('mouseenter', () => {
+    slider.addEventListener('mouseover', () => {
         slider.classList.add('paused');
         isPaused = true;
     });
-    slider.addEventListener('mouseleave', () => {
+    slider.addEventListener('mouseout', () => {
         slider.classList.remove('paused');
         isPaused = false;
     });
 
     // Improved drag to rotate (like a real wheel)
-    let dragging = false, lastAngle = 0, currentRotation = 0, velocity = 0;
+    let dragging = false, lastAngle = 0, currentRotation = 0, velocity = 0, inertiaFrame = null;
     
     const center = () => {
         const rect = slider.getBoundingClientRect();
@@ -261,31 +452,27 @@
         return Math.atan2(y - c.y, x - c.x) * 180 / Math.PI;
     }
     function setRotation(angle) {
-        slider.style.animation = 'none'; // Temporarily disable CSS animation for manual control
+        slider.style.animation = 'none';
         slider.style.transform = `perspective(1000px) rotateX(-16deg) rotateY(${angle}deg)`;
     }
-    
-    // Function to extract current Y rotation from computed style (simplified for this context)
     function getCurrentYRotation() {
         const st = window.getComputedStyle(slider);
         const transformMatrix = st.transform || st.webkitTransform || st.mozTransform;
         if (transformMatrix && transformMatrix !== 'none') {
-            // This is a simplified approach, direct parsing of matrix3d can be complex.
-            // Assuming rotateY is the primary varying transform here.
             const match = transformMatrix.match(/rotateY\((-?\d+\.?\d*)deg\)/);
             if (match && match[1]) {
                 return parseFloat(match[1]);
             }
         }
-        return 0; // Default if no transform
+        return 0;
     }
-
     slider.addEventListener('mousedown', (e) => {
         isPaused = true;
         slider.classList.add('paused');
         dragging = true;
         lastAngle = getAngle(e.clientX, e.clientY);
-        currentRotation = getCurrentYRotation(); // Get actual rotation
+        currentRotation = getCurrentYRotation();
+        if (inertiaFrame) cancelAnimationFrame(inertiaFrame);
     });
     document.addEventListener('mousemove', (e) => {
         if (!dragging) return;
@@ -301,30 +488,30 @@
     document.addEventListener('mouseup', () => {
         if (!dragging) return;
         dragging = false;
-        let inertia = velocity * 0.8; // Reduce initial inertia slightly
+        let inertia = velocity * 0.8;
         function animateInertia() {
             if (Math.abs(inertia) < 0.05) {
-                // Re-enable CSS animation if not paused by user
                 if (!isPaused) slider.style.animation = `${autoRunAnimationName} 20s linear infinite`;
-                else slider.style.animation = 'none'; // Ensure it stays none if manually paused
+                else slider.style.animation = 'none';
+                inertiaFrame = null;
                 return;
             }
             currentRotation += inertia;
             setRotation(currentRotation);
             inertia *= 0.95;
-            requestAnimationFrame(animateInertia);
+            inertiaFrame = requestAnimationFrame(animateInertia);
         }
         animateInertia();
     });
-
     // Touch support
     slider.addEventListener('touchstart', (e) => {
         isPaused = true;
         slider.classList.add('paused');
         dragging = true;
         lastAngle = getAngle(e.touches[0].clientX, e.touches[0].clientY);
-        currentRotation = getCurrentYRotation(); // Get actual rotation
-        e.preventDefault(); // Prevent default touch behavior (like scrolling)
+        currentRotation = getCurrentYRotation();
+        if (inertiaFrame) cancelAnimationFrame(inertiaFrame);
+        e.preventDefault();
     });
     slider.addEventListener('touchmove', (e) => {
         if (!dragging) return;
@@ -336,167 +523,80 @@
         setRotation(currentRotation);
         velocity = delta;
         lastAngle = angle;
-        e.preventDefault(); // Prevent default touch behavior (like scrolling)
+        e.preventDefault();
     });
     slider.addEventListener('touchend', () => {
         if (!dragging) return;
         dragging = false;
-        let inertia = velocity * 0.8; // Reduce initial inertia slightly
+        let inertia = velocity * 0.8;
         function animateInertia() {
             if (Math.abs(inertia) < 0.05) {
                 if (!isPaused) slider.style.animation = `${autoRunAnimationName} 20s linear infinite`;
                 else slider.style.animation = 'none';
+                inertiaFrame = null;
                 return;
             }
             currentRotation += inertia;
             setRotation(currentRotation);
             inertia *= 0.95;
-            requestAnimationFrame(animateInertia);
+            inertiaFrame = requestAnimationFrame(animateInertia);
         }
         animateInertia();
     });
-
-    // EFFECT: Animation when scrolling
-    const items = Array.from(document.querySelectorAll('.slider .item'));
-    let activeAnimation = false; // Flag to prevent multiple animations
-    let gridMode = false; // Indicates if items are in "hidden/grid" state after fading out
-
-    function toRightAndFade() {
-        if (activeAnimation || gridMode) return; // Don't re-trigger if already animating or in grid mode
-        activeAnimation = true;
-        gridMode = true; // Set to gridMode immediately at the start of fade-out
-
-        slider.classList.add('paused'); // Pause auto-rotation
-        slider.style.animation = 'none'; // Stop current animation for precise control
-
-        items.forEach((item, i) => {
-            const rect = item.getBoundingClientRect();
-            item.style.position = 'fixed'; // Fix position relative to viewport
-            item.style.left = rect.left + 'px';
-            item.style.top = rect.top + 'px';
-            item.style.width = rect.width + 'px';
-            item.style.height = rect.height + 'px';
-            item.style.zIndex = '1000'; // Bring to front
-            item.style.opacity = '1';
-            item.style.transform = 'none'; // Clear any 3D transforms for linear movement
-            item.style.transition = 'none'; // Clear existing transitions
+    // Dừng auto xoay khi hover vào bất kỳ item trong slider
+    document.querySelectorAll('.slider1 .item').forEach(item => {
+        item.addEventListener('mouseenter', () => {
+            slider.classList.add('paused');
+            isPaused = true;
         });
-
-        // Animate them flying to the right and fading out
-        setTimeout(() => {
-            items.forEach((item, i) => {
-                const screenWidth = window.innerWidth;
-                item.style.transition = `transform 1.2s cubic-bezier(.77,0,.18,1), opacity 0.8s ease-in-out`;
-                item.style.transform = `translateX(${screenWidth + 300}px)`; // Move far right off screen
-                item.style.opacity = '0'; // Fade out
-                item.style.transitionDelay = (i * 70) + 'ms'; // Staggered delay
-            });
-        }, 50); // Small delay to apply initial styles
-
-        // Clean up after animation
-        setTimeout(() => {
-            items.forEach((item) => {
-                item.style.display = 'none'; // Hide completely
-                // Reset all inline styles so CSS can take over cleanly later
-                item.style.cssText = ''; 
-                // Ensure --position is re-applied as cssText = '' removes it
-                item.style.setProperty('--position', item.dataset.position); 
-            });
-            activeAnimation = false;
-        }, 1200 + items.length * 70 + 100); // Wait for all animations to complete + buffer
-    }
-
-    function toCircleAppearFromLeft() {
-        if (activeAnimation || !gridMode) return; // Don't re-trigger if already animating or not in grid mode
-        activeAnimation = true;
-        gridMode = false; // Set to not gridMode immediately at the start of fade-in
-
-        slider.style.animation = 'none'; // Stop auto-rotation for smooth transition in
-        slider.classList.add('paused'); 
-
-        items.forEach((item, i) => {
-            // Reset to initial state for animation from left
-            item.style.display = 'block'; // Make visible
-            item.style.opacity = '0'; // Start invisible
-            item.style.position = 'absolute'; // Restore absolute position within slider
-            item.style.left = '0';
-            item.style.top = '0';
-            item.style.width = '100%';
-            item.style.height = '100%';
-            item.style.zIndex = '1'; // Reset z-index
-
-            // Initial position: far left, scale nhỏ, shadow mờ
-            item.style.transform = `translateX(-${window.innerWidth * 0.8}px) scale(0.8)`;
-            item.style.boxShadow = '0 0 0px 0px #f7b50000';
-            item.style.transition = 'none'; // No transition initially
-            item.style.setProperty('--position', item.dataset.position); // Ensure --position is set
+        item.addEventListener('mouseleave', () => {
+            slider.classList.remove('paused');
+            isPaused = false;
         });
-
-        // Animate: fly from left to original 3D circular position and fade in, scale, glow
-        setTimeout(() => {
-            items.forEach((item, i) => {
-                const quantity = items.length;
-                const position = parseInt(item.dataset.position);
-                const rotateYValue = (position - 1) * (360 / quantity);
-                const translateZValue = 550;
-                // 1. Bay vào, scale lớn nhẹ, glow mạnh
-                setTimeout(() => {
-                    item.style.transition = 'transform 0.7s cubic-bezier(.77,0,.18,1), opacity 0.5s, box-shadow 0.5s';
-                    item.style.transform = `rotateY(${rotateYValue}deg) translateZ(${translateZValue}px) scale(1.08)`;
-                    item.style.opacity = '1';
-                    item.style.boxShadow = '0 0 32px 8px #f7b500cc, 0 0 0 4px #fff8';
-                }, i * 90 + 10);
-                // 2. Sau đó scale về 1, shadow dịu lại
-                setTimeout(() => {
-                    item.style.transition = 'transform 0.3s, box-shadow 0.4s';
-                    item.style.transform = `rotateY(${rotateYValue}deg) translateZ(${translateZValue}px) scale(1)`;
-                    item.style.boxShadow = '0 4px 24px #0002';
-                }, i * 90 + 10 + 600);
-            });
-        }, 50);
-
-        // Clean up and re-enable autoRun animation
-        setTimeout(() => {
-            items.forEach((item) => {
-                item.style.cssText = ''; 
-                item.style.setProperty('--position', item.dataset.position); // Re-set original custom property
-            });
-            slider.classList.remove('paused'); // Allow autoRun animation
-            slider.style.animation = `${autoRunAnimationName} 20s linear infinite`; // Re-enable CSS animation
-            activeAnimation = false;
-        }, 1000 + items.length * 90 + 400);
-    }
-
-    // Initial setup: Store --position for later use if style.cssText = '' wipes it
-    items.forEach(item => {
-        item.dataset.position = item.style.getPropertyValue('--position');
-        // Add alt text for accessibility as well if not already there
-        if (!item.querySelector('img').alt) {
-            item.querySelector('img').alt = 'MBTI Type Card'; // Generic alt text
-        }
-    });
-
-    // --- Cập nhật logic kiểm tra cuộn chuột ---
-    let lastScrollTop = 0; // Biến để lưu vị trí cuộn trước đó
-    const scrollThreshold = 10; // Ngưỡng cuộn (pixels) để kích hoạt hiệu ứng
-
-    window.addEventListener('scroll', () => {
-        // Chỉ xử lý nếu không có animation nào đang chạy
-        if (activeAnimation) return; 
-
-        const currentScrollTop = window.scrollY || document.documentElement.scrollTop;
-
-        // Cuộn xuống
-        if (currentScrollTop > lastScrollTop + scrollThreshold) { 
-            toRightAndFade();
-        } 
-        // Cuộn lên
-        else if (currentScrollTop < lastScrollTop - scrollThreshold) { 
-            toCircleAppearFromLeft();
-        }
-        
-        lastScrollTop = currentScrollTop; // Cập nhật vị trí cuộn cuối cùng
     });
     </script>
+    <script>
+(function() {
+    const texts = [
+        'Tỏa sáng năng lực nghề nghiệp',
+        'Khám phá tiềm năng bản thân'
+    ];
+    let idx = 0;
+    let direction = 1; // 1: left->right, -1: right->left
+    const row = document.querySelector('.mbti-header-animate-row');
+    const textEl = row.querySelector('.mbti-header-text');
+    const robot = row.querySelector('.mbti-header-robot');
+    function animateRobot() {
+        const rowWidth = row.offsetWidth;
+        const robotWidth = robot.offsetWidth;
+        const maxX = rowWidth - robotWidth;
+        robot.style.transition = 'transform 1.2s cubic-bezier(.77,0,.18,1)';
+        if (direction === 1) {
+            robot.style.transform = `translateY(-50%) translateX(${maxX}px)`;
+        } else {
+            robot.style.transform = `translateY(-50%) translateX(0)`;
+        }
+        setTimeout(() => {
+            // Đổi text
+            idx = (idx + 1) % texts.length;
+            textEl.style.opacity = 0;
+            setTimeout(() => {
+                textEl.textContent = texts[idx];
+                textEl.style.opacity = 1;
+            }, 350);
+            // Đổi hướng
+            direction *= -1;
+            // Lật robot nếu muốn (nếu robot nhìn 1 hướng)
+            robot.style.transform += direction === -1 ? ' scaleX(-1)' : ' scaleX(1)';
+            setTimeout(animateRobot, 1200);
+        }, 1200);
+    }
+    // Khởi động sau khi load xong
+    window.addEventListener('DOMContentLoaded', () => {
+        setTimeout(animateRobot, 600);
+    });
+})();
+</script>
+{% endblock %}
 </body>
 </html>

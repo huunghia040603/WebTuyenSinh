@@ -31,9 +31,13 @@ def dangky():
 def mbti():
     return render_template('/khampha/mbti.html')
 
-@app.route("/mbti16")
-def mbti16():
-    return render_template('/khampha/mbti16.html')
+@app.route("/mota")
+def mota():
+    return render_template('/khampha/mota.html')
+
+@app.route("/visao")
+def visao():
+    return render_template('/khampha/visao.html')
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -1,0 +1,307 @@
+{% block stylesheets %}
+    <style>
+        body {
+            font-family: 'Montserrat', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #0a2a2a;
+        }
+        .visao-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 48px 16px 0 16px;
+            margin-bottom: 40px;
+            margin-top: 100px;
+        }
+        .visao-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 32px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+        .visao-title {
+            font-size: 2.6rem;
+            font-weight: 900;
+            color: #0a107c;
+            margin-bottom: 0;
+            flex: 0 0 auto;
+            text-align:justify;
+        }
+        .visao-desc {
+            color: #000000;
+            font-size: 0.9rem;
+            max-width: 700px;
+            margin-bottom: 0;
+            flex: 1 1 0;
+            text-align:justify;
+        }
+        .visao-slider {
+           
+            border-radius: 28px;
+            box-shadow: 0 4px 32px #00e0ff22;
+            padding:100px 180px 80px 180px;
+            align-items: center;
+            position: relative;
+            min-height: 220px;
+            overflow: hidden;
+            transition: transform 1.2s cubic-bezier(.77,0,.18,1), opacity 1.2s;
+            will-change: transform, opacity;
+            background: linear-gradient(90deg, #e0e7ef 60%, #c6f1ff 100%);
+            border-left: 4px solid #00e0ff;
+
+        }
+        .visao-slider.slide-left {
+            transform: translateX(-100vw);
+            opacity: 0;
+        }
+        .visao-slider.slide-right {
+            transform: translateX(100vw);
+            opacity: 0;
+        }
+        .visao-slider.slide-in {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        .visao-slide-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.7rem;
+            color: #0a107c;
+            box-shadow: 0 2px 8px #00e0ff22, 0 0 0 2px #00e0ff33;
+            cursor: pointer;
+            z-index: 10;
+            opacity: 1;
+            transition: background 1.2s, color 1.2s, opacity 1.2s;
+            outline: none;
+            border: 2px solid #00e0ff33;
+        }
+        .visao-slide-arrow.left { left: 15px; }
+        .visao-slide-arrow.right { right: 15px; }
+        .visao-slide-arrow:active, .visao-slide-arrow:focus {
+            background: #00e0ff;
+            color: #fff;
+            opacity: 1;
+        }
+        .visao-slide-arrow:hover {
+            background: #00e0ff;
+            color: #fff;
+            opacity: 1;
+        }
+        .visao-slide-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            position: relative;
+            transition: transform 2s cubic-bezier(.77,0,.18,1), opacity 1.35s;
+            will-change: transform, opacity;
+            
+
+        }
+        .visao-slide-content.slide-left {
+            transform: translateX(-100%);
+            opacity: 0;
+        }
+        .visao-slide-content.slide-right {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        .visao-slide-content.slide-in {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        .visao-slide-icon {
+            width: 90px;
+            height: 90px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .visao-slide-icon img {
+            margin-right:20px;
+            height: 250px;
+            object-fit: contain;
+        }
+        .visao-slide-info {
+            flex: 1;
+        }
+        .visao-slide-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #0a107c;
+            margin-bottom: 10px;
+        }
+        .visao-slide-desc {
+            font-size: 1.13rem;
+            color: #0a2a2a;
+            margin-bottom: 0;
+        }
+        .visao-note {
+            margin: 32px 0 0 0;
+            font-size: 1rem;
+            color: #0a107c;
+           
+            border-radius: 12px;
+            padding: 16px 22px;
+            font-style: italic;
+            background: linear-gradient(90deg, #e0e7ef 60%, #c6f1ff 100%);
+            border-left: 4px solid #00e0ff;
+        }
+        .visao-box-yellow {
+            background: #ffe28a;
+            color: #0a2a2a;
+            border-radius: 14px;
+            padding: 18px 24px;
+            margin: 32px 0 0 0;
+            font-size: 1.08rem;
+            font-weight: 500;
+        }
+        @media (max-width: 700px) {
+            .visao-title { font-size: 1.5rem; }
+            .visao-slider { flex-direction: column; padding: 18px 8px; }
+            .visao-slide-content { flex-direction: column; gap: 18px; }
+            .visao-slide-title { font-size: 1.2rem; }
+            .visao-slide-icon { width: 60px; height: 60px; }
+            .visao-slide-arrow {
+                width: 38px;
+                height: 38px;
+                font-size: 1.3rem;
+            }
+        }
+        @media (max-width: 900px) {
+            .visao-header-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            .visao-title { font-size: 1.5rem; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous" />
+    {% endblock %}
+
+<body>
+    <div class="visao-container">
+        <div class="visao-header-row">
+            <div class="visao-title">Tại sao bạn nên làm trắc nghiệm MBTI?</div>
+            <div class="visao-desc">
+                MBTI giúp bạn hiểu rõ hơn về bản thân, bao gồm điểm mạnh, điểm yếu, sở thích, cũng như khả năng tương thích với các ngành nghề, trường học và môi trường phù hợp nhất với bạn.
+            </div>
+        </div>
+        <div class="visao-slider" id="visao-slider">
+            <button class="visao-slide-arrow left" id="visao-prev"><i class="fa fa-chevron-left"></i></button>
+            <div class="visao-slide-content">
+                <div class="visao-slide-icon"><img id="visao-slide-icon" src="/static/images/mbti/briefcase.png" alt="icon"></div>
+                <div class="visao-slide-info">
+                    <div class="visao-slide-title" id="visao-slide-title">01. Trong sự nghiệp</div>
+                    <div class="visao-slide-desc" id="visao-slide-desc">
+                        MBTI giúp bạn xác định nhóm ngành nghề phù hợp với tính cách, điểm mạnh và sở thích của mình. Nhờ đó, bạn có thể lựa chọn công việc, môi trường làm việc phù hợp nhất để phát triển bản thân lâu dài.
+                    </div>
+                </div>
+            </div>
+            <button class="visao-slide-arrow right" id="visao-next"><i class="fa fa-chevron-right"></i></button>
+        </div>
+        <div class="visao-note">
+            Lưu ý: MBTI không phân loại ai tốt / xấu hơn ai, mà giúp bạn nhận ra điểm mạnh, điểm yếu để không ngừng hoàn thiện bản thân.
+        </div>
+       
+    </div>
+    {% block scripts %}
+    <script>
+    // Dữ liệu các slide
+    const visaoSlides = [
+        {
+            icon: '/static/images/gif/1.gif',
+            title: '01. Trong sự nghiệp',
+            desc: 'MBTI giúp bạn xác định nhóm ngành nghề phù hợp với tính cách, điểm mạnh và sở thích của mình. Nhờ đó, bạn có thể lựa chọn công việc, môi trường làm việc phù hợp nhất để phát triển bản thân lâu dài.'
+        },
+        {
+            icon: '/static/images/gif/2.gif',
+            title: '02. Tìm trường học phù hợp',
+            desc: 'Kết quả MBTI giúp bạn chọn trường học, môi trường đào tạo phù hợp với phong cách học tập, định hướng phát triển cá nhân và nghề nghiệp tương lai.'
+        },
+        {
+            icon: '/static/images/gif/3.gif',
+            title: '03. Định hướng ngành nghề',
+            desc: 'MBTI giúp bạn khám phá các ngành nghề phù hợp với tính cách, từ đó xây dựng lộ trình học tập, phát triển kỹ năng và lựa chọn ngành học đúng đắn.'
+        },
+        {
+            icon: '/static/images/gif/4.gif',
+            title: '04. Hiểu bản thân & giao tiếp',
+            desc: 'Hiểu rõ bản thân giúp bạn tự tin hơn khi giao tiếp, làm việc nhóm, xây dựng mối quan hệ tốt với bạn bè, thầy cô và đồng nghiệp.'
+        }
+    ];
+    let visaoIdx = 0;
+    let visaoTimer = null;
+    let visaoAnimating = false;
+    const slider = document.getElementById('visao-slider');
+    const slideContent = document.querySelector('.visao-slide-content');
+    function renderVisaoSlide(idx) {
+        document.getElementById('visao-slide-icon').src = visaoSlides[idx].icon;
+        document.getElementById('visao-slide-title').textContent = visaoSlides[idx].title;
+        document.getElementById('visao-slide-desc').textContent = visaoSlides[idx].desc;
+    }
+    function animateVisaoSlider(direction = 1, nextIdx = null) {
+        if (visaoAnimating) return;
+        visaoAnimating = true;
+        const outClass = direction === 1 ? 'slide-left' : 'slide-right';
+        const inClass = 'slide-in';
+        slider.classList.remove('slide-in');
+        slider.classList.add(outClass);
+        setTimeout(() => {
+            if (nextIdx !== null) {
+                renderVisaoSlide(nextIdx);
+                visaoIdx = nextIdx;
+            }
+            slider.classList.remove(outClass);
+            slider.classList.add(inClass);
+            setTimeout(() => {
+                visaoAnimating = false;
+            }, 1200);
+        }, 600);
+    }
+    function startVisaoAutoSlide() {
+        if (visaoTimer) clearInterval(visaoTimer);
+        visaoTimer = setInterval(() => {
+            let nextIdx = (visaoIdx + 1) % visaoSlides.length;
+            animateVisaoSlider(1, nextIdx);
+        }, 4000);
+    }
+    document.getElementById('visao-prev').onclick = function() {
+        if (visaoAnimating) return;
+        let prevIdx = (visaoIdx - 1 + visaoSlides.length) % visaoSlides.length;
+        animateVisaoSlider(-1, prevIdx);
+        startVisaoAutoSlide();
+    };
+    document.getElementById('visao-next').onclick = function() {
+        if (visaoAnimating) return;
+        let nextIdx = (visaoIdx + 1) % visaoSlides.length;
+        animateVisaoSlider(1, nextIdx);
+        startVisaoAutoSlide();
+    };
+    // Khởi tạo slide đầu tiên và auto slide
+    slider.classList.add('slide-in');
+    renderVisaoSlide(visaoIdx);
+    startVisaoAutoSlide();
+    // Dừng auto slide khi hover, tiếp tục khi rời chuột
+    slider.addEventListener('mouseenter', function() {
+        if (visaoTimer) clearInterval(visaoTimer);
+    });
+    slider.addEventListener('mouseleave', function() {
+        startVisaoAutoSlide();
+    });
+    </script>
+    {% endblock %}
+
