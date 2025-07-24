@@ -111,7 +111,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
             `;
 
-            card.querySelector('.card-image').addEventListener('mouseenter', () => showModal(university, location, tuitionDisplay));
+            // Sửa: chỉ hiện modal khi hover vào tên trường 3s mới hiện ra
+            let hoverTimeout;
+            const nameEl = card.querySelector('.university-name');
+            nameEl.addEventListener('mouseenter', () => {
+                hoverTimeout = setTimeout(() => showModal(university, location, tuitionDisplay), 300);
+            });
+            nameEl.addEventListener('mouseleave', () => {
+                clearTimeout(hoverTimeout);
+            });
             universitiesGrid.appendChild(card);
         });
     }
