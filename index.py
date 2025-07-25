@@ -11,9 +11,9 @@ def index():
 def dai_hoc_hcm():
     return render_template('dh-hcm.html')
 
-@app.route("/truongdaihoc/ou")
-def dai_hoc_ou():
-    return render_template('truongdaihoc/daihocmo.html')
+# @app.route("/truongdaihoc/ou")
+# def dai_hoc_ou():
+#     return render_template('truongdaihoc/daihocmo.html')
 
 @app.errorhandler(404)
 def page_not_found(e):
