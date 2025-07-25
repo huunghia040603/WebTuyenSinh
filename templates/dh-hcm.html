@@ -109,9 +109,11 @@
     }
 
     .filter-select {
+        color: #0a4191;
         padding: 10px 25px;
         border: 2px solid #e5e7eb;
         text-align: center;
+        font-weight: 600;
         border-radius: 8px;
         background: white;
         font-size: 0.9rem;
@@ -786,6 +788,155 @@
     text-shadow: 0 2px 12px #00e0ff22;
 }
 
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+       
+.double-slider-box2 {
+    background-color: #fff;
+    padding: 2px 40px;
+    border-radius: 10px;
+    max-width: 20rem;
+    width: 100%;
+}
+
+h3.range-title2 {
+    margin-bottom: 4rem;
+    text-align: center;
+    color: #333;
+}
+
+.range-slider2 {
+    position: relative;
+    width: 100%;
+    height: 5px;
+    margin: 3px 0;
+    background-color: #ffffff; /* Lighter track for contrast */
+    border-radius: 5px;
+}
+
+.slider-track2 {
+    height: 100%;
+    position: absolute;
+    background-color: #0700cf;
+    border-radius: 5px;
+}
+
+.range-slider2 input {
+    position: absolute;
+    width: 100%;
+    background: none;
+    pointer-events: none;
+    top: 50%;
+    transform: translateY(-50%);
+    appearance: none;
+    -webkit-appearance: none; /* For Chrome/Safari */
+}
+
+.range-slider2 input[type="range"]::-webkit-slider-thumb {
+    height: 25px;
+    width: 25px;
+    border-radius: 50%;
+    border: 3px solid #ff9a1f !important;
+        background: #fff; /* Thumb background color */
+    pointer-events: auto;
+    -webkit-appearance: none;
+    cursor: grab;
+    box-shadow: 0 .125rem .5625rem -0.125rem rgba(0, 0, 0, .25);
+    transition: background 0.3s ease;
+}
+
+.range-slider2 input[type="range"]::-webkit-slider-thumb:active {
+    cursor: grabbing;
+}
+
+.range-slider2 input[type="range"]::-moz-range-thumb {
+    height: 25px;
+    width: 25px;
+    border-radius: 50%;
+    border: 3px solid #ffb60c !important;
+    background: #fff;
+    pointer-events: auto;
+    -moz-appearance: none;
+    cursor: grab;
+    box-shadow: 0 .125rem .5625rem -0.125rem rgba(0, 0, 0, .25);
+    transition: background 0.3s ease;
+}
+
+.range-slider2 input[type="range"]::-moz-range-thumb:active {
+    cursor: grabbing;
+}
+
+
+.input-box2 {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.min-box2,
+.max-box2 {
+    width: 48%; /* Adjust width for spacing */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.input-wrap2 {
+    position: relative;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.input-wrap2 input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 1rem;
+    color: #333;
+    pointer-events: auto; /* Allow input for direct typing */
+    -moz-appearance: textfield; /* Hide arrows for number input in Firefox */
+}
+
+.input-wrap2 input::-webkit-outer-spin-button,
+.input-wrap2 input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.input-wrap2 label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+    color: #666;
+    text-align: center;
+}
+
+.slider-tooltip2 {
+    position: absolute;
+    top: -30px; /* Position above the thumb */
+    background-color: #fed169;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    transform: translateX(-50%); /* Center the tooltip */
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.range-slider2 input[type="range"]::-webkit-slider-thumb:hover + .slider-tooltip2,
+.range-slider2 input[type="range"]::-moz-range-thumb:hover + .slider-tooltip2 {
+    opacity: 1;
+}
+
+/* Ensure tooltips are always visible for demonstration */
+.min-val2 + .slider-tooltip2, .max-val2 + .slider-tooltip2 {
+    opacity: 1;
+}
+
 </style>
 {% endblock %}
 
@@ -813,8 +964,18 @@
                 <option value="TP.Đà Nẵng">Đà Nẵng</option>
                 <option value="other">Khác</option>
             </select>
-            
-           {% include 'double_range.html'%}
+            <div class="tuition-range-row" style="display: flex; align-items: center; gap: 18px; width: 100%; max-width: 420px; background-color: #fff; border-radius: 8px; padding: 2px 18px;">
+                <span class="filter-label" style=" color: #0a4191;">Học phí</span>
+                <div class="range-slider2" style="flex: 1; position: relative; height: 32px;">
+                    <input type="range" min="0" max="100" value="0" id="tuitionMin" style="width: 100%; position: absolute; top: 50%; transform: translateY(-50%); z-index: 2;">
+                    <input type="range" min="0" max="100" value="100" id="tuitionMax" style="width: 100%; position: absolute; top: 50%; transform: translateY(-50%); z-index: 1;">
+                    <div id="tuitionRangeTrack" style="position: absolute; height: 6px; background: #00118f; border-radius: 4px; top: 50%; transform: translateY(-50%); z-index: 0;"></div>
+                </div>
+                <span id="tuitionRangeValue" style="min-width: 120px; text-align: right; color: #0a4191; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                  Từ <input type="number" id="tuitionRangeInputMin" min="0" max="100" value="0" style=" text-align: right; border: 1px solid #0a4191; border-radius: 5px; font-weight: 600; color: #0a4191;"> đến <input type="number" id="tuitionRangeInputMax" min="0" max="100" value="100" style=" text-align: right; border: 1px solid #0a4191; border-radius: 5px; font-weight: 600; color: #0a4191;"> triệu
+                </span>
+            </div>
+          
 
             <select class="filter-select" id="typeFilter">
                 <option value="">Tất cả loại trường</option>
@@ -859,6 +1020,90 @@
 </div>
 
 <script src="/static/js/dh-hcm.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Updated IDs and classes to reflect the '2' suffix
+        const minVal = document.getElementById("min-val2");
+        const maxVal = document.getElementById("max-val2");
+        const priceInputMin = document.getElementById("min-input2");
+        const priceInputMax = document.getElementById("max-input2");
+        const minTooltip = document.querySelector(".min-tooltip2");
+        const maxTooltip = document.querySelector(".max-tooltip2");
+        const range = document.querySelector(".slider-track2");
+
+        const minGap = 500; // Minimum difference between min and max values
+        const sliderMinValue = parseInt(minVal.min);
+        const sliderMaxValue = parseInt(maxVal.max);
+
+        // Function to update the slider and inputs
+        function updateSliderAndInputs() {
+            let minPrice = parseInt(minVal.value);
+            let maxPrice = parseInt(maxVal.value);
+
+            if (maxPrice - minPrice < minGap) {
+                if (event.target.classList.contains("min-val2")) { // Updated class check
+                    minVal.value = maxPrice - minGap;
+                } else {
+                    maxVal.value = minPrice + minGap;
+                }
+            }
+
+            priceInputMin.value = minVal.value;
+            priceInputMax.value = maxVal.value;
+
+            minTooltip.textContent = `$${minVal.value}`;
+            maxTooltip.textContent = `$${maxVal.value}`;
+
+            // Update the track and tooltip positions
+            const minPercentage = ((minVal.value - sliderMinValue) / (sliderMaxValue - sliderMinValue)) * 100;
+            const maxPercentage = ((maxVal.value - sliderMinValue) / (sliderMaxValue - sliderMinValue)) * 100;
+
+            range.style.left = `${minPercentage}%`;
+            range.style.right = `${100 - maxPercentage}%`;
+
+            // Adjust tooltip position for better visibility if close to edges
+            // Note: The `px` values (25px) might need fine-tuning based on thumb size and design
+            minTooltip.style.left = `calc(${minPercentage}% + ${(25 * (1 - minPercentage / 100))}px)`;
+            maxTooltip.style.left = `calc(${maxPercentage}% - ${(25 * (maxPercentage / 100))}px)`;
+        }
+
+        // Initial update when the page loads
+        updateSliderAndInputs();
+
+        // Event listeners for slider changes
+        minVal.addEventListener("input", updateSliderAndInputs);
+        maxVal.addEventListener("input", updateSliderAndInputs);
+
+        // Event listeners for direct input changes
+        priceInputMin.addEventListener("change", function () {
+            let minPrice = parseInt(priceInputMin.value);
+            let maxPrice = parseInt(priceInputMax.value);
+
+            if (minPrice < sliderMinValue) {
+                minPrice = sliderMinValue;
+            }
+            if (minPrice > maxPrice - minGap) {
+                minPrice = maxPrice - minGap;
+            }
+            minVal.value = minPrice;
+            updateSliderAndInputs();
+        });
+
+        priceInputMax.addEventListener("change", function () {
+            let minPrice = parseInt(priceInputMin.value);
+            let maxPrice = parseInt(priceInputMax.value);
+
+            if (maxPrice > sliderMaxValue) {
+                maxPrice = sliderMaxValue;
+            }
+            if (maxPrice < minPrice + minGap) {
+                maxPrice = minPrice + minGap;
+            }
+            maxVal.value = maxPrice;
+            updateSliderAndInputs();
+        });
+    });
+</script>
 {% endblock %}
 
 

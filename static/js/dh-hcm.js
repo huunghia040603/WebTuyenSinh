@@ -23,66 +23,67 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const tuitionMinInput = document.getElementById('tuitionMin');
     const tuitionMaxInput = document.getElementById('tuitionMax');
-    const tuitionRangeValueDisplay = document.getElementById('tuitionRangeValue'); // Renamed for clarity
-    const rangeFill = document.querySelector('.range-fill'); // Added for the fill between thumbs
-    const rangeSliderContainer = document.querySelector('.range-slider'); // Added for overall slider dimensions
-
+    const tuitionRangeValue = document.getElementById('tuitionRangeValue');
+    const tuitionRangeTrack = document.getElementById('tuitionRangeTrack');
+    const tuitionRangeInputMin = document.getElementById('tuitionRangeInputMin');
+    const tuitionRangeInputMax = document.getElementById('tuitionRangeInputMax');
     let currentTuitionMin = parseInt(tuitionMinInput.value, 10);
-    let currentTuitionMax = parseInt(tuitionMaxInput.value, 10); // Initialize with max value from HTML
+    let currentTuitionMax = parseInt(tuitionMaxInput.value, 10);
     const MIN_TUITION = parseInt(tuitionMinInput.min, 10);
     const MAX_TUITION = parseInt(tuitionMaxInput.max, 10);
 
-    // Function to update the appearance of the double-range slider
-    function updateSliderStyles() {
-        const minVal = parseInt(tuitionMinInput.value, 10);
-        const maxVal = parseInt(tuitionMaxInput.value, 10);
-
-        const range = MAX_TUITION - MIN_TUITION;
-        const minPercent = ((minVal - MIN_TUITION) / range) * 100;
-        const maxPercent = ((maxVal - MIN_TUITION) / range) * 100;
-
-        // Set the fill style
-        rangeFill.style.left = `${minPercent}%`;
-        rangeFill.style.width = `${maxPercent - minPercent}%`;
-
-        // Update the displayed value
-        tuitionRangeValueDisplay.textContent = `${minVal} - ${maxVal} triệu`;
-
-        // Position the value display dynamically (can be refined for more accuracy)
-        // This is a simplified positioning based on the midpoint of the range
-        const avgPercent = (minPercent + maxPercent) / 2;
-        tuitionRangeValueDisplay.style.left = `${avgPercent}%`;
-    }
-
-    // Function to handle changes in either tuition slider
-    function handleTuitionRangeChange() {
+    function updateTuitionSliderUI() {
         let min = parseInt(tuitionMinInput.value, 10);
         let max = parseInt(tuitionMaxInput.value, 10);
-
-        // Ensure min is always less than or equal to max
         if (min > max) {
-            // If min tries to go above max, set max to min, and update max slider value
             tuitionMaxInput.value = min;
             max = min;
         }
         if (max < min) {
-            // If max tries to go below min, set min to max, and update min slider value
             tuitionMinInput.value = max;
             min = max;
         }
-
         currentTuitionMin = min;
         currentTuitionMax = max;
-        
-        updateSliderStyles(); // Update visual styles and text display
-        applyFiltersAndFetch(1);
+        // Update input number
+        tuitionRangeInputMin.value = min;
+        tuitionRangeInputMax.value = max;
+        // Track fill
+        const range = MAX_TUITION - MIN_TUITION;
+        const minPercent = ((min - MIN_TUITION) / range) * 100;
+        const maxPercent = ((max - MIN_TUITION) / range) * 100;
+        tuitionRangeTrack.style.left = `${minPercent}%`;
+        tuitionRangeTrack.style.width = `${maxPercent - minPercent}%`;
     }
-    
-    tuitionMinInput.addEventListener('input', handleTuitionRangeChange);
-    tuitionMaxInput.addEventListener('input', handleTuitionRangeChange);
-    
-    // Initial update of slider styles on load
-    updateSliderStyles();
+    tuitionMinInput.addEventListener('input', function() {
+        updateTuitionSliderUI();
+        applyFiltersAndFetch(1);
+    });
+    tuitionMaxInput.addEventListener('input', function() {
+        updateTuitionSliderUI();
+        applyFiltersAndFetch(1);
+    });
+    // Đồng bộ input number với slider
+    tuitionRangeInputMin.addEventListener('change', function() {
+        let min = parseInt(tuitionRangeInputMin.value, 10);
+        let max = parseInt(tuitionRangeInputMax.value, 10);
+        if (isNaN(min) || min < MIN_TUITION) min = MIN_TUITION;
+        if (min > max) min = max;
+        tuitionMinInput.value = min;
+        updateTuitionSliderUI();
+        applyFiltersAndFetch(1);
+    });
+    tuitionRangeInputMax.addEventListener('change', function() {
+        let min = parseInt(tuitionRangeInputMin.value, 10);
+        let max = parseInt(tuitionRangeInputMax.value, 10);
+        if (isNaN(max) || max > MAX_TUITION) max = MAX_TUITION;
+        if (max < min) max = min;
+        tuitionMaxInput.value = max;
+        updateTuitionSliderUI();
+        applyFiltersAndFetch(1);
+    });
+    // Initial UI update
+    updateTuitionSliderUI();
 
     // Function to fetch data from API with pagination and filters
     async function fetchUniversities(page = 1) {
