@@ -159,6 +159,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 start: uni.start, // Assuming this is a number (million VND)
                 end: uni.end,   // Assuming this is a number (million VND)
                 registration : uni.registration,
+                tag: uni.tag,
                 acceptanceRate: 'N/A', // Placeholder
                 studentCount: 'N/A', // Placeholder
                 min_admission_score: uni.min_admission_score || null
@@ -232,7 +233,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         <img src="${university.logo}" alt="${university.name_vn}" onerror="this.onerror=null;this.src='https://placehold.co/120x120/cccccc/333333?text=No+Logo';">
                     </div>
                     <div class="card-info">
-                        <div>   ${university.registration ===true ? '<span class="info-tag tag-registration">NỔI BẬT</span>' : ''}
+                        <div>   ${university.tag === 'outstanding' ? '<span class="info-tag tag-registration">NỔI BẬT</span>' : ''}
                             <div class="university-name">${university.name_vn} <span class="university-code"> - (${university.short_code})</span></div>
                             <div class="info-tags">
                                 <span class="info-tag tag-public">${university.school_type === 'public' ? 'Công lập' : 'Ngoài công lập'}</span>
