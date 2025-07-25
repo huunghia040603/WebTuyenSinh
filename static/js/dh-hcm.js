@@ -17,15 +17,72 @@ document.addEventListener('DOMContentLoaded', function () {
     let currentPage = 1;
     let totalPages = 1;
     let currentSearchTerm = '';
-    let currentLocationFilter = '';
+    let currentLocationFilter = 'tphcm'; // Default selected in HTML
     let currentTypeFilter = '';
     let currentAdmissionScoreFilter = '';
 
     const tuitionMinInput = document.getElementById('tuitionMin');
     const tuitionMaxInput = document.getElementById('tuitionMax');
-    const tuitionRangeValue = document.getElementById('tuitionRangeValue');
-    let currentTuitionMin = 0;
-    let currentTuitionMax = 100;
+    const tuitionRangeValueDisplay = document.getElementById('tuitionRangeValue'); // Renamed for clarity
+    const rangeFill = document.querySelector('.range-fill'); // Added for the fill between thumbs
+    const rangeSliderContainer = document.querySelector('.range-slider'); // Added for overall slider dimensions
+
+    let currentTuitionMin = parseInt(tuitionMinInput.value, 10);
+    let currentTuitionMax = parseInt(tuitionMaxInput.value, 10); // Initialize with max value from HTML
+    const MIN_TUITION = parseInt(tuitionMinInput.min, 10);
+    const MAX_TUITION = parseInt(tuitionMaxInput.max, 10);
+
+    // Function to update the appearance of the double-range slider
+    function updateSliderStyles() {
+        const minVal = parseInt(tuitionMinInput.value, 10);
+        const maxVal = parseInt(tuitionMaxInput.value, 10);
+
+        const range = MAX_TUITION - MIN_TUITION;
+        const minPercent = ((minVal - MIN_TUITION) / range) * 100;
+        const maxPercent = ((maxVal - MIN_TUITION) / range) * 100;
+
+        // Set the fill style
+        rangeFill.style.left = `${minPercent}%`;
+        rangeFill.style.width = `${maxPercent - minPercent}%`;
+
+        // Update the displayed value
+        tuitionRangeValueDisplay.textContent = `${minVal} - ${maxVal} triệu`;
+
+        // Position the value display dynamically (can be refined for more accuracy)
+        // This is a simplified positioning based on the midpoint of the range
+        const avgPercent = (minPercent + maxPercent) / 2;
+        tuitionRangeValueDisplay.style.left = `${avgPercent}%`;
+    }
+
+    // Function to handle changes in either tuition slider
+    function handleTuitionRangeChange() {
+        let min = parseInt(tuitionMinInput.value, 10);
+        let max = parseInt(tuitionMaxInput.value, 10);
+
+        // Ensure min is always less than or equal to max
+        if (min > max) {
+            // If min tries to go above max, set max to min, and update max slider value
+            tuitionMaxInput.value = min;
+            max = min;
+        }
+        if (max < min) {
+            // If max tries to go below min, set min to max, and update min slider value
+            tuitionMinInput.value = max;
+            min = max;
+        }
+
+        currentTuitionMin = min;
+        currentTuitionMax = max;
+        
+        updateSliderStyles(); // Update visual styles and text display
+        applyFiltersAndFetch(1);
+    }
+    
+    tuitionMinInput.addEventListener('input', handleTuitionRangeChange);
+    tuitionMaxInput.addEventListener('input', handleTuitionRangeChange);
+    
+    // Initial update of slider styles on load
+    updateSliderStyles();
 
     // Function to fetch data from API with pagination and filters
     async function fetchUniversities(page = 1) {
@@ -40,110 +97,40 @@ document.addEventListener('DOMContentLoaded', function () {
         const baseUrl = 'https://timtruonghoc.pythonanywhere.com/schools/';
         const params = new URLSearchParams();
 
+        // Add search term if present
+        if (currentSearchTerm) {
+            params.append('search', currentSearchTerm);
+        }
+
         // Add filters
+        // Only apply filters if search term is not active or if backend supports combining them
+        // Based on user request, if search input is used, param is 'search'.
+        // If filter boxes are used, params depend on the filter.
+        // For simplicity, we'll send all applicable filters, assuming backend handles combination.
         if (currentLocationFilter) {
-            // Note: Your backend location filter might need to be adjusted
-            // If backend supports, uncomment and adjust:
-            // params.append('location', currentLocationFilter);
+            params.append('country', currentLocationFilter);
         }
         if (currentTypeFilter) {
             params.append('school_type', currentTypeFilter);
         }
-        if (currentAdmissionScoreFilter) {
-            // Note: Your backend admission score filter might need to be adjusted
-            // If backend supports, uncomment and adjust:
-            // params.append('admission_score_range', currentAdmissionScoreFilter);
+        
+        // Add tuition range filters if they are not at their default min/max
+        if (currentTuitionMin > MIN_TUITION) {
+            params.append('start', currentTuitionMin);
         }
-
-        // Nếu có searchTerm, fetch nhiều trang liên tiếp, gộp lại rồi lọc client-side
-        let clientSideSearch = false;
-        if (currentSearchTerm) {
-            clientSideSearch = true;
-            let allResults = [];
-            let pageNum = 1;
-            let totalFetched = 0;
-            let pageSize = 20;
-            let maxFetch = 100;
-            let more = true;
-            while (more && totalFetched < maxFetch) {
-                const p = new URLSearchParams(params);
-                p.append('page', pageNum);
-                p.append('page_size', pageSize);
-                const url = `${baseUrl}?${p.toString()}`;
-                // eslint-disable-next-line no-await-in-loop
-                const response = await fetch(url);
-                if (!response.ok) break;
-                // eslint-disable-next-line no-await-in-loop
-                const data = await response.json();
-                if (!data.results || data.results.length === 0) break;
-                allResults = allResults.concat(data.results);
-                totalFetched += data.results.length;
-                if (!data.next || data.results.length < pageSize) more = false;
-                pageNum++;
-            }
-            let universities = allResults.map(uni => ({
-                id: uni.id,
-                name_en: uni.name_en,
-                name_vn: uni.name_vn,
-                short_code: uni.short_code,
-                admission_code: uni.admission_code,
-                logo: uni.logo,
-                established_year: uni.established_year,
-                school_type: uni.school_type,
-                website_url: uni.website_url,
-                quota_per_year: uni.quota_per_year,
-                introduction: uni.introduction,
-                phone_number: uni.phone_number,
-                email: uni.email,
-                country: uni.country,
-                map_link: uni.map_link,
-                majors_data: uni.majors_data,
-                start: uni.start,
-                end: uni.end,
-                tuition_fee_ranges: uni.tuition_fee_ranges,
-                registration : uni.registration,
-                acceptanceRate: 'N/A', // Placeholder
-                studentCount: 'N/A', // Placeholder
-                min_admission_score: uni.min_admission_score || null
-            }));
-            // Hàm loại bỏ dấu tiếng Việt và chuẩn hóa chuỗi
-            function normalizeString(str) {
-                return str
-                    .normalize('NFD')
-                    .replace(/\p{Diacritic}/gu, '')
-                    .replace(/đ/g, 'd').replace(/Đ/g, 'D')
-                    .toLowerCase()
-                    .replace(/\s+/g, ' ')
-                    .trim();
-            }
-            const normSearch = normalizeString(currentSearchTerm);
-            universities = universities.filter(u => {
-                const normName = normalizeString(u.name_vn || '');
-                const normShort = (u.short_code || '').toLowerCase();
-                const normAdmission = (u.admission_code || '').toLowerCase();
-                return (
-                    normName.includes(normSearch) ||
-                    normShort.includes(normSearch) ||
-                    normAdmission.includes(normSearch)
-                );
-            });
-            // Lọc location nếu có
-            if (currentLocationFilter) {
-                universities = universities.filter(u =>
-                    u.country && u.country.toLowerCase().includes(currentLocationFilter)
-                );
-            }
-            window._searchResults = universities;
-            totalPages = Math.ceil(universities.length / 12) || 1;
-            const startIdx = (currentPage - 1) * 12;
-            const endIdx = startIdx + 12;
-            renderUniversities(universities.slice(startIdx, endIdx));
-            updatePaginationControls();
-            return;
+        if (currentTuitionMax < MAX_TUITION) { 
+            params.append('end', currentTuitionMax);
         }
+        
+        // Admission score filter is currently client-side; not sent to API
+        // if (currentAdmissionScoreFilter) {
+        //     params.append('admission_score_range', currentAdmissionScoreFilter);
+        // }
 
-        // Nếu không search, phân trang server như cũ
         params.append('page', currentPage);
+        // Assuming a page_size of 12 for rendering in the grid
+        params.append('page_size', 12); 
+
         const url = `${baseUrl}?${params.toString()}`;
         try {
             const response = await fetch(url);
@@ -168,15 +155,29 @@ document.addEventListener('DOMContentLoaded', function () {
                 country: uni.country,
                 map_link: uni.map_link,
                 majors_data: uni.majors_data,
-                start: uni.start,
-                end: uni.end,
-                tuition_fee_ranges: uni.tuition_fee_ranges,
+                start: uni.start, // Assuming this is a number (million VND)
+                end: uni.end,   // Assuming this is a number (million VND)
                 registration : uni.registration,
                 acceptanceRate: 'N/A', // Placeholder
                 studentCount: 'N/A', // Placeholder
                 min_admission_score: uni.min_admission_score || null
             }));
+            
             totalPages = data.total_pages;
+
+            // Client-side filtering for admission score if backend doesn't support it directly
+            if (currentAdmissionScoreFilter) {
+                universities = universities.filter(uni => {
+                    const score = parseFloat(uni.min_admission_score);
+                    if (isNaN(score)) return false; // Exclude if score is not a number
+                    if (currentAdmissionScoreFilter === 'low') return score >= 15 && score <= 18;
+                    if (currentAdmissionScoreFilter === 'medium') return score > 18 && score <= 20;
+                    if (currentAdmissionScoreFilter === 'high') return score > 20 && score <= 22;
+                    if (currentAdmissionScoreFilter === 'veryhigh') return score > 22;
+                    return true;
+                });
+            }
+
             renderUniversities(universities);
             updatePaginationControls();
         } catch (error) {
@@ -195,15 +196,6 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        // Lọc theo học phí nếu đang kéo slider
-        if (tuitionMinInput && tuitionMaxInput) {
-            universities = universities.filter(uni => {
-                if (typeof uni.start !== 'number' || typeof uni.end !== 'number') return true;
-                // Lọc trường có khoảng học phí giao với khoảng chọn
-                return uni.end >= currentTuitionMin && uni.start <= currentTuitionMax;
-            });
-        }
-
         universities.forEach((university, index) => {
             const card = document.createElement('div');
             card.className = 'university-card';
@@ -212,25 +204,25 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             card.style.animationDelay = `${index * 0.1}s`;
 
-            let location = 'Khác';
-            if (university.country.includes('TPHCM')) {
-                location = 'TPHCM';
-            } else if (university.country.includes('TP.Hà Nội')) {
-                location = 'TP.Hà Nội';
-            } else if (university.country.includes('TP.Đà Nẵng')) {
-                location = 'TP.Đà Nẵng';
+            let locationText = 'Khác';
+            if (university.country && university.country.includes('TPHCM')) {
+                locationText = 'TP. Hồ Chí Minh';
+            } else if (university.country && university.country.includes('TP.Hà Nội')) {
+                locationText = 'TP. Hà Nội';
+            } else if (university.country && university.country.includes('TP.Đà Nẵng')) {
+                locationText = 'TP. Đà Nẵng';
             }
 
+            // Format tuition display
             let tuitionDisplay = 'Chưa có';
-            if (university.tuition_fee_ranges && university.tuition_fee_ranges.length > 0) {
-                const minTuition = Math.min(...university.tuition_fee_ranges.map(range => range.min_value));
-                const maxTuition = Math.max(...university.tuition_fee_ranges.map(range => range.max_value));
-                if (minTuition && maxTuition) {
-                    tuitionDisplay = `${(minTuition / 1000000).toFixed(0)}tr - ${(maxTuition / 1000000).toFixed(0)}tr`;
-                } else if (minTuition) {
-                    tuitionDisplay = `Từ ${(minTuition / 1000000).toFixed(0)}tr`;
+            if (typeof university.start === 'number' && typeof university.end === 'number') {
+                if (university.start === 0 && university.end === 0) {
+                    tuitionDisplay = `Miễn phí`;
+                } else {
+                    tuitionDisplay = `${university.start} - ${university.end} triệu`;
                 }
             }
+
 
             card.innerHTML = `
                 <div class="card-content">
@@ -247,14 +239,11 @@ document.addEventListener('DOMContentLoaded', function () {
                                 <span class="info-tag tag-year">Thành lập: ${university.established_year}</span>
                             </div>
                             <div class="info-tags">
-                                <span class="info-tag tag-tuition">Học phí: ${university.start === 0 && university.end === 0 ? `Miễn phí`: `${university.start} - ${university.end} triệu`}</span>
-                                <span class="info-tag tag-location">${location}</span>
+                                <span class="info-tag tag-tuition">Học phí: ${tuitionDisplay}</span>
+                                <span class="info-tag tag-location">${locationText}</span>
                             </div>
                         </div>
-                       <!-- <div class="card-action">
-                            <a href="${university.website_url}" target="_blank" class="see-more">>> Xem thêm</a>
-                        </div> -->
-                    </div>
+                       </div>
                 </div>
             `;
 
@@ -262,7 +251,7 @@ document.addEventListener('DOMContentLoaded', function () {
             let hoverTimeout;
             const nameEl = card.querySelector('.university-name');
             nameEl.addEventListener('mouseenter', () => {
-                hoverTimeout = setTimeout(() => showModal(university, location, tuitionDisplay), 100);
+                hoverTimeout = setTimeout(() => showModal(university, locationText, tuitionDisplay), 100);
             });
             nameEl.addEventListener('mouseleave', () => {
                 clearTimeout(hoverTimeout);
@@ -310,7 +299,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Modal logic
     let modalTimeout;
 
-    function showModal(university, location, tuitionDisplay) {
+    function showModal(university, locationText, tuitionDisplay) {
         clearTimeout(modalTimeout);
         modalTimeout = setTimeout(() => {
             // Xử lý giới thiệu cắt ngắn + nút xem thêm
@@ -339,8 +328,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         <li><strong>Loại hình:</strong> ${university.school_type === 'public' ? 'Công lập' : 'Ngoài công lập'}</li>
                         <li><strong>Năm thành lập:</strong> ${university.established_year}</li>
                         <li><strong>Chỉ tiêu hàng năm:</strong> ${university.quota_per_year ? university.quota_per_year.toLocaleString() : 'N/A'}</li>
-                        <li><strong>Học phí:</strong> ${university.start === 0 && university.end === 0 ?`Miễn phí`:  `${university.start} - ${university.end} triệu` }</li>
-                        <li><strong>Địa điểm:</strong> ${location}</li>
+                        <li><strong>Học phí:</strong> ${tuitionDisplay}</li>
+                        <li><strong>Địa điểm:</strong> ${locationText}</li>
                         ${university.min_admission_score ? `<li><strong>Điểm sàn xét tuyển:</strong> ${university.min_admission_score}</li>` : ''}
                     </ul>
                 </div>
@@ -395,35 +384,12 @@ document.addEventListener('DOMContentLoaded', function () {
     };
     modalContent.addEventListener('mouseleave', hideModal);
 
-    // Xử lý sự kiện slider học phí 2 đầu mút
-    function handleTuitionRangeChange() {
-        let min = parseInt(tuitionMinInput.value, 10);
-        let max = parseInt(tuitionMaxInput.value, 10);
-        if (min > max) {
-            // Nếu kéo min vượt max, đẩy max lên theo min
-            max = min;
-            tuitionMaxInput.value = max;
-        }
-        if (max < min) {
-            // Nếu kéo max nhỏ hơn min, đẩy min xuống theo max
-            min = max;
-            tuitionMinInput.value = min;
-        }
-        currentTuitionMin = min;
-        currentTuitionMax = max;
-        tuitionRangeValue.textContent = `Từ ${min} đến ${max} triệu`;
-        applyFiltersAndFetch(1);
-    }
-    tuitionMinInput.addEventListener('input', handleTuitionRangeChange);
-    tuitionMaxInput.addEventListener('input', handleTuitionRangeChange);
-
     // Filter and Pagination logic
     function applyFiltersAndFetch(page = 1) {
-        // Chỉ lấy searchTerm cho name_vn và short_code
         currentSearchTerm = searchInput.value.trim().toLowerCase();
         currentLocationFilter = locationFilter.value.toLowerCase();
         currentTypeFilter = typeFilter.value.toLowerCase();
-        currentAdmissionScoreFilter = admissionScoreFilter.value;
+        currentAdmissionScoreFilter = admissionScoreFilter.value; // Stays client-side filter
         fetchUniversities(page);
     }
 
@@ -457,5 +423,5 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Initial fetch and render
-    fetchUniversities();
+    applyFiltersAndFetch(); // Initial call to fetch universities with default filters
 });
