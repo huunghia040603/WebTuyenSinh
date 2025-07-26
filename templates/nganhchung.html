@@ -210,8 +210,7 @@
 
     .major-info {
         display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
+        flex-direction: column;
         gap: 15px;
     }
 
@@ -219,22 +218,58 @@
         display: flex;
         flex-direction: column;
         gap: 8px;
+    }
+
+    .info-row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .info-box.small {
         flex: 1;
+        font-size: 0.75rem;
+        padding: 8px 10px;
+    }
+
+    .view-more-btn {
+        background: linear-gradient(90deg, #1e3a8a, #3b82f6 );
+        color: white;
+        border: 2px solid #1e3a8a;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+        width: 100%;
+        text-align: center;
     }
 
     .info-box {
         background: #f3f4f6;
-        border: 1px solid #1e3a8a;
+        /* border: 1px solid #1e3a8a; */
         color: #000;
         padding: 8px 12px;
         border-radius: 6px;
         font-size: 0.8rem;
-        font-weight: 600;
+        font-weight: 650;
+        text-align: center;
+    }
+    .info-box.vang {
+        background: #ffeebf;
+        /* border: 1px solid #1e3a8a; */
+        color: #000;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 650;
         text-align: center;
     }
 
     .view-more-btn {
-        background: linear-gradient(90deg, #1e3a8a, #3b82f6, #8b5cf6);
+        background: linear-gradient(90deg, #1e3a8a, #3b82f6 );
         color: white;
         border: none;
         padding: 10px 20px;
@@ -1081,7 +1116,7 @@ h3.range-title2 {
 {% block content %}
 <div class="container">
     <div class="header-section">
-        <h1 class="header-title">Danh Sách Ngành Tại Việt Nam</h1>
+        <h1 class="header-title">Danh Sách Ngành Học Tại Việt Nam</h1>
         <p class="header-subtitle">Tìm kiếm và khám phá các ngành nghề phù hợp với bạn</p>
     </div>
 
@@ -1096,7 +1131,7 @@ h3.range-title2 {
     </div>
 <div class="suggestion-bar">
             <i class="fas fa-info-circle"></i>
-            Gợi ý: Di chuột vào tiêu đề trường để xem thêm thông tin chi tiết
+            Lưu ý nhỏ: Thông tin chỉ mang tính chất tham khảo, có thể thay đổi theo thời gian, và điều kiện cụ thể của từng trường.
         </div>
     <div class="majors-grid" id="majorsGrid">
         <!-- Major Card 1 -->
@@ -1109,8 +1144,14 @@ h3.range-title2 {
                 <p class="major-description">Nếu có thể, hãy lưu trữ ảnh của bạn trên một CDN (Content Delivery Network) để đảm bảo tốc độ tải nhanh và ổn định cho người dùng.</p>
                 <div class="major-info">
                     <div class="info-boxes">
-                        <div class="info-box">Mức lương TB: 10 - 20 triệu</div>
-                        <div class="info-box">Điểm cơ hội : 90 </div>
+                        <div class="info-row">
+                            <div class="info-box small">Thời gian học: 4 - 5 năm</div>
+                            <div class="info-box small vang">Thu nhập: 10 - 20 triệu</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-box small">Học phí: 10-15 triệu/năm</div>
+                            <div class="info-box small vang">Điểm cơ hội: 90</div>
+                        </div>
                     </div>
                     <button class="view-more-btn">Xem Thêm</button>
                 </div>
@@ -1127,8 +1168,14 @@ h3.range-title2 {
                 <p class="major-description">Ngành học về phát triển phần mềm, quản lý hệ thống thông tin và ứng dụng công nghệ trong doanh nghiệp.</p>
                 <div class="major-info">
                     <div class="info-boxes">
-                        <div class="info-box">Mức lương trung bình: 15 - 25 triệu</div>
-                        <div class="info-box">Điểm cơ hội việc làm: 95 điểm</div>
+                        <div class="info-row">
+                            <div class="info-box small">Thời gian học: 4 năm</div>
+                            <div class="info-box small vang">Thu nhập: 15 - 25 triệu</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-box small">Học phí: 12-18 triệu/năm</div>
+                            <div class="info-box small vang">Điểm cơ hội: 95</div>
+                        </div>
                     </div>
                     <button class="view-more-btn">Xem Thêm</button>
                 </div>
@@ -1145,8 +1192,14 @@ h3.range-title2 {
                 <p class="major-description">Nghiên cứu về thương mại quốc tế, đầu tư nước ngoài và các mối quan hệ kinh tế toàn cầu.</p>
                 <div class="major-info">
                     <div class="info-boxes">
-                        <div class="info-box">Mức lương trung bình: 12 - 22 triệu</div>
-                        <div class="info-box">Điểm cơ hội việc làm: 88 điểm</div>
+                        <div class="info-row">
+                            <div class="info-box small">Thời gian học: 4 năm</div>
+                            <div class="info-box small vang">Thu nhập: 12 - 22 triệu</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-box small">Học phí: 10-16 triệu/năm</div>
+                            <div class="info-box small vang">Điểm cơ hội: 88</div>
+                        </div>
                     </div>
                     <button class="view-more-btn">Xem Thêm</button>
                 </div>
@@ -1163,8 +1216,14 @@ h3.range-title2 {
                 <p class="major-description">Đào tạo bác sĩ đa khoa với kiến thức y học cơ bản và kỹ năng thực hành lâm sàng.</p>
                 <div class="major-info">
                     <div class="info-boxes">
-                        <div class="info-box">Mức lương trung bình: 20 - 40 triệu</div>
-                        <div class="info-box">Điểm cơ hội việc làm: 92 điểm</div>
+                        <div class="info-row">
+                            <div class="info-box small">Thời gian học: 6 năm</div>
+                            <div class="info-box small vang">Thu nhập: 20 - 40 triệu</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-box small">Học phí: 25-35 triệu/năm</div>
+                            <div class="info-box small vang">Điểm cơ hội: 92</div>
+                        </div>
                     </div>
                     <button class="view-more-btn">Xem Thêm</button>
                 </div>
@@ -1181,8 +1240,14 @@ h3.range-title2 {
                 <p class="major-description">Nghiên cứu hệ thống pháp luật, quyền và nghĩa vụ công dân trong xã hội.</p>
                 <div class="major-info">
                     <div class="info-boxes">
-                        <div class="info-box">Mức lương trung bình: 8 - 18 triệu</div>
-                        <div class="info-box">Điểm cơ hội việc làm: 85 điểm</div>
+                        <div class="info-row">
+                            <div class="info-box small">Thời gian học: 4 năm</div>
+                            <div class="info-box small vang">Thu nhập: 8 - 18 triệu</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-box small">Học phí: 8-12 triệu/năm</div>
+                            <div class="info-box small vang">Điểm cơ hội: 85</div>
+                        </div>
                     </div>
                     <button class="view-more-btn">Xem Thêm</button>
                 </div>
@@ -1199,8 +1264,14 @@ h3.range-title2 {
                 <p class="major-description">Thiết kế và quy hoạch không gian sống, công trình kiến trúc đẹp và bền vững.</p>
                 <div class="major-info">
                     <div class="info-boxes">
-                        <div class="info-box">Mức lương trung bình: 12 - 25 triệu</div>
-                        <div class="info-box">Điểm cơ hội việc làm: 87 điểm</div>
+                        <div class="info-row">
+                            <div class="info-box small">Thời gian học: 5 năm</div>
+                            <div class="info-box small vang">Thu nhập: 12 - 25 triệu</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-box small">Học phí: 15-22 triệu/năm</div>
+                            <div class="info-box small vang">Điểm cơ hội: 87</div>
+                        </div>
                     </div>
                     <button class="view-more-btn">Xem Thêm</button>
                 </div>
