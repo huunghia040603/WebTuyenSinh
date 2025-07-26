@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
         currentPage = page;
 
-        const baseUrl = 'https://timtruonghoc.pythonanywhere.com/schools/';
+        const baseUrl = 'https://webtimtruong.pythonanywhere.com/schools/';
         const params = new URLSearchParams();
 
         // Add search term if present
@@ -201,7 +201,7 @@ document.addEventListener('DOMContentLoaded', function () {
         universities.forEach((university, index) => {
             const card = document.createElement('div');
             card.className = 'university-card';
-            if (university.registration === true) {
+            if (university.tag === 'outstanding') {
                 card.classList.add('highlight');
             }
             card.style.animationDelay = `${index * 0.1}s`;
@@ -354,7 +354,7 @@ document.addEventListener('DOMContentLoaded', function () {
             modalOverlay.classList.add('active');
             document.body.style.overflow = 'hidden';
             // Đổi màu border modal-content nếu là trường nổi bật
-            if (university.registration === true) {
+            if (university.tag === 'outstanding') {
                 modalContent.style.borderColor = '#ffc107'; 
                 // vàng
                 document.querySelector('.apply-btn').classList.add('highlight');

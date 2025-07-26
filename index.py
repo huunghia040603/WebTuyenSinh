@@ -39,5 +39,9 @@ def mota():
 def visao():
     return render_template('/khampha/visao.html')
 
+@app.route("/nganhchung")
+def nganhchung():
+    return render_template('nganhchung.html')
+
 if __name__ == "__main__":
     app.run(debug=True)
