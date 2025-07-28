@@ -13,9 +13,9 @@ const tuitionSearchSelect = document.getElementById('tuitionSearch');
 const tuitionSortSelect = document.getElementById('tuitionSort'); // Biến mới cho sắp xếp
 const searchButton = document.getElementById('searchButton');
 
-let currentPage = parseInt(localStorage.getItem('nganhchung_currentPage')) || 1;
+let currentPage = 1;
 let totalPages = 1;
-let currentSearchQuery = '';
+let currentSearchState = {}; // Lưu trữ trạng thái tìm kiếm hiện tại
 
 // Hàm fetch dữ liệu từ API
 async function fetchMajors(page = 1, params = {}) {
@@ -43,8 +43,6 @@ async function fetchMajors(page = 1, params = {}) {
         const data = await response.json();
         
         currentPage = page;
-        // Lưu trang hiện tại vào localStorage
-        localStorage.setItem('nganhchung_currentPage', currentPage.toString());
         totalPages = Math.ceil(data.count / 9);
         
         renderMajors(data.results);
@@ -159,34 +157,9 @@ function updatePagination(nextUrl, previousUrl) {
     nextPageButton.disabled = !nextUrl;
     
     pageNumbersDiv.innerHTML = '';
-    
-    // Tạo các nút số trang
-    const maxVisiblePages = 5; // Hiển thị tối đa 5 trang
-    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-    
-    // Điều chỉnh startPage nếu endPage quá gần cuối
-    if (endPage - startPage < maxVisiblePages - 1) {
-        startPage = Math.max(1, endPage - maxVisiblePages + 1);
-    }
-    
-    for (let i = startPage; i <= endPage; i++) {
-        const pageButton = document.createElement('button');
-        pageButton.classList.add('page-number-button');
-        pageButton.textContent = i;
-        
-        // Highlight trang hiện tại
-        if (i === currentPage) {
-            pageButton.classList.add('active');
-        }
-        
-        // Thêm event listener cho nút số trang
-        pageButton.addEventListener('click', () => {
-            fetchMajors(i, currentSearchQuery);
-        });
-        
-        pageNumbersDiv.appendChild(pageButton);
-    }
+    const span = document.createElement('span');
+    span.textContent = `Trang ${currentPage} / ${totalPages}`;
+    pageNumbersDiv.appendChild(span);
 }
 
 // Hàm xử lý tìm kiếm và sắp xếp
@@ -235,23 +208,22 @@ nextPageButton.addEventListener('click', () => {
     }
 });
 
-// Xử lý tìm kiếm
-searchInput.addEventListener('keyup', (e) => {
-    if (e.key === 'Enter' || searchInput.value === '') {
-        const query = searchInput.value.trim();
-        if (query !== currentSearchQuery) {
-            currentSearchQuery = query;
-            fetchMajors(1, currentSearchQuery);
-        }
+// Xử lý sự kiện tìm kiếm
+searchButton.addEventListener('click', handleSearch);
+
+// Gán sự kiện 'keyup' cho ô input và 'change' cho các dropdown
+nameSearchInput.addEventListener('keyup', (e) => {
+    if (e.key === 'Enter') {
+        handleSearch();
     }
 });
 
+opportunitiesSearchSelect.addEventListener('change', handleSearch);
+durationSearchSelect.addEventListener('change', handleSearch);
+tuitionSearchSelect.addEventListener('change', handleSearch);
+tuitionSortSelect.addEventListener('change', handleSearch); // Gán sự kiện change cho dropdown sắp xếp
+
 // Gọi hàm fetch ban đầu để tải dữ liệu khi trang web được load
 document.addEventListener('DOMContentLoaded', () => {
-    // Khôi phục search query vào input
-    if (currentSearchQuery) {
-        searchInput.value = currentSearchQuery;
-    }
-    // Load dữ liệu với trang và search query đã lưu
-    fetchMajors(currentPage, currentSearchQuery);
+    fetchMajors();
 });
