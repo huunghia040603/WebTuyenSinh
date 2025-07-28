@@ -1,5 +1,5 @@
 // Khai báo các biến và hằng số
-const API_URL = 'https://webtimtruong.pythonanywhere.com/all_major/';
+const API_URL = 'https://webtimtruong.pythonanywhere.com/all_major_has_pagi/';
 const majorsGrid = document.getElementById('majorsGrid');
 const prevPageButton = document.getElementById('prevPage');
 const nextPageButton = document.getElementById('nextPage');
@@ -157,6 +157,12 @@ function renderMajors(majors) {
         const viewMoreButton = document.createElement('button');
         viewMoreButton.classList.add('view-more-btn');
         viewMoreButton.textContent = 'Xem Thêm';
+        
+        // Thêm event listener cho nút "Xem thêm"
+        viewMoreButton.addEventListener('click', () => {
+            // Chuyển hướng đến trang chi tiết ngành
+            window.location.href = `/nganh/${major.all_major_id}`;
+        });
 
         // Thêm các thành phần vào major-info
         majorInfoDiv.appendChild(infoBoxesDiv);
@@ -170,6 +176,16 @@ function renderMajors(majors) {
         // Thêm các thành phần vào major-card
         majorCard.appendChild(majorImageDiv);
         majorCard.appendChild(majorContent);
+        
+        // Thêm event listener cho toàn bộ card (ngoại trừ nút "Xem thêm")
+        majorCard.addEventListener('click', (e) => {
+            // Không chuyển hướng nếu click vào nút "Xem thêm"
+            if (e.target.classList.contains('view-more-btn')) {
+                return;
+            }
+            // Chuyển hướng đến trang chi tiết ngành
+            window.location.href = `/nganh/${major.all_major_id}`;
+        });
 
         majorsGrid.appendChild(majorCard);
     });

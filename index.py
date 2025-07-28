@@ -51,5 +51,9 @@ def university_detail(university_code):
 def demo():
     return render_template('demo.html')
 
+@app.route("/nganh/<major_id>")
+def major_detail(major_id):
+    return render_template('chitiet-nganhchung.html')
+
 if __name__ == "__main__":
     app.run(debug=True)
