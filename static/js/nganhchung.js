@@ -4,50 +4,27 @@ const majorsGrid = document.getElementById('majorsGrid');
 const prevPageButton = document.getElementById('prevPage');
 const nextPageButton = document.getElementById('nextPage');
 const pageNumbersDiv = document.getElementById('pageNumbers');
-const searchInput = document.getElementById('searchInput');
+
+// Các trường input và dropdown
+const nameSearchInput = document.getElementById('nameSearchInput');
+const opportunitiesSearchSelect = document.getElementById('opportunitiesSearch');
+const durationSearchSelect = document.getElementById('durationSearch');
+const tuitionSearchSelect = document.getElementById('tuitionSearch');
+const tuitionSortSelect = document.getElementById('tuitionSort'); // Biến mới cho sắp xếp
+const searchButton = document.getElementById('searchButton');
 
 let currentPage = 1;
 let totalPages = 1;
-let currentSearchQuery = '';
+let currentSearchState = {}; // Lưu trữ trạng thái tìm kiếm hiện tại
 
 // Hàm fetch dữ liệu từ API
-async function fetchMajors(page = 1, search = '') {
+async function fetchMajors(page = 1, params = {}) {
     majorsGrid.innerHTML = `
     <style>
-        .modern-loader {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 220px;
-            width: 100%;
-            margin: 0 auto;
-            margin-left: 105%;
-        }
-        .modern-loader-spinner {
-            width: 84px;
-            height: 84px;
-            border-radius: 50%;
-            border: 6px solid #e0e7ef;
-            border-top: 6px solid #0a4191;
-            border-right: 6px solid #ffa200;
-            border-bottom: 6px solid #0c01ad;
-            animation: modern-spin 1.1s linear infinite;
-            box-shadow: 0 4px 24px #00e0ff33, 0 0 0 4px #fff8;
-            margin-bottom: 18px;
-        }
-        @keyframes modern-spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .modern-loader-text {
-            font-size: 1.15rem;
-            color: #0a4191;
-            font-weight: 700;
-            letter-spacing: 1px;
-            text-align: center;
-            text-shadow: 0 2px 12px #00e0ff22;
-        }
+        .modern-loader { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 220px; width: 100%; margin: 0 auto; margin-left: 105%; }
+        .modern-loader-spinner { width: 84px; height: 84px; border-radius: 50%; border: 6px solid #e0e7ef; border-top: 6px solid #0a4191; border-right: 6px solid #ffa200; border-bottom: 6px solid #0c01ad; animation: modern-spin 1.1s linear infinite; box-shadow: 0 4px 24px #00e0ff33, 0 0 0 4px #fff8; margin-bottom: 18px; }
+        @keyframes modern-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .modern-loader-text { font-size: 1.15rem; color: #0a4191; font-weight: 700; letter-spacing: 1px; text-align: center; text-shadow: 0 2px 12px #00e0ff22; }
     </style>
     <div class="modern-loader">
         <div class="modern-loader-spinner"></div>
@@ -56,7 +33,10 @@ async function fetchMajors(page = 1, search = '') {
     `;
 
     try {
-        const response = await fetch(`${API_URL}?page=${page}&search=${search}`);
+        const urlParams = new URLSearchParams(params);
+        urlParams.set('page', page);
+        
+        const response = await fetch(`${API_URL}?${urlParams.toString()}`);
         if (!response.ok) {
             throw new Error('Lỗi khi tải dữ liệu ngành.');
         }
@@ -74,7 +54,7 @@ async function fetchMajors(page = 1, search = '') {
     }
 }
 
-// Hàm render dữ liệu ra giao diện
+// Hàm render dữ liệu ra giao diện (không đổi)
 function renderMajors(majors) {
     majorsGrid.innerHTML = '';
     if (majors.length === 0) {
@@ -89,7 +69,7 @@ function renderMajors(majors) {
         const majorImageDiv = document.createElement('div');
         majorImageDiv.classList.add('major-image');
         const majorImage = document.createElement('img');
-        majorImage.src = major.field.cover || '/static/images/default.png'; 
+        majorImage.src = major.field?.cover || '/static/images/default.png'; 
         majorImage.alt = major.name;
         majorImageDiv.appendChild(majorImage);
 
@@ -102,7 +82,6 @@ function renderMajors(majors) {
         
         const majorDescription = document.createElement('p');
         majorDescription.classList.add('major-description');
-        // Sửa: Sử dụng innerHTML để hiển thị nội dung RichTextField
         majorDescription.innerHTML = major.short_description || 'Không có mô tả ngắn.';
         
         const majorInfoDiv = document.createElement('div');
@@ -116,12 +95,10 @@ function renderMajors(majors) {
         
         const trainingDurationBox = document.createElement('div');
         trainingDurationBox.classList.add('info-box', 'small');
-        // Sửa: Sử dụng innerHTML cho các trường RichTextField
         trainingDurationBox.innerHTML = `Thời gian học: ${major.training_duration || 'Đang cập nhật'}`;
         
         const salaryBox = document.createElement('div');
         salaryBox.classList.add('info-box', 'small', 'vang');
-        // Sửa: Sử dụng innerHTML cho các trường có thể chứa HTML
         salaryBox.innerHTML = `Thu nhập: ${major.salary || 'Đang cập nhật'}`;
         
         infoRow1.appendChild(trainingDurationBox);
@@ -132,7 +109,6 @@ function renderMajors(majors) {
         
         const tuitionFeeBox = document.createElement('div');
         tuitionFeeBox.classList.add('info-box', 'small');
-        // Sửa: Sử dụng innerHTML cho các trường RichTextField
         tuitionFeeBox.innerHTML = `Học phí: ${major.tuition_fee_per_year || 'Đang cập nhật'}`;
         
         const opportunitiesBox = document.createElement('div');
@@ -175,7 +151,7 @@ function renderMajors(majors) {
     });
 }
 
-// Cập nhật phân trang
+// Cập nhật phân trang (không đổi)
 function updatePagination(nextUrl, previousUrl) {
     prevPageButton.disabled = !previousUrl;
     nextPageButton.disabled = !nextUrl;
@@ -186,29 +162,66 @@ function updatePagination(nextUrl, previousUrl) {
     pageNumbersDiv.appendChild(span);
 }
 
+// Hàm xử lý tìm kiếm và sắp xếp
+function handleSearch() {
+    // Lấy giá trị từ các dropdown
+    const nameQuery = nameSearchInput.value.trim();
+    const opportunitiesQuery = opportunitiesSearchSelect.value;
+    const durationQuery = durationSearchSelect.value;
+    const tuitionQuery = tuitionSearchSelect.value;
+    const sortQuery = tuitionSortSelect.value; // Lấy giá trị sắp xếp mới
+    
+    // Tạo đối tượng chứa các tham số
+    const params = {};
+    if (nameQuery) params.name = nameQuery;
+    if (opportunitiesQuery) params.opportunities = opportunitiesQuery;
+    if (durationQuery) params.all_training_duration = durationQuery;
+
+    // Gán tham số lọc học phí
+    if (tuitionQuery) {
+        params.tuition_fee_per_year = tuitionQuery;
+    }
+    
+    // Gán tham số sắp xếp
+    if (sortQuery) {
+        params.ordering = sortQuery;
+    }
+
+    const isSearchChanged = JSON.stringify(params) !== JSON.stringify(currentSearchState);
+
+    if (isSearchChanged) {
+        currentSearchState = params;
+        fetchMajors(1, currentSearchState);
+    }
+}
+
 // Xử lý sự kiện cho các nút phân trang
 prevPageButton.addEventListener('click', () => {
     if (currentPage > 1) {
-        fetchMajors(currentPage - 1, currentSearchQuery);
+        fetchMajors(currentPage - 1, currentSearchState);
     }
 });
 
 nextPageButton.addEventListener('click', () => {
     if (currentPage < totalPages) {
-        fetchMajors(currentPage + 1, currentSearchQuery);
+        fetchMajors(currentPage + 1, currentSearchState);
     }
 });
 
-// Xử lý tìm kiếm
-searchInput.addEventListener('keyup', (e) => {
-    if (e.key === 'Enter' || searchInput.value === '') {
-        const query = searchInput.value.trim();
-        if (query !== currentSearchQuery) {
-            currentSearchQuery = query;
-            fetchMajors(1, currentSearchQuery);
-        }
+// Xử lý sự kiện tìm kiếm
+searchButton.addEventListener('click', handleSearch);
+
+// Gán sự kiện 'keyup' cho ô input và 'change' cho các dropdown
+nameSearchInput.addEventListener('keyup', (e) => {
+    if (e.key === 'Enter') {
+        handleSearch();
     }
 });
+
+opportunitiesSearchSelect.addEventListener('change', handleSearch);
+durationSearchSelect.addEventListener('change', handleSearch);
+tuitionSearchSelect.addEventListener('change', handleSearch);
+tuitionSortSelect.addEventListener('change', handleSearch); // Gán sự kiện change cho dropdown sắp xếp
 
 // Gọi hàm fetch ban đầu để tải dữ liệu khi trang web được load
 document.addEventListener('DOMContentLoaded', () => {

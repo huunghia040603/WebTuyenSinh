@@ -268,40 +268,6 @@
         text-align: center;
     }
 
-    .info-box.vang[data-tooltip] {
-        position: relative;
-        cursor: help;
-    }
-
-    .info-box.vang[data-tooltip]:hover::after {
-        content: attr(data-tooltip);
-        position: absolute;
-        bottom: 100%;
-        left: 50%;
-        transform: translateX(-50%);
-        background: #333;
-        color: white;
-        padding: 8px 12px;
-        border-radius: 6px;
-        font-size: 0.8rem;
-        white-space: nowrap;
-        z-index: 1000;
-        margin-bottom: 5px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-    }
-
-    .info-box.vang[data-tooltip]:hover::before {
-        content: '';
-        position: absolute;
-        bottom: 100%;
-        left: 50%;
-        transform: translateX(-50%);
-        border: 5px solid transparent;
-        border-top-color: #333;
-        margin-bottom: -5px;
-        z-index: 1000;
-    }
-
     .view-more-btn {
         background: linear-gradient(90deg, #1e3a8a, #3b82f6 );
         color: white;
@@ -1146,7 +1112,6 @@ h3.range-title2 {
 }
 
 </style>{%endblock%}
-
 {% block content %}
 <div class="container">
     <div class="header-section">
@@ -1158,27 +1123,81 @@ h3.range-title2 {
         <div class="search-row">
             <div class="search-input">
                 <i class="fas fa-search" style="padding-left: 20px;"></i>
-                <input type="text" id="searchInput" placeholder="Tìm kiếm theo tên ngành hoặc mã ngành...">
+                <input type="text" id="nameSearchInput" placeholder="Tìm kiếm theo tên ngành hoặc việc làm...">
+            </div>
+            
+            <div class="search-filters">
+                <div class="filter-group">
+                    <label for="opportunitiesSearch">Cơ hội việc làm:</label>
+                    <select id="opportunitiesSearch">
+                        <option value="">Tất cả</option>
+                        <option value="65">65% trở lên</option>
+                        <option value="70">70% trở lên</option>
+                        <option value="80">80% trở lên</option>
+                        <option value="90">90% trở lên</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="durationSearch">Thời gian đào tạo:</label>
+                    <select id="durationSearch">
+                        <option value="">Tất cả</option>
+                        <option value="3.5">3.5-4 năm</option>
+                        <option value="4">4 năm</option>
+                        <option value="4.5">4.5-5 năm</option>
+                        <option value="6">Trên 5 năm</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="tuitionSearch">Học phí/năm (triệu):</label>
+                    <select id="tuitionSearch">
+                        <option value="">Tất cả</option>
+                        <option value="miễn phí">Miễn phí</option>
+                        <option value="0-9">Dưới 10 triệu</option>
+                        <option value="10-20">10 - 19 triệu</option>
+                        <option value="20-40">20 - 40 triệu</option>
+                        <option value="40-60">40 - 60 triệu</option>
+                        <option value="60-80">60 - 80 triệu</option>
+                        <option value="80-100">80 - 100 triệu</option>
+                        <option value="100-300">100 - 300 triệu</option>
+                        <option value="300-500">300 - 500 triệu</option>
+                        <option value="500-1000000">Hơn 500 triệu</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="tuitionSort">Sắp xếp học phí:</label>
+                    <select id="tuitionSort">
+                        <option value="">Mặc định</option>
+                        <option value="tuition_fee_per_year">Thấp đến cao</option>
+                        <option value="-tuition_fee_per_year">Cao đến thấp</option>
+                    </select>
+                </div>
+
+                <button id="searchButton" class="search-btn">Tìm kiếm</button>
             </div>
         </div>
-        
     </div>
-<div class="suggestion-bar">
-            <i class="fas fa-info-circle"></i>
-            Lưu ý nhỏ: Thông tin chỉ mang tính chất tham khảo, có thể thay đổi theo thời gian, và điều kiện cụ thể của từng trường.
-        </div>
+    
+    <div class="suggestion-bar">
+        <i class="fas fa-info-circle"></i>
+        Lưu ý nhỏ: Thông tin chỉ mang tính chất tham khảo, có thể thay đổi theo thời gian, và điều kiện cụ thể của từng trường.
+    </div>
+
     <div class="majors-grid" id="majorsGrid">
-      
-    </div>
+        </div>
 
     <div class="pagination-controls">
         <button id="prevPage" class="pagination-button">&laquo; Trước</button>
-        <div id="pageNumbers" class="pagination-page-numbers">
-            </div>
+        <div id="pageNumbers" class="pagination-page-numbers"></div>
         <button id="nextPage" class="pagination-button">Sau &raquo;</button>
     </div>
-</div>
+
 {% endblock %}
 {% block scripts%}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.js"></script>
+
 <script src="/static/js/nganhchung.js"></script>
 {% endblock %}
