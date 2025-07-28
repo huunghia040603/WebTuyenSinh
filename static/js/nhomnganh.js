@@ -17,24 +17,28 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
     // Hàm lấy dữ liệu từ API và hiển thị lên trang
     async function fetchFieldGroups() {
+      
         try {
             const response = await fetch(API_URL);
             
+          
             if (!response.ok) {
                 throw new Error('Lỗi khi lấy dữ liệu: ' + response.status);
             }
             
             const fieldGroups = await response.json();
+           
             
             renderFieldGroups(fieldGroups);
         } catch (error) {
-            console.error('Có lỗi xảy ra:', error);
+          
             nhomnganhGrid.innerHTML = '<p>Không thể tải dữ liệu nhóm ngành. Vui lòng thử lại sau.</p>';
         }
     }
 
     // Hàm tạo và hiển thị các box nhóm ngành dựa trên dữ liệu
     function renderFieldGroups(data) {
+        
         nhomnganhGrid.innerHTML = '';
         
         data.forEach((item, index) => {
@@ -53,6 +57,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         });
         
         addModalEventListeners();
+      
     }
 
     // Hàm gán sự kiện click cho tất cả các nút "Ngành đào tạo"
@@ -62,6 +67,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 const fieldId = this.getAttribute('data-field-id');
                 const fieldName = this.getAttribute('data-name');
                 const fieldDesc = this.getAttribute('data-desc');
+
+              
 
                 modalTitle.textContent = fieldName;
                 modalDesc.textContent = fieldDesc;
@@ -75,6 +82,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         });
         
         closeBtn.onclick = function() {
+        
             modal.style.display = 'none';
             document.body.style.overflow = '';
             modalList.innerHTML = '';
@@ -82,6 +90,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         
         modal.onclick = function(e) {
             if (e.target === modal) { 
+            
                 modal.style.display = 'none'; 
                 document.body.style.overflow = '';
                 modalList.innerHTML = '';
@@ -91,6 +100,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
     
     // Hàm mới: Fetch dữ liệu ngành chi tiết và hiển thị trong modal
     async function fetchAndRenderMajors(fieldId) {
+    
+        
         // Hiển thị thông báo đang tải
         modalList.innerHTML = `
         <style>
@@ -103,7 +114,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     min-height: 220px;
     width: 100%;
     margin: 0 auto;
-     margin-left: 60%;
+      margin-left: 60%;
 }
 .modern-loader-spinner {
     width: 84px;
@@ -129,35 +140,40 @@ document.addEventListener('DOMContentLoaded', (event) => {
     text-align: center;
     text-shadow: 0 2px 12px #00e0ff22;
 }
-            
         </style>
         <div class="modern-loader">
             <div class="modern-loader-spinner"></div>
             <div class="modern-loader-text">Tôi đang tải dữ liệu! <br/> Chờ tôi xíu nhé...</div>
         </div>
-    `;
+        `;
 
         try {
-            const response = await fetch(`${MAJOR_API_URL}${fieldId}`);
+            const url = `${MAJOR_API_URL}${fieldId}`;
+           
+            const response = await fetch(url);
+            
+           
             
             if (!response.ok) {
                 throw new Error('Lỗi khi lấy dữ liệu ngành: ' + response.status);
             }
             
             const majors = await response.json();
+          
             
-            if (majors.length > 0) {
-                // Tạo chuỗi HTML từ dữ liệu majors
-                const majorsHtml = majors.map(major => 
+            if (majors.results && majors.results.length > 0) {
+                const majorsHtml = majors.results.map(major => 
                     `<div class='modal-nganh-list-item'>${major.name}</div>`
                 ).join('');
                 modalList.innerHTML = majorsHtml;
+               
             } else {
                 modalList.innerHTML = '<p>Không có ngành học nào thuộc nhóm ngành này.</p>';
+               
             }
 
         } catch (error) {
-            console.error('Có lỗi xảy ra khi lấy dữ liệu ngành:', error);
+           
             modalList.innerHTML = '<p>Không thể tải danh sách ngành. Vui lòng thử lại sau.</p>';
         }
     }
