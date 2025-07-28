@@ -235,6 +235,96 @@
     color: #92400e;
 }
 
+/* Slider styles */
+.demo-slider {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.demo-slider-container {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+}
+
+.demo-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.demo-slide.active {
+    opacity: 1;
+}
+
+.demo-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.demo-slider-nav {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+}
+
+.demo-nav-btn {
+    background: #f3f4f6;
+    border: 1px solid #d1d5db;
+    color: #374151;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.demo-nav-btn:hover {
+    background: #e5e7eb;
+    border-color: #9ca3af;
+}
+
+.demo-nav-btn.active {
+    background: #0033a0;
+    color: white;
+    border-color: #0033a0;
+}
+
+.demo-slider-dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.demo-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #d1d5db;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.demo-dot:hover {
+    background: #9ca3af;
+}
+
+.demo-dot.active {
+    background: #0033a0;
+    transform: scale(1.2);
+}
+
 @media (max-width: 1200px) {
     .demo-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -263,6 +353,79 @@
     }
 }
 </style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Slider functionality
+    const slider = document.querySelector('.demo-slider');
+    if (!slider) return;
+    
+    const slides = slider.querySelectorAll('.demo-slide');
+    const navBtns = slider.querySelectorAll('.demo-nav-btn');
+    const dots = slider.querySelectorAll('.demo-dot');
+    
+    let currentSlide = 0;
+    let autoSlideInterval;
+    
+    function showSlide(index) {
+        // Hide all slides
+        slides.forEach(slide => slide.classList.remove('active'));
+        navBtns.forEach(btn => btn.classList.remove('active'));
+        dots.forEach(dot => dot.classList.remove('active'));
+        
+        // Show current slide
+        if (slides[index]) {
+            slides[index].classList.add('active');
+            navBtns[index].classList.add('active');
+            dots[index].classList.add('active');
+        }
+        
+        currentSlide = index;
+    }
+    
+    function nextSlide() {
+        const next = (currentSlide + 1) % slides.length;
+        showSlide(next);
+    }
+    
+    function startAutoSlide() {
+        autoSlideInterval = setInterval(nextSlide, 3000); // Change slide every 4 seconds
+    }
+    
+    function stopAutoSlide() {
+        if (autoSlideInterval) {
+            clearInterval(autoSlideInterval);
+        }
+    }
+    
+    // Event listeners for navigation buttons
+    navBtns.forEach((btn, index) => {
+        btn.addEventListener('click', () => {
+            showSlide(index);
+            stopAutoSlide();
+            startAutoSlide(); // Restart auto slide
+        });
+    });
+    
+    // Event listeners for dots
+    dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+            showSlide(index);
+            stopAutoSlide();
+            startAutoSlide(); // Restart auto slide
+        });
+    });
+    
+    // Pause auto slide on hover
+    slider.addEventListener('mouseenter', stopAutoSlide);
+    slider.addEventListener('mouseleave', startAutoSlide);
+    
+    // Start auto slide
+    startAutoSlide();
+});
+</script>
 {% endblock %}
 
 {% block content %}
@@ -420,13 +583,41 @@
                 </div>
             </div>
         </div>
-        <div class="demo-card img">
+        <div class="demo-card">
             <div class="demo-card-header">
                 Thông tin tuyển sinh
             </div>
-            <div class="demo-card-content img">
-                <img style="width: 100%; height: 200px; border-radius: 8px;" src="/static/images/nganh/anh01.png" alt="Thông tin tuyển sinh" class="demo-info-image">
-                
+            <div class="demo-card-content">
+                <div class="demo-slider">
+                    <div class="demo-slider-container">
+                        <div class="demo-slide active">
+                            <img src="/static/images/nganh/anh01.png" alt="Thông tin tuyển sinh 1">
+                        </div>
+                        <div class="demo-slide">
+                            <img src="/static/images/nganh/anh02.png" alt="Thông tin tuyển sinh 2">
+                        </div>
+                        <div class="demo-slide">
+                            <img src="/static/images/nganh/anh03.png" alt="Thông tin tuyển sinh 3">
+                        </div>
+                        <div class="demo-slide">
+                            <img src="/static/images/nganh/anh04.png" alt="Thông tin tuyển sinh 4">
+                        </div>
+                    </div>
+                    
+                    <div class="demo-slider-nav">
+                        <button class="demo-nav-btn" data-slide="0">Tuyển sinh</button>
+                        <button class="demo-nav-btn" data-slide="1">Học phí</button>
+                        <button class="demo-nav-btn" data-slide="2">Điểm chuẩn</button>
+                        <button class="demo-nav-btn" data-slide="3">Cơ hội</button>
+                    </div>
+                    
+                    <div class="demo-slider-dots">
+                        <span class="demo-dot active" data-slide="0"></span>
+                        <span class="demo-dot" data-slide="1"></span>
+                        <span class="demo-dot" data-slide="2"></span>
+                        <span class="demo-dot" data-slide="3"></span>
+                    </div>
+                </div>
             </div>
         </div>
         
