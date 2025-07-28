@@ -231,7 +231,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             card.innerHTML = `
-                <div class="card-content">
+                <div class="card-content" data-university-id="${university.id}" data-university-code="${university.short_code}">
                     <div class="card-image">
                         <img src="${university.logo}" alt="${university.name_vn}" onerror="this.onerror=null;this.src='https://placehold.co/120x120/cccccc/333333?text=No+Logo';">
                     </div>
@@ -257,12 +257,21 @@ document.addEventListener('DOMContentLoaded', function () {
             const nameEl = card.querySelector('.university-name');
             if (nameEl) { // Check if element exists
                 nameEl.addEventListener('mouseenter', () => {
-                    hoverTimeout = setTimeout(() => showModal(university, locationText, tuitionDisplay), 100);
+                    hoverTimeout = setTimeout(() => showModal(university, locationText, tuitionDisplay), 300);
                 });
                 nameEl.addEventListener('mouseleave', () => {
                     clearTimeout(hoverTimeout);
                 });
             }
+
+            // Thêm sự kiện click cho card
+            card.addEventListener('click', () => {
+                const universityCode = card.querySelector('.card-content').getAttribute('data-university-code');
+                if (universityCode) {
+                    window.location.href = `/${universityCode.toLowerCase()}`;
+                }
+            });
+
             universitiesGrid.appendChild(card);
         });
     }
@@ -347,21 +356,50 @@ document.addEventListener('DOMContentLoaded', function () {
                  ${university.map_link ? `
                 <div class="detailed-section">
                     <h4 class="section-heading">Bản đồ</h4>
-                    <div style="width: 100%; height: 300px; overflow: hidden; border-radius: 10px;">
-                        ${university.map_link}
-                    </div>
+                    <div id="mapBox" style="width: 100%; height: 300px; overflow: hidden; border-radius: 10px;"></div>
                 </div>` : ''}
             `;
             modalOverlay.classList.add('active');
             document.body.style.overflow = 'hidden';
-            // Đổi màu border modal-content nếu là trường nổi bật
-            if (university.registration === true) {
+            
+            // Đổi màu border modal-content và nút button nếu là trường nổi bật
+            if (university.tag === 'outstanding') {
+                modalContent.style.borderColor = '#ffc107'; // Viền vàng
+                modalContent.style.borderWidth = '3px';
+                const applyBtn = document.querySelector('.apply-btn');
+                if (applyBtn) {
+                    applyBtn.style.backgroundColor = '#ffc107';
+                    applyBtn.style.color = '#000';
+                    applyBtn.style.borderColor = '#ffc107';
+                }
+            } else if (university.registration === true) {
                 modalContent.style.borderColor = '#ffc107'; 
-                // vàng
+                modalContent.style.borderWidth = '2px';
                 document.querySelector('.apply-btn').classList.add('highlight');
             } else {
                 modalContent.style.borderColor = '#3b82f6'; // xanh mặc định
+                modalContent.style.borderWidth = '2px';
+                const applyBtn = document.querySelector('.apply-btn');
+                if (applyBtn) {
+                    applyBtn.style.backgroundColor = '';
+                    applyBtn.style.color = '';
+                    applyBtn.style.borderColor = '';
+                }
                 document.querySelector('.apply-btn').classList.remove('highlight');
+            }
+
+            // Thêm nút "Xem chi tiết" vào modal
+            const modalActions = document.querySelector('.modal-actions');
+            if (modalActions) {
+                const detailBtn = modalActions.querySelector('.detail-btn');
+                if (detailBtn) {
+                    detailBtn.onclick = () => {
+                        const universityCode = university.short_code;
+                        if (universityCode) {
+                            window.location.href = `/${universityCode.toLowerCase()}`;
+                        }
+                    };
+                }
             }
 
             const btn = document.getElementById('seeMoreBtn');
@@ -373,6 +411,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         btn.style.display = 'none';
                     }
                 });
+            }
+
+            // Trích xuất src từ chuỗi <iframe ...> và gán vào src của <iframe>
+            const mapBox = document.getElementById('mapBox');
+            if (mapBox && university.map_link) {
+                mapBox.innerHTML = university.map_link; // map_link là chuỗi <iframe ...>
             }
         }, 100); // Giảm thời gian hover xuống để trải nghiệm tốt hơn
     }

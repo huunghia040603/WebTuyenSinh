@@ -12,7 +12,51 @@ let currentSearchQuery = '';
 
 // Hàm fetch dữ liệu từ API
 async function fetchMajors(page = 1, search = '') {
-    majorsGrid.innerHTML = '<div class="loading">Đang tải dữ liệu...</div>';
+    majorsGrid.innerHTML = `
+    <style>
+
+.modern-loader {
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+min-height: 220px;
+width: 100%;
+margin: 0 auto;
+ margin-left: 105%;
+}
+.modern-loader-spinner {
+width: 84px;
+height: 84px;
+border-radius: 50%;
+border: 6px solid #e0e7ef;
+border-top: 6px solid #0a4191;
+border-right: 6px solid #ffa200;
+border-bottom: 6px solid #0c01ad;
+animation: modern-spin 1.1s linear infinite;
+box-shadow: 0 4px 24px #00e0ff33, 0 0 0 4px #fff8;
+margin-bottom: 18px;
+}
+@keyframes modern-spin {
+0% { transform: rotate(0deg); }
+100% { transform: rotate(360deg); }
+}
+.modern-loader-text {
+font-size: 1.15rem;
+color: #0a4191;
+font-weight: 700;
+letter-spacing: 1px;
+text-align: center;
+text-shadow: 0 2px 12px #00e0ff22;
+}
+        
+    </style>
+    <div class="modern-loader">
+        <div class="modern-loader-spinner"></div>
+        <div class="modern-loader-text">Tôi đang tải dữ liệu! <br/> Chờ tôi xíu nhé...</div>
+    </div>
+`;
+
     try {
         const response = await fetch(`${API_URL}?page=${page}&search=${search}`);
         if (!response.ok) {
@@ -102,6 +146,7 @@ function renderMajors(majors) {
         const opportunitiesBox = document.createElement('div');
         opportunitiesBox.classList.add('info-box', 'small', 'vang');
         opportunitiesBox.textContent = `Điểm cơ hội: ${major.opportunities || 'Đang cập nhật'}`;
+        opportunitiesBox.setAttribute('data-tooltip', `Điểm cơ hội việc làm ${major.opportunities || 'Đang cập nhật'}/100`);
 
         infoRow2.appendChild(tuitionFeeBox);
         infoRow2.appendChild(opportunitiesBox);

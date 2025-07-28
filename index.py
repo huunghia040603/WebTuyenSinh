@@ -43,5 +43,13 @@ def visao():
 def nganhchung():
     return render_template('nganhchung.html')
 
+@app.route("/<university_code>")
+def university_detail(university_code):
+    return render_template('truongdaihoc/chitiet.html')
+
+@app.route("/demo")
+def demo():
+    return render_template('demo.html')
+
 if __name__ == "__main__":
     app.run(debug=True)
