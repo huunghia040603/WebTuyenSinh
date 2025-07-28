@@ -127,7 +127,7 @@ window.addEventListener('load', function () {
         setInnerHTMLOrText('majorField', major.field?.name);
         
         // training_duration và tuition_fee_per_year là RichTextField nên cần dùng innerHTML
-        setInnerHTMLOrText('majorDuration', major.training_duration);
+        setInnerHTMLOrText('majorDuration', major.training_duration + ' năm');
         setInnerHTMLOrText('majorTuition', major.tuition_fee_per_year);
         
         setInnerHTMLOrText('majorSalary', major.salary);
@@ -147,19 +147,112 @@ window.addEventListener('load', function () {
     }
 
     function updateMajorSuitable(major) {
-        setInnerHTMLOrText('majorSuitable', major.suitable, 'Không có thông tin tố chất phù hợp');
+        const majorSuitable = document.getElementById('majorSuitable');
+        if (majorSuitable) {
+            if (major.suitable) {
+                // Tách dữ liệu theo dấu phẩy và tạo các ô
+                const qualities = major.suitable.split(',').map(item => item.trim()).filter(item => item);
+                
+                if (qualities.length > 0) {
+                    let html = '<div class="chitiet-qualities">';
+                    qualities.forEach(quality => {
+                        // Chỉ viết hoa chữ cái đầu của từ đầu tiên
+                        const words = quality.split(' ');
+                        const capitalizedQuality = words.map((word, index) => {
+                            if (index === 0) {
+                                // Từ đầu tiên: viết hoa chữ cái đầu
+                                return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+                            } else {
+                                // Các từ khác: giữ nguyên
+                                return word;
+                            }
+                        }).join(' ');
+                        html += `<div class="chitiet-quality-item"><strong>${capitalizedQuality}</strong></div>`;
+                    });
+                    html += '</div>';
+                    majorSuitable.innerHTML = html;
+                } else {
+                    majorSuitable.textContent = 'Không có thông tin tố chất phù hợp';
+                }
+            } else {
+                majorSuitable.textContent = 'Không có thông tin tố chất phù hợp';
+            }
+        }
     }
 
     function updateMajorProgram(major) {
-        setInnerHTMLOrText('majorProgram', major.program, 'Không có thông tin chương trình học');
+        const majorProgram = document.getElementById('majorProgram');
+        if (majorProgram) {
+            if (major.program) {
+                // Xử lý format cho chương trình học
+                let formattedProgram = major.program;
+                
+                // Xuống dòng sau dấu : và dấu . (nhưng không xuống dòng nếu đang trong dấu ngoặc)
+                formattedProgram = formattedProgram.replace(/[:.](?![^()]*\))/g, '$&<br>');
+                
+                // In đậm các tiêu đề chính (Kiến thức đại cương, Kiến thức cơ sở nghiệp vụ, Kiến thức chuyên sâu, v.v.)
+                formattedProgram = formattedProgram.replace(/(Kiến thức [^:]*):/g, '<strong>$1:</strong>');
+                formattedProgram = formattedProgram.replace(/(Chương trình [^:]*):/g, '<strong>$1:</strong>');
+                majorProgram.innerHTML = formattedProgram;
+            } else {
+                majorProgram.textContent = 'Không có thông tin chương trình học';
+            }
+        }
     }
 
     function updateMajorJobs(major) {
-        setInnerHTMLOrText('majorJobs', major.job, 'Không có thông tin việc làm');
+        const majorJobs = document.getElementById('majorJobs');
+        if (majorJobs) {
+            if (major.job) {
+                // Tách dữ liệu theo dấu phẩy và dấu chấm phẩy, tạo các ô
+                const jobs = major.job.split(/[,;]/).map(item => item.trim()).filter(item => item);
+                
+                if (jobs.length > 0) {
+                    let html = '<div class="chitiet-jobs">';
+                    jobs.forEach(job => {
+                        // Viết hoa chữ cái đầu của từ đầu tiên
+                        const words = job.split(' ');
+                        const capitalizedJob = words.map((word, index) => {
+                            if (index === 0) {
+                                // Từ đầu tiên: viết hoa chữ cái đầu
+                                return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+                            } else {
+                                // Các từ khác: giữ nguyên
+                                return word;
+                            }
+                        }).join(' ');
+                        html += `<div class="chitiet-job-item">${capitalizedJob}</div>`;
+                    });
+                    html += '</div>';
+                    majorJobs.innerHTML = html;
+                } else {
+                    majorJobs.textContent = 'Không có thông tin việc làm';
+                }
+            } else {
+                majorJobs.textContent = 'Không có thông tin việc làm';
+            }
+        }
     }
 
     function updateMajorNote(major) {
-        setInnerHTMLOrText('majorNote', major.note, 'Không có thông tin điểm nổi bật');
+        const majorNote = document.getElementById('majorNote');
+        if (majorNote) {
+            if (major.note) {
+                // Xử lý note để tự động xuống dòng và không có khoảng trắng quá nhiều
+                let formattedNote = major.note;
+                
+                // Thay thế nhiều khoảng trắng liên tiếp bằng một khoảng trắng
+                formattedNote = formattedNote.replace(/\s+/g, ' ');
+                
+                // Thay thế dấu . và : bằng xuống dòng
+                formattedNote = formattedNote.replace(/[:.]/g, '$&<br>');
+                
+                // Wrap note content in demo-highlight div
+                majorNote.innerHTML = `<div class="demo-highlight"><strong>Điểm nổi bật: </strong>${formattedNote}</div>`;
+            } else {
+                majorNote.textContent = 'Không có thông tin điểm nổi bật';
+            }
+        }
     }
 
     function updateOpportunityStats(major) {
@@ -170,8 +263,9 @@ window.addEventListener('load', function () {
         const demandLevel = document.getElementById('demandLevel');
         if (demandLevel) {
             if (major.opportunities) {
-                if (major.opportunities >= 80) demandLevel.textContent = 'Cao';
-                else if (major.opportunities >= 60) demandLevel.textContent = 'Trung bình';
+                if (major.opportunities >= 90) demandLevel.textContent = 'Rất Cao';
+                else if (major.opportunities >= 80) demandLevel.textContent = 'Cao';
+                else if (major.opportunities >= 65) demandLevel.textContent = 'Trung bình';
                 else demandLevel.textContent = 'Thấp';
             } else {
                 demandLevel.textContent = '--';
@@ -220,7 +314,7 @@ window.addEventListener('load', function () {
         
         function startAutoSlide() {
             stopAutoSlide(); // Ensure no multiple intervals running
-            autoSlideInterval = setInterval(nextSlide, 3000);
+            autoSlideInterval = setInterval(nextSlide, 2000);
         }
         
         function stopAutoSlide() {
