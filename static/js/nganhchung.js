@@ -9,7 +9,7 @@ const pageNumbersDiv = document.getElementById('pageNumbers');
 const nameSearchInput = document.getElementById('nameSearchInput');
 const opportunitiesSearchSelect = document.getElementById('opportunitiesSearch');
 const durationSearchSelect = document.getElementById('durationSearch');
-const tuitionSearchSelect = document.getElementById('tuitionSearch');
+
 const tuitionSortSelect = document.getElementById('tuitionSort'); // Biến mới cho sắp xếp
 const searchButton = document.getElementById('searchButton');
 
@@ -95,7 +95,7 @@ function renderMajors(majors) {
         
         const trainingDurationBox = document.createElement('div');
         trainingDurationBox.classList.add('info-box', 'small');
-        trainingDurationBox.innerHTML = `Thời gian học: ${major.training_duration || 'Đang cập nhật'}`;
+        trainingDurationBox.innerHTML = `Thời gian học: ${major.training_duration || 'Đang cập nhật'} năm`;
         
         const salaryBox = document.createElement('div');
         salaryBox.classList.add('info-box', 'small', 'vang');
@@ -168,7 +168,7 @@ function handleSearch() {
     const nameQuery = nameSearchInput.value.trim();
     const opportunitiesQuery = opportunitiesSearchSelect.value;
     const durationQuery = durationSearchSelect.value;
-    const tuitionQuery = tuitionSearchSelect.value;
+   
     const sortQuery = tuitionSortSelect.value; // Lấy giá trị sắp xếp mới
     
     // Tạo đối tượng chứa các tham số
@@ -177,10 +177,7 @@ function handleSearch() {
     if (opportunitiesQuery) params.opportunities = opportunitiesQuery;
     if (durationQuery) params.all_training_duration = durationQuery;
 
-    // Gán tham số lọc học phí
-    if (tuitionQuery) {
-        params.tuition_fee_per_year = tuitionQuery;
-    }
+   
     
     // Gán tham số sắp xếp
     if (sortQuery) {
@@ -208,20 +205,16 @@ nextPageButton.addEventListener('click', () => {
     }
 });
 
-// Xử lý sự kiện tìm kiếm
-searchButton.addEventListener('click', handleSearch);
-
-// Gán sự kiện 'keyup' cho ô input và 'change' cho các dropdown
-nameSearchInput.addEventListener('keyup', (e) => {
-    if (e.key === 'Enter') {
-        handleSearch();
+// Xử lý tìm kiếm
+searchInput.addEventListener('keyup', (e) => {
+    if (e.key === 'Enter' || searchInput.value === '') {
+        const query = searchInput.value.trim();
+        if (query !== currentSearchQuery) {
+            currentSearchQuery = query;
+            fetchMajors(1, currentSearchQuery);
+        }
     }
 });
-
-opportunitiesSearchSelect.addEventListener('change', handleSearch);
-durationSearchSelect.addEventListener('change', handleSearch);
-tuitionSearchSelect.addEventListener('change', handleSearch);
-tuitionSortSelect.addEventListener('change', handleSearch); // Gán sự kiện change cho dropdown sắp xếp
 
 // Gọi hàm fetch ban đầu để tải dữ liệu khi trang web được load
 document.addEventListener('DOMContentLoaded', () => {
