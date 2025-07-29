@@ -292,6 +292,25 @@ document.addEventListener('DOMContentLoaded', function () {
             endPage = Math.min(totalPages, maxPageButtons);
         }
 
+        // Thêm nút trang đầu nếu cần
+        if (startPage > 1) {
+            const firstPageButton = document.createElement('button');
+            firstPageButton.className = 'page-number-button';
+            firstPageButton.textContent = '1';
+            firstPageButton.addEventListener('click', () => {
+                fetchUniversities(1);
+                if (universitiesGrid) universitiesGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+            pageNumbersContainer.appendChild(firstPageButton);
+            if (startPage > 2) {
+                const ellipsis = document.createElement('span');
+                ellipsis.className = 'pagination-ellipsis';
+                ellipsis.textContent = '...';
+                pageNumbersContainer.appendChild(ellipsis);
+            }
+        }
+
+        // Các nút trang chính
         for (let i = startPage; i <= endPage; i++) {
             const pageButton = document.createElement('button');
             pageButton.className = 'page-number-button';
@@ -301,11 +320,27 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             pageButton.addEventListener('click', () => {
                 fetchUniversities(i);
-                if (universitiesGrid) {
-                    universitiesGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
+                if (universitiesGrid) universitiesGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
             });
-            if (pageNumbersContainer) pageNumbersContainer.appendChild(pageButton);
+            pageNumbersContainer.appendChild(pageButton);
+        }
+
+        // Thêm nút trang cuối nếu cần
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                const ellipsis = document.createElement('span');
+                ellipsis.className = 'pagination-ellipsis';
+                ellipsis.textContent = '...';
+                pageNumbersContainer.appendChild(ellipsis);
+            }
+            const lastPageButton = document.createElement('button');
+            lastPageButton.className = 'page-number-button';
+            lastPageButton.textContent = totalPages;
+            lastPageButton.addEventListener('click', () => {
+                fetchUniversities(totalPages);
+                if (universitiesGrid) universitiesGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+            pageNumbersContainer.appendChild(lastPageButton);
         }
     }
 

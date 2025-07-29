@@ -91,20 +91,21 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: box-shadow 0.2s, border 0.2s, transform 0.2s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: 2.5px solid #e5e7eb;
     animation: doitac-float-move 22s linear infinite;
     will-change: transform;
     cursor: pointer;
     overflow: hidden;
-    
 }
+
 .doitac-float-logo:hover {
     border: 3.5px solid #0a4191;
-    box-shadow: 0 8px 32px #0a419133;
-    transform: scale(1.12);
-    z-index: 2;
+    box-shadow: 0 12px 40px #0a419133;
+    transform: scale(1.15) rotate(5deg);
+    z-index: 10;
 }
+
 .doitac-float-logo img {
     width: 100%;
     height: 100%;
@@ -112,14 +113,40 @@
     border-radius: 50%;
     background: #fff;
     display: block;
+    transition: transform 0.3s ease;
 }
+
+.doitac-float-logo:hover img {
+    transform: scale(1.1);
+}
+
 @keyframes doitac-marquee {
     0% { transform: translateX(0); }
     100% { transform: translateX(-50%); }
 }
-@keyframes doitac-float-move {
-    0% { left: -120px; }
-    100% { left: 100vw; }
+
+@keyframes doitac-float-move-1 {
+    0%   { left: -120px; transform: translateY(0px) rotate(0deg);}
+    20%  { transform: translateY(-18px) rotate(2deg);}
+    40%  { transform: translateY(12px) rotate(-2deg);}
+    60%  { transform: translateY(-10px) rotate(1deg);}
+    80%  { transform: translateY(8px) rotate(-1deg);}
+    100% { left: 100vw; transform: translateY(0px) rotate(0deg);}
+}
+@keyframes doitac-float-move-2 {
+    0%   { left: -120px; transform: translateY(0px) rotate(0deg);}
+    15%  { transform: translateY(10px) rotate(-2deg);}
+    35%  { transform: translateY(-16px) rotate(2deg);}
+    55%  { transform: translateY(8px) rotate(-1deg);}
+    75%  { transform: translateY(-12px) rotate(1deg);}
+    100% { left: 100vw; transform: translateY(0px) rotate(0deg);}
+}
+@keyframes doitac-float-move-3 {
+    0%   { left: -120px; transform: translateY(0px) rotate(0deg);}
+    25%  { transform: translateY(-12px) rotate(1deg);}
+    50%  { transform: translateY(16px) rotate(-2deg);}
+    75%  { transform: translateY(-8px) rotate(2deg);}
+    100% { left: 100vw; transform: translateY(0px) rotate(0deg);}
 }
 @media (max-width: 900px) {
     .doitac-section { padding: 0 2vw; }
@@ -167,15 +194,40 @@ function getNonOverlapTop(size) {
     return base;
 }
 function createFloatLogo(item, idx) {
-    const size = random(60, 90);
+    const size = random(50, 100);
     const div = document.createElement('a');
     div.className = 'doitac-float-logo';
     div.href = item.link;
     div.target = '_blank';
     div.style.width = div.style.height = size + 'px';
     div.style.top = getNonOverlapTop(size) + 'px';
-    div.style.animationDuration = random(16, 28) + 's';
-    div.style.animationDelay = (-1 * random(0, 20)) + 's';
+
+    // Chọn ngẫu nhiên 1 trong 3 animation chuyển động lên xuống
+    const anims = ['doitac-float-move-1', 'doitac-float-move-2', 'doitac-float-move-3'];
+    const animName = anims[Math.floor(Math.random() * anims.length)];
+    div.style.animationName = animName;
+
+    // Animation duration, delay, timing function như cũ
+    const animationVariants = [
+        { duration: random(18, 32), delay: random(-25, -5), path: 'linear' },
+        { duration: random(20, 35), delay: random(-30, -10), path: 'ease-in-out' },
+        { duration: random(15, 28), delay: random(-20, -8), path: 'ease-out' },
+        { duration: random(22, 38), delay: random(-35, -15), path: 'linear' }
+    ];
+    const variant = animationVariants[idx % animationVariants.length];
+    div.style.animationDuration = variant.duration + 's';
+    div.style.animationDelay = variant.delay + 's';
+    div.style.animationTimingFunction = variant.path;
+
+    div.addEventListener('mouseenter', () => {
+        div.style.animationPlayState = 'paused';
+        div.style.transform = 'scale(1.15) rotate(5deg)';
+    });
+    div.addEventListener('mouseleave', () => {
+        div.style.animationPlayState = 'running';
+        div.style.transform = 'scale(1) rotate(0deg)';
+    });
+
     div.innerHTML = `<img src="${item.img}" alt="logo">`;
     floatLogos.appendChild(div);
 }
@@ -195,7 +247,8 @@ async function renderOutstandingLogos() {
             const card = document.createElement('a');
             card.className = 'doitac-logo-card';
             card.href = '/' + u.short_code; // chuyển đến trang chi tiết trường
-            card.innerHTML = `<span class="doitac-top-badge"> TOP </span>
+            card.innerHTML = `
+            <!-- <span class="doitac-top-badge"> TOP </span> -->
                 <img src="${u.logo || '/static/images/logo/1.jpg'}" class="doitac-logo-img" alt="${u.name}">`;
             marquee.appendChild(card);
         });
@@ -208,6 +261,11 @@ async function renderOutstandingLogos() {
             img: u.logo || '/static/images/logo/1.jpg',
             link: '/' + u.short_code
         }, i);
+        createFloatLogo({
+            img: u.logo || '/static/images/logo/1.jpg',
+            link: '/' + u.short_code
+        }, i);
+       
     });
 }
 renderOutstandingLogos();

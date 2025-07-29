@@ -212,7 +212,7 @@
 
 .right-nav {
     position: fixed;
-    right: 20px;
+    right: 10px;
     top: 80%;
     transform: translateY(-50%);
     z-index: 1000;
@@ -222,13 +222,13 @@
 }
 
 .nav-btn {
-    width: 50px;
-    height: 50px;
+    width: 43px;
+    height: 43px;
     background: #0a4191;
     border: none;
     border-radius: 8px;
     color: white;
-    font-size: 18px;
+    font-size: 15px;
     cursor: pointer;
     transition: all 0.2s;
     display: flex;
@@ -263,13 +263,13 @@
 .magic-share {
     position: fixed;
     bottom: 7%;
-    left: 20px;
+    left: 10px;
     z-index: 1000;
 }
 
 .share-btn {
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
     background: linear-gradient(45deg, #0a4191, #1e40af);
     border: none;
     border-radius: 50%;
@@ -436,12 +436,24 @@
     }
     
     .right-nav {
-        /* display: none; */
-        
+        right: 10px;
+        left: unset;
+        top: unset;
+        bottom: 60px;
+        transform: none;
+        position: fixed;
+        z-index: 1000;
+        flex-direction: column;
+        gap: 10px;
+        max-width: 100vw;
+    }
+    body, html {
+        overflow-x: hidden !important;
+        max-width: 100vw;
     }
     
     .magic-share {
-        bottom: 10px;
+        bottom: 60px;
         left: 10px;
     }
     
@@ -461,6 +473,19 @@
         bottom: 60px;
         gap: 8px;
     }
+}
+
+@media (max-width: 400px) {
+    .right-nav {
+        right: 2vw;
+        bottom: 30px;
+        gap: 7px;
+    }
+}
+
+body, html {
+    overflow-x: hidden !important;
+    max-width: 100vw;
 }
 </style>
 {% endblock %}
