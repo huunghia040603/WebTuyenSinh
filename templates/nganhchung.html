@@ -48,8 +48,7 @@
 
     /* Search and Filter Section */
     .search-filter-section {
-        background: linear-gradient(90deg, #0a4191 0%, #3b82f6 100%);
-        border-radius: 24px;
+        background: linear-gradient(135deg, #0a4191 0%, #0c01ad 100%);        border-radius: 24px;
         box-shadow: 0 4px 24px #0a41911a;
         padding: 32px 24px 24px 24px;
         margin-bottom: 32px;
@@ -88,11 +87,11 @@
         border: none;
         background: transparent;
         outline: none;
-        font-size: 1.25rem;
+        font-size: 1.0rem;
         padding: 20px 0;
         width: 100%;
         color: #fff;
-        font-weight: 600;
+        /* font-weight: 600; */
         letter-spacing: 0.01em;
     }
     .search-bar-input-wrap input::placeholder {
@@ -105,7 +104,7 @@
         color: #0a4191;
         border: none;
         border-radius: 50px;
-        font-weight: 700;
+        /* font-weight: 700; */
         font-size: 1.1rem;
         padding: 16px 36px;
         cursor: pointer;
@@ -122,7 +121,7 @@
     }
     .search-bar-filters {
         display: flex;
-        gap: 18px;
+        gap: 28px;
         flex-wrap: wrap;
         margin-top: 0;
         margin-left: 30px;
@@ -137,7 +136,7 @@
     .filter-group label {
         font-size: 0.98rem;
         color: #ffeebf;
-        font-weight: 600;
+        /* font-weight: 600; */
         margin-bottom: 2px;
         display: flex;
         align-items: center;
@@ -147,10 +146,10 @@
         border-radius: 10px;
         border: 2px solid #fff;
         padding: 12px 16px;
-        font-size: 1.05rem;
+        font-size: 0.9rem;
         background: rgba(255,255,255,0.15);
         color: #fff;
-        font-weight: 600;
+        /* font-weight: 600; */
         transition: border 0.2s, background 0.2s;
     }
     .filter-group select:focus {
@@ -902,7 +901,6 @@
         background: #f9fafb;
         color: #374151;
         font-size: 0.9rem;
-        font-weight: 600;
         cursor: pointer;
         transition: all 0.3s ease;
         margin: 0 2px;
@@ -1191,7 +1189,7 @@ h3.range-title2 {
             </div>
             <div class="search-bar-filters">
                 <div class="filter-group">
-                    <label for="opportunitiesSearch"><i class="fas fa-briefcase"></i> Cơ hội việc làm</label>
+                    <label for="opportunitiesSearch"><i class="fas fa-briefcase"></i>Điểm cơ hội việc làm</label>
                     <select id="opportunitiesSearch">
                         <option value="">Tất cả</option>
                         <option value="65">65 trở lên</option>
@@ -1211,22 +1209,7 @@ h3.range-title2 {
                     </select>
                 </div>
                 
-                <div class="filter-group">
-                    <label for="tuitionSearch">Học phí/năm (triệu):</label>
-                    <select id="tuitionSearch">
-                        <option value="">Tất cả</option>
-                        <option value="miễn phí">Miễn phí</option>
-                        <option value="0-9">Dưới 10 triệu</option>
-                        <option value="10-20">10 - 19 triệu</option>
-                        <option value="20-40">20 - 40 triệu</option>
-                        <option value="40-60">40 - 60 triệu</option>
-                        <option value="60-80">60 - 80 triệu</option>
-                        <option value="80-100">80 - 100 triệu</option>
-                        <option value="100-300">100 - 300 triệu</option>
-                        <option value="300-500">300 - 500 triệu</option>
-                        <option value="500-1000000">Hơn 500 triệu</option>
-                    </select>
-                </div>
+                
                 
                 <div class="filter-group">
                     <label for="tuitionSort"><i class="fas fa-sort-amount-up"></i> Sắp xếp học phí</label>
