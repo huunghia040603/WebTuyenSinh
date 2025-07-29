@@ -55,11 +55,21 @@ def demo():
 def major_detail(major_id):
     return render_template('chitiet-nganhchung.html')
 
+@app.route("/mbtinew")
+def mbtinew():
+    return render_template('khampha/mbtinew.html')
 
+@app.route("/moi")
+def moi():
+    return render_template('khampha/moi.html')
 
 @app.route("/zodiac")
 def cunghoangdao():
     return render_template('cunghoangdao.html')
+
+@app.route("/mbti-new")
+def mbti_new():
+    return render_template('mbti/mbti_new.html')
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -1,0 +1,381 @@
+{% extends "base.html" %}
+{% block stylesheets %}
+  <style>
+    :root {
+      --blue: #0a4191;
+      --blue-light: #eaf3ff;
+      --yellow: #ffe066;
+      --yellow-light: #fffbe6;
+      --gray-bg: #f8fafc;
+      --card-radius: 20px;
+      --shadow: 0 8px 32px rgba(10,65,145,0.08);
+    }
+    body { font-family: 'Montserrat', Arial, sans-serif; margin: 0; background: var(--gray-bg); color: #1a2a3a; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; margin-bottom: 36px; }
+    /* ... giữ nguyên toàn bộ style cũ, chỉ bỏ header/footer ... */
+    .hero { background: linear-gradient(135deg, var(--blue) 0%, var(--yellow) 100%); color: #fff; text-align: center; padding: 140px 0 120px 0; position: relative; }
+    .hero-title { font-size: 2.5rem; font-weight: 900; margin-bottom: 12px; letter-spacing: 1px; }
+    .hero-sub { font-size: 1.2rem; margin-bottom: 24px; }
+    .hero-btn { background: var(--yellow); color: var(--blue); border-radius: 32px; padding: 16px 40px; font-size: 1.1rem; font-weight: 700; border: none; cursor: pointer; box-shadow: var(--shadow); transition: background 0.2s, color 0.2s, transform 0.2s; }
+    .hero-btn:hover { background: #fffbe6; color: var(--blue); transform: translateY(-2px); }
+    .hero-cards { display: flex; gap: 24px; justify-content: center; margin-top: 36px; flex-wrap: wrap; }
+    .hero-card { background: #fff; color: var(--blue); border-radius: var(--card-radius); box-shadow: var(--shadow); padding: 24px 32px; min-width: 220px; max-width: 260px; display: flex; flex-direction: column; align-items: center; }
+    .hero-card i { font-size: 2.2rem; margin-bottom: 12px; color: var(--yellow); }
+    .hero-card-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 8px; }
+    .hero-card-desc { font-size: 0.98rem; color: #3a4a6a; }
+    /* Timeline, intro, group, mbti-card, guide, faq, quote: giữ nguyên style cũ */
+    .timeline-section { background: var(--blue-light); padding: 48px 0 32px 0; }
+    .timeline-title { text-align: center; font-size: 1.5rem; font-weight: 800; color: var(--blue); margin-bottom: 32px; }
+    .timeline { display: flex; justify-content: center; align-items: flex-end; gap: 60px; position: relative; max-width: 900px; margin: 0 auto; }
+    .timeline::before { content: ''; position: absolute; top: 50%; left: 60px; right: 60px; height: 6px; background: linear-gradient(90deg, var(--blue) 0%, var(--yellow) 100%); z-index: 0; border-radius: 3px; }
+    .timeline-step { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; }
+    .timeline-icon { background: var(--yellow); color: var(--blue); border-radius: 50%; width: 54px; height: 54px; display: flex; align-items: center; justify-content: center; font-size: 2rem; box-shadow: var(--shadow); margin-bottom: 8px; border: 3px solid #fff; }
+    .timeline-label { font-size: 1rem; font-weight: 700; color: var(--blue); margin-bottom: 2px; }
+    .timeline-date { font-size: 0.95rem; color: #888; }
+    .intro-section { background: #fff; padding: 56px 0 32px 0; }
+    .intro-container { display: flex; gap: 40px; align-items: center; max-width: 1100px; margin: 0 auto; flex-wrap: wrap; }
+    .intro-img { flex: 1; min-width: 220px; }
+    .intro-img img { width: 100%; max-width: 320px; border-radius: 18px; box-shadow: var(--shadow); }
+    .intro-content { flex: 2; min-width: 260px; }
+    .intro-title { font-size: 2rem; font-weight: 800; color: var(--blue); margin-bottom: 18px; }
+    .intro-desc { font-size: 1.08rem; color: #2a3a5a; line-height: 1.7; }
+    .group-section { background: var(--yellow-light); padding: 48px 0; }
+    .group-title { text-align: center; font-size: 1.5rem; font-weight: 800; color: var(--blue); margin-bottom: 32px; }
+    .group-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    @media (max-width: 700px) {
+      .group-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .group-card { background: #fff; border-radius: var(--card-radius); box-shadow: var(--shadow); padding: 32px 24px; display: flex; flex-direction: column; align-items: center; border-left: 8px solid var(--blue); transition: border-color 0.2s; }
+    .group-card .group-icon { font-size: 2.5rem; color: var(--blue); margin-bottom: 12px; }
+    .group-card .group-name { font-size: 1.2rem; font-weight: 800; color: var(--blue); margin-bottom: 8px; }
+    .group-card .group-types { font-size: 1.05rem; color: var(--yellow); font-weight: 700; margin-bottom: 10px; }
+    .group-card .group-desc { color: #3a4a6a; font-size: 0.98rem; text-align: center; }
+    .group-card:hover { border-color: var(--yellow); }
+    .mbti-card-section { background: #fff; padding: 48px 0; }
+    .mbti-card-title { text-align: center; font-size: 1.5rem; font-weight: 800; color: var(--blue); margin-bottom: 32px; }
+    .mbti-card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 28px; max-width: 900px; margin: 0 auto; }
+    .mbti-card { background: var(--blue-light); border-radius: 18px; box-shadow: var(--shadow); padding: 24px 12px; text-align: center; border: 2px solid var(--yellow-light); transition: border-color 0.2s, box-shadow 0.2s; }
+    .mbti-card .mbti-type { font-size: 1.3rem; font-weight: 800; color: var(--blue); margin-bottom: 8px; }
+    .mbti-card .mbti-desc { color: #2a3a5a; font-size: 0.98rem; margin-bottom: 8px; }
+    .mbti-card .mbti-icon { font-size: 2.2rem; color: var(--yellow); margin-bottom: 8px; }
+    .mbti-card:hover { border-color: var(--yellow); box-shadow: 0 12px 32px #ffe06644; }
+    .guide-section { background: var(--blue-light); padding: 48px 0; }
+    .guide-title { text-align: center; font-size: 1.5rem; font-weight: 800; color: var(--blue); margin-bottom: 32px; }
+    .guide-list { max-width: 700px; margin: 0 auto; background: #fff; border-radius: 18px; box-shadow: var(--shadow); padding: 32px 24px; }
+    .guide-list li { margin-bottom: 18px; font-size: 1.05rem; color: #2a3a5a; line-height: 1.6; }
+    .guide-list li:last-child { margin-bottom: 0; }
+    .faq-section { background: #fff; padding: 48px 0; }
+    .faq-title { text-align: center; font-size: 1.5rem; font-weight: 800; color: var(--blue); margin-bottom: 32px; }
+    .faq-list { max-width: 800px; margin: 0 auto; }
+    .faq-item { border-bottom: 1px solid #e0e7ef; padding: 18px 0; }
+    .faq-q { font-weight: 700; color: var(--blue); cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 1.08rem; }
+    .faq-a { color: #2a3a5a; font-size: 0.98rem; margin-top: 8px; display: none; }
+    .faq-item.active .faq-a { display: block; }
+    .faq-item .fa-chevron-down { transition: transform 0.2s; }
+    .faq-item.active .fa-chevron-down { transform: rotate(180deg); }
+    .quote-section { background: var(--yellow-light); padding: 48px 0; text-align: center; }
+    .quote-icon { font-size: 2.5rem; color: var(--blue); margin-bottom: 18px; }
+    .quote-text { font-size: 1.2rem; color: #2a3a5a; font-style: italic; margin-bottom: 18px; }
+    .quote-author { font-weight: 700; color: var(--blue); margin-bottom: 18px; }
+    .quote-btn { background: var(--blue); color: #fff; border-radius: 32px; padding: 14px 36px; font-size: 1.1rem; font-weight: 700; border: none; cursor: pointer; box-shadow: var(--shadow); transition: background 0.2s, color 0.2s, transform 0.2s; }
+    .quote-btn:hover { background: var(--yellow); color: var(--blue); transform: translateY(-2px); }
+    @media (max-width: 900px) {
+      .intro-container, .group-grid, .mbti-card-grid { flex-direction: column; gap: 24px; }
+      .timeline { flex-direction: column; gap: 32px; }
+      .timeline::before { display: none; }
+    }
+    @media (max-width: 600px) {
+      .hero-title { font-size: 1.3rem; }
+      .container { padding: 0 8px; }
+      .intro-title, .group-title, .mbti-card-title, .guide-title, .faq-title { font-size: 1.1rem; }
+      .group-card, .mbti-card, .guide-list, .faq-list { padding: 16px 8px; }
+    }
+  </style>
+{% endblock %}
+{% block content %}
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-title">TRẮC NGHIỆM TÍNH CÁCH MBTI</div>
+      <div class="hero-sub">Khám phá & Sớm nhận bản thân</div>
+      <button class="hero-btn">Làm bài test</button>
+    </div>
+    <div class="hero-cards-slider-wrapper">
+      <div class="hero-cards-slider" id="heroCardsSlider">
+        <div class="hero-card"><i class="fas fa-user-astronaut"></i><div class="hero-card-title">Khám phá bản thân</div><div class="hero-card-desc">Hiểu rõ điểm mạnh, điểm yếu, định hướng phát triển cá nhân.</div></div>
+        <div class="hero-card"><i class="fas fa-briefcase"></i><div class="hero-card-title">Định hướng nghề nghiệp</div><div class="hero-card-desc">Tìm ngành nghề phù hợp với tính cách, tăng cơ hội thành công.</div></div>
+        <div class="hero-card"><i class="fas fa-users"></i><div class="hero-card-title">Cải thiện quan hệ</div><div class="hero-card-desc">Giao tiếp hiệu quả, xây dựng mối quan hệ tốt đẹp hơn.</div></div>
+        <div class="hero-card"><i class="fas fa-lightbulb"></i><div class="hero-card-title">Phát triển tiềm năng</div><div class="hero-card-desc">Phát huy tối đa năng lực, rèn luyện kỹ năng còn yếu.</div></div>
+        <div class="hero-card"><i class="fas fa-heart"></i><div class="hero-card-title">Tăng sự tự tin</div><div class="hero-card-desc">Hiểu bản thân giúp bạn tự tin hơn trong mọi quyết định.</div></div>
+        <div class="hero-card"><i class="fas fa-graduation-cap"></i><div class="hero-card-title">Chọn trường phù hợp</div><div class="hero-card-desc">MBTI giúp bạn chọn môi trường học tập phù hợp nhất.</div></div>
+        <div class="hero-card"><i class="fas fa-chart-pie"></i><div class="hero-card-title">Phát triển sự nghiệp</div><div class="hero-card-desc">Định hướng phát triển lâu dài dựa trên tính cách cá nhân.</div></div>
+      </div>
+    </div>
+  </section>
+  <style>
+    .hero-cards-slider-wrapper {
+      width: 100vw;
+      max-width: 100vw;
+      margin-left: calc(-50vw + 50%);
+      margin-right: calc(-50vw + 50%);
+      position: relative;
+      left: 0;
+      right: 0;
+      overflow: hidden;
+    }
+    .hero-cards-slider {
+      display: flex;
+      gap: 24px;
+      will-change: transform;
+      /* Không dùng animation CSS nữa */
+    }
+    .hero-card {
+      min-width: 330px;
+      max-width: 260px;
+      flex: 0 0 260px;
+    }
+    @media (max-width: 600px) {
+      .hero-card { min-width: 80vw; max-width: 80vw; }
+    }
+    /* Fade effect for left/right edges */
+    .hero-cards-slider-wrapper::before,
+    .hero-cards-slider-wrapper::after {
+      /* Xoá hiệu ứng fade xanh ở hai viền */
+      display: none;
+    }
+  </style>
+  <script>
+(function() {
+  const slider = document.getElementById('heroCardsSlider');
+  const cards = Array.from(slider.children);
+  // Clone nhiều lần cho đủ dài seamless
+  for (let i = 0; i < 2; i++) {
+    cards.forEach(card => slider.appendChild(card.cloneNode(true)));
+  }
+  let pos = 0;
+  const cardWidth = cards[0].offsetWidth + 24; // 24 là gap
+  const totalCards = cards.length * 3;
+  function animate() {
+    pos += 1.2; // tốc độ, càng lớn càng nhanh
+    if (pos >= cardWidth * cards.length) {
+      pos = 0;
+    }
+    slider.style.transform = `translateX(${-pos}px)`;
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+</script>
+
+  <!-- Timeline Section -->
+  
+
+  <!-- Giới thiệu MBTI (gộp thành 1 khối nền chung) -->
+  
+  {% include "/khampha/mota.html" %}
+  <!-- Phân loại nhóm MBTI -->
+  <section class="group-section">
+    <div class="container">
+      <div class="group-title">Cách MBTI phân loại 16 nhóm tính cách</div>
+      <div class="group-grid">
+        <div class="group-card"><div class="group-icon"><i class="fas fa-brain"></i></div><div class="group-name">Nhà Phân Tích</div><div class="group-types">INTJ, INTP, ENTJ, ENTP</div><div class="group-desc">Tư duy logic, thích phân tích, giải quyết vấn đề phức tạp.</div></div>
+        <div class="group-card"><div class="group-icon"><i class="fas fa-handshake"></i></div><div class="group-name">Nhà Ngoại Giao</div><div class="group-types">INFJ, INFP, ENFJ, ENFP</div><div class="group-desc">Giàu cảm xúc, trực giác mạnh, thích giúp đỡ người khác.</div></div>
+        <div class="group-card"><div class="group-icon"><i class="fas fa-user-shield"></i></div><div class="group-name">Người Quan Tâm</div><div class="group-types">ISTJ, ISFJ, ESTJ, ESFJ</div><div class="group-desc">Thực tế, trách nhiệm, thích tổ chức, quản lý.</div></div>
+        <div class="group-card"><div class="group-icon"><i class="fas fa-compass"></i></div><div class="group-name">Người Khám Phá</div><div class="group-types">ISTP, ISFP, ESTP, ESFP</div><div class="group-desc">Năng động, thích phiêu lưu, sống cho hiện tại.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MBTI 16 Types Section (Card lật) -->
+  <section class="mbti16-section">
+    <div class="mbti16-title">Các loại tính cách</div>
+    <div class="mbti16-group-title mbti16-group-analyst"><span class="mbti16-group-icon"></span>Nhóm Nhà Phân Tích</div>
+    <div class="mbti16-row">
+        <!-- INTJ -->
+        <div class="mbti-card"> <div class="mbti-card-inner"> <div class="mbti-card-front"><img src="/static/images/mbti/intj.png" alt="INTJ"></div><div class="mbti-card-back"><div class="mbti-type">INTJ</div><div class="mbti-short">Người kiến tạo</div><div class="mbti-desc">INTJ là người chiến lược, độc lập, có tầm nhìn xa và luôn lên kế hoạch rõ ràng. Họ thích phân tích, sáng tạo giải pháp mới và rất quyết đoán.</div><button class="mbti-more-btn" onclick="window.location.href='/mbti/intj'">Xem thêm</button></div></div></div>
+        <!-- INTP -->
+        <div class="mbti-card"> <div class="mbti-card-inner"> <div class="mbti-card-front"><img src="/static/images/mbti/intp.png" alt="INTP"></div><div class="mbti-card-back"><div class="mbti-type">INTP</div><div class="mbti-short">Nhà tư duy</div><div class="mbti-desc">INTP là người phân tích, tò mò, thích tìm hiểu nguyên lý và ý tưởng mới. Họ độc lập, sáng tạo và thường có tư duy logic xuất sắc.</div><button class="mbti-more-btn" onclick="window.location.href='/mbti/intp'">Xem thêm</button></div></div></div>
+        <!-- ENTJ -->
+        <div class="mbti-card"> <div class="mbti-card-inner"> <div class="mbti-card-front"><img src="/static/images/mbti/entj.png" alt="ENTJ"></div><div class="mbti-card-back"><div class="mbti-type">ENTJ</div><div class="mbti-short">Nhà chỉ huy</div><div class="mbti-desc">ENTJ là người quyết đoán, có khả năng lãnh đạo, tư duy chiến lược và luôn hướng tới mục tiêu lớn. Họ mạnh mẽ, tự tin và thích tổ chức, quản lý.</div><button class="mbti-more-btn" onclick="window.location.href='/mbti/entj'">Xem thêm</button></div></div></div>
+        <!-- ENTP -->
+        <div class="mbti-card"> <div class="mbti-card-inner"> <div class="mbti-card-front"><img src="/static/images/mbti/entp.png" alt="ENTP"></div><div class="mbti-card-back"><div class="mbti-type">ENTP</div><div class="mbti-short">Người đàm phán</div><div class="mbti-desc">ENTP là người thích tranh luận, sáng tạo, linh hoạt và luôn tìm kiếm giải pháp mới. Họ thích thử thách, không ngại thay đổi và có tư duy phản biện tốt.</div><button class="mbti-more-btn" onclick="window.location.href='/mbti/entp'">Xem thêm</button></div></div></div>
+    </div>
+    <div class="mbti16-group-title mbti16-group-diplomat"><span class="mbti16-group-icon"></span>Nhóm Nhà Ngoại Giao</div>
+    <div class="mbti16-row">
+        <!-- INFJ -->
+        <div class="mbti-card"> <div class="mbti-card-inner"> <div class="mbti-card-front"><img src="/static/images/mbti/infj.png" alt="INFJ"></div><div class="mbti-card-back"><div class="mbti-type">INFJ</div><div class="mbti-short">Người cố vấn</div><div class="mbti-desc">INFJ là người sâu sắc, giàu lòng trắc ẩn, luôn muốn giúp đỡ và truyền cảm hứng cho người khác. Họ sống nội tâm, có lý tưởng và trực giác mạnh mẽ.</div><button class="mbti-more-btn" onclick="window.location.href='/mbti/infj'">Xem thêm</button></div></div></div>
+        <!-- INFP -->
+        <div class="mbti-card"> <div class="mbti-card-inner"> <div class="mbti-card-front"><img src="/static/images/mbti/infp.png" alt="INFP"></div><div class="mbti-card-back"><div class="mbti-type">INFP</div><div class="mbti-short">Người hoà giải</div><div class="mbti-desc">INFP là người giàu cảm xúc, lý tưởng, sáng tạo và luôn hướng tới giá trị cá nhân. Họ đồng cảm, chân thành và mong muốn giúp đỡ người khác.</div><button class="mbti-more-btn" onclick="window.location.href='/mbti/infp'">Xem thêm</button></div></div></div>
+        <!-- ENFJ -->
+        <div class="mbti-card"> <div class="mbti-card-inner"> <div class="mbti-card-front"><img src="/static/images/mbti/enfj.png" alt="ENFJ"></div><div class="mbti-card-back"><div class="mbti-type">ENFJ</div><div class="mbti-short">Người hướng dẫn</div><div class="mbti-desc">ENFJ là người lãnh đạo tự nhiên, giàu cảm xúc, luôn quan tâm và thúc đẩy người khác phát triển. Họ giỏi giao tiếp, truyền cảm hứng và xây dựng cộng đồng.</div><button class="mbti-more-btn" onclick="window.location.href='/mbti/enfj'">Xem thêm</button></div></div></div>
+        <!-- ENFP -->
+        <div class="mbti-card"> <div class="mbti-card-inner"> <div class="mbti-card-front"><img src="/static/images/mbti/enfp.png" alt="ENFP"></div><div class="mbti-card-back"><div class="mbti-type">ENFP</div><div class="mbti-short">Người truyền cảm hứng</div><div class="mbti-desc">ENFP là người sáng tạo, nhiệt huyết, giàu trí tưởng tượng và luôn tìm kiếm ý nghĩa cuộc sống. Họ thân thiện, linh hoạt và thích khám phá ý tưởng mới.</div><button class="mbti-more-btn" onclick="window.location.href='/mbti/enfp'">Xem thêm</button></div></div></div>
+    </div>
+    <div class="mbti16-group-title mbti16-group-sentinel"><span class="mbti16-group-icon"></span>Nhóm Người Quan Tâm</div>
+    <div class="mbti16-row">
+        <!-- ISTJ -->
+        <div class="mbti-card"> <div class="mbti-card-inner"> <div class="mbti-card-front"><img src="/static/images/mbti/istj.png" alt="ISTJ"></div><div class="mbti-card-back"><div class="mbti-type">ISTJ</div><div class="mbti-short">Người suy luận</div><div class="mbti-desc">ISTJ là người thực tế, đáng tin cậy, có trách nhiệm cao, luôn tuân thủ quy tắc và truyền thống. Họ làm việc chăm chỉ, cẩn thận và rất trung thành.</div><button class="mbti-more-btn" onclick="window.location.href='/mbti/istj'">Xem thêm</button></div></div></div>
+        <!-- ISFJ -->
+        <div class="mbti-card"> <div class="mbti-card-inner"> <div class="mbti-card-front"><img src="/static/images/mbti/isfj.png" alt="ISFJ"></div><div class="mbti-card-back"><div class="mbti-type">ISFJ</div><div class="mbti-short">Người bảo vệ</div><div class="mbti-desc">ISFJ là người tận tâm, chu đáo, luôn quan tâm chăm sóc người khác. Họ sống tình cảm, trung thành và rất đáng tin cậy trong các mối quan hệ.</div><button class="mbti-more-btn" onclick="window.location.href='/mbti/isfj'">Xem thêm</button></div></div></div>
+        <!-- ESTJ -->
+        <div class="mbti-card"> <div class="mbti-card-inner"> <div class="mbti-card-front"><img src="/static/images/mbti/estj.png" alt="ESTJ"></div><div class="mbti-card-back"><div class="mbti-type">ESTJ</div><div class="mbti-short">Người điều hành</div><div class="mbti-desc">ESTJ là người thực tế, quyết đoán, có khả năng tổ chức và quản lý tốt. Họ thích sự rõ ràng, trật tự và luôn hướng tới hiệu quả trong công việc.</div><button class="mbti-more-btn" onclick="window.location.href='/mbti/estj'">Xem thêm</button></div></div></div>
+        <!-- ESFJ -->
+        <div class="mbti-card"> <div class="mbti-card-inner"> <div class="mbti-card-front"><img src="/static/images/mbti/esfj.png" alt="ESFJ"></div><div class="mbti-card-back"><div class="mbti-type">ESFJ</div><div class="mbti-short">Người lãnh sự</div><div class="mbti-desc">ESFJ là người thân thiện, chu đáo, luôn quan tâm và giúp đỡ người khác. Họ sống tình cảm, thích hòa đồng và xây dựng môi trường tích cực.</div><button class="mbti-more-btn" onclick="window.location.href='/mbti/esfj'">Xem thêm</button></div></div></div>
+    </div>
+    <div class="mbti16-group-title mbti16-group-explorer"><span class="mbti16-group-icon"></span>Nhóm Người Khám Phá</div>
+    <div class="mbti16-row">
+        <!-- ISTP -->
+        <div class="mbti-card"> <div class="mbti-card-inner"> <div class="mbti-card-front"><img src="/static/images/mbti/istp.png" alt="ISTP"></div><div class="mbti-card-back"><div class="mbti-type">ISTP</div><div class="mbti-short">Nhà kỹ thuật</div><div class="mbti-desc">ISTP là người thực tế, thích khám phá, giải quyết vấn đề bằng hành động. Họ linh hoạt, thích tự do và thường giỏi về kỹ thuật, máy móc.</div><button class="mbti-more-btn" onclick="window.location.href='/mbti/istp'">Xem thêm</button></div></div></div>
+        <!-- ISFP -->
+        <div class="mbti-card"> <div class="mbti-card-inner"> <div class="mbti-card-front"><img src="/static/images/mbti/isfp.png" alt="ISFP"></div><div class="mbti-card-back"><div class="mbti-type">ISFP</div><div class="mbti-short">Nhà phiêu lưu</div><div class="mbti-desc">ISFP là người sống tình cảm, yêu nghệ thuật, thích tự do và trải nghiệm. Họ nhẹ nhàng, linh hoạt, sống vì hiện tại và thường có gu thẩm mỹ tốt.</div><button class="mbti-more-btn" onclick="window.location.href='/mbti/isfp'">Xem thêm</button></div></div></div>
+        <!-- ESTP -->
+        <div class="mbti-card"> <div class="mbti-card-inner"> <div class="mbti-card-front"><img src="/static/images/mbti/estp.png" alt="ESTP"></div><div class="mbti-card-back"><div class="mbti-type">ESTP</div><div class="mbti-short">Người doanh nhân</div><div class="mbti-desc">ESTP là người năng động, thích phiêu lưu, giải quyết vấn đề nhanh nhạy. Họ linh hoạt, thích thử thách và luôn sống hết mình cho hiện tại.</div><button class="mbti-more-btn" onclick="window.location.href='/mbti/estp'">Xem thêm</button></div></div></div>
+        <!-- ESFP -->
+        <div class="mbti-card"> <div class="mbti-card-inner"> <div class="mbti-card-front"><img src="/static/images/mbti/esfp.png" alt="ESFP"></div><div class="mbti-card-back"><div class="mbti-type">ESFP</div><div class="mbti-short">Người trình diễn</div><div class="mbti-desc">ESFP là người năng động, vui vẻ, thích giao tiếp và tận hưởng cuộc sống. Họ sống hết mình cho hiện tại, thích mang lại niềm vui cho mọi người xung quanh.</div><button class="mbti-more-btn" onclick="window.location.href='/mbti/esfp'">Xem thêm</button></div></div></div>
+    </div>
+  </section>
+  <style>
+    /* Nhúng style mbti16 cho card lật */
+    .mbti16-title { text-align: center; color: #000; font-size: 2.6rem; font-weight: bold; margin-top: 40px; margin-bottom: 64px; letter-spacing: 1px; }
+    .mbti16-group-title { display: flex; align-items: center; justify-content: center; gap: 18px; position: relative; font-size: 1.7rem; font-weight: 700; margin: 40px 100px; padding: 18px 36px 18px 24px; border-radius: 18px; background: #f4f8fc; box-shadow: 0 4px 24px #00e0ff11, 0 0 0 4px #fff8; border-left: 7px solid #00e0ff; transition: box-shadow 0.3s, border-color 0.3s, background 0.3s; cursor: pointer; color: #0a4191; letter-spacing: 1.5px; z-index: 1; text-align: center; }
+    .mbti16-group-title .mbti16-group-icon { font-size: 2.7rem; margin-right: 18px; color: #00e0ff; filter: drop-shadow(0 2px 8px #00e0ff44); flex-shrink: 0; transition: color 0.3s, filter 0.3s; }
+    .mbti16-group-title .mbti16-group-label { font-size: 1.3rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: #0a4191; background: none; margin-right: 0; text-align: center; flex: 1; }
+    .mbti16-group-title.mbti16-group-analyst { border-left-color: #00e0ff; background: #eaf7ff; color: #0a4191; }
+    .mbti16-group-title.mbti16-group-diplomat { border-left-color: #00ffb8; background: #eafff7; color: #0a4191; }
+    .mbti16-group-title.mbti16-group-sentinel { border-left-color: #ffe066; background: #fffbe6; color: #0a4191; }
+    .mbti16-group-title.mbti16-group-explorer { border-left-color: #ffb199; background: #fff2ea; color: #0a4191; }
+    .mbti16-group-title:hover { border-left-width: 10px; color: #03009e; background: #e0f3ff; }
+    .mbti16-group-title::after { content: ''; display: block; width: 80px; height: 4px; border-radius: 2px; margin: 12px auto 0 auto; background: currentColor; opacity: 0.25; transition: width 0.3s, opacity 0.3s; }
+    .mbti16-group-title:hover::after { width: 520px; opacity: 0.7; color: #03009e; }
+    .mbti16-row { display: grid; grid-template-columns: repeat(4, 1fr); grid-gap: 48px 36px; max-width: 1200px; margin: 0 auto; padding: 0 32px; }
+    @media (max-width: 1100px) { .mbti16-row { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 768px) { .mbti16-row { grid-template-columns: repeat(2, 1fr); } }
+    .mbti-card { perspective: 1200px; width: 100%; min-height: 280px; height: 330px; background: none; display: flex; align-items: stretch; justify-content: stretch; opacity: 0; transform: translateX(0); transition: opacity 1.6s cubic-bezier(.77,0,.18,1), transform 1.6s cubic-bezier(.77,0,.18,1); }
+    .mbti-card.animate-from-left { transform: translateX(-60px); }
+    .mbti-card.animate-from-right { transform: translateX(60px); }
+    .mbti-card.mbti-card-visible { opacity: 1 !important; transform: translateX(0) !important; }
+    .mbti-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.7s cubic-bezier(.77,0,.18,1); transform-style: preserve-3d; }
+    .mbti-card:hover .mbti-card-inner, .mbti-card:focus-within .mbti-card-inner { transform: rotateY(180deg); }
+    .mbti-card-front, .mbti-card-back { position: absolute; width: 100%; height: 100%; border-radius: 28px; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; margin: 0; padding: 0; }
+    .mbti-card-front { z-index: 2; padding: 0; transition: box-shadow 0.3s, filter 0.3s; background-color: #ffffff6e; border: 1px solid #ffffff; box-shadow: 0 8px 40px #00e0ff33, 0 0 0 4px #fff8; }
+    .mbti-card-front img { width: 100%; height: 450px; }
+    .mbti-card:hover .mbti-card-front img { filter: drop-shadow(0 0 32px #00e0ffcc) brightness(1.1); }
+    .mbti-card-back { transform: rotateY(180deg); background: linear-gradient(135deg, #0a4191, #00e0ff 100%); box-shadow: 0 8px 40px #00e0ff33, 0 0 0 4px #fff8; justify-content: center; }
+    .mbti-card-back .mbti-type { font-size: 1.4rem; font-family: 'Segoe UI', 'Montserrat', Arial, sans-serif; font-weight: bold; color: #fff; letter-spacing: 2px; margin-bottom: 8px; text-align: center; text-shadow: 0 2px 12px #1fa36b99; }
+    .mbti-card-back .mbti-short { font-size: 1rem; color: #e0fffa; margin-bottom: 18px; text-align: center; font-weight: 500; }
+    .mbti-card-back .mbti-desc { font-size: 0.9rem; color: #fff; text-align: center; line-height: 1.6; font-family: 'Montserrat', Arial, sans-serif; margin:0 10px; margin-bottom: 28px; }
+    .mbti-card-back .mbti-more-btn { background: linear-gradient(90deg, #00e0ff 0%, #1fa36b 100%); color: #fff; border: none; border-radius: 12px; padding: 12px 32px; font-size: 1.08rem; font-weight: 700; cursor: pointer; box-shadow: 0 2px 12px #00e0ff55; letter-spacing: 1px; transition: background 0.2s, box-shadow 0.2s, transform 0.2s; }
+    .mbti-card-back .mbti-more-btn:hover { background: linear-gradient(90deg, #edc937 0%, #00e0ff 100%); box-shadow: 0 4px 24px #00e0ff99; transform: scale(1.07); }
+    @media (max-width: 768px) { .mbti-cards-container { display: flex; flex-wrap: wrap; justify-content: space-around; gap: 15px; } .mbti-card { perspective: 1000px; width: 100%; min-height: 180px; height: 200px; } .mbti-card-front, .mbti-card-back { position: absolute; width: 100%; height: 100%; border-radius: 10px; } .mbti-card-front img { width: 100%; height: 100%; object-fit: cover; } }
+  </style>
+  <script>
+    // Hiệu ứng xuất hiện từ 2 phía khi scroll
+    function animateMBTICards() {
+      const allRows = document.querySelectorAll('.mbti16-row');
+      allRows.forEach(row => {
+        const cards = Array.from(row.querySelectorAll('.mbti-card'));
+        cards.forEach((card, idx) => {
+          card.classList.remove('animate-from-left', 'animate-from-right', 'mbti-card-visible');
+          if (idx < cards.length / 2) {
+            card.classList.add('animate-from-left');
+          } else {
+            card.classList.add('animate-from-right');
+          }
+        });
+      });
+      // IntersectionObserver
+      const observer = new window.IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const card = entry.target;
+            setTimeout(() => {
+              card.classList.add('mbti-card-visible');
+            }, card.dataset.delay ? parseInt(card.dataset.delay) : 0);
+            obs.unobserve(card);
+          }
+        });
+      }, { threshold: 0.2 });
+      // Gán delay nối tiếp từng thẻ trong mỗi hàng
+      allRows.forEach(row => {
+        const cards = Array.from(row.querySelectorAll('.mbti-card'));
+        cards.forEach((card, idx) => {
+          card.dataset.delay = idx * 120;
+          observer.observe(card);
+        });
+      });
+    }
+    document.addEventListener('DOMContentLoaded', animateMBTICards);
+  </script>
+
+  <!-- Hướng dẫn làm bài test MBTI (3 ô ngang) -->
+  <section class="guide-section" id="huongnghiep" style="background: #f8fafc; padding: 78px 0 74px 0;">
+    <div class="container" style="max-width: 1100px; margin: 0 auto;">
+      <h2 style="font-size: 2rem; font-weight: 900; color: #0a4191; margin-bottom: 28px; text-align: center; letter-spacing: 0.5px;">Hướng dẫn làm trắc nghiệm MBTI để có kết quả chính xác nhất</h2>
+      <div class="guide-list-modern" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;">
+        <div class="guide-modern-item" style="background: #fffbe6; border-radius: 16px; box-shadow: 0 2px 12px #ffe06622; padding: 22px 24px; text-align: center; display: flex; flex-direction: column; justify-content: center; min-height: 180px;">
+          <div style="font-size: 1.13rem; font-weight: 800; color: #0a4191; margin-bottom: 8px; letter-spacing: 0.2px;">Giữ tâm trạng ổn định</div>
+          <div style="font-size: 1rem; color: #2a3a5a; line-height:1.6;">Kết quả của một trắc nghiệm tâm lý phụ thuộc rất nhiều vào tâm trạng của bạn, vậy nên hãy thực hiện nó trong một trạng thái tâm lý bình ổn nhất.</div>
+        </div>
+        <div class="guide-modern-item" style="background: #eaf3ff; border-radius: 16px; box-shadow: 0 2px 12px #0a419122; padding: 22px 24px; text-align: center; display: flex; flex-direction: column; justify-content: center; min-height: 180px;">
+          <div style="font-size: 1.13rem; font-weight: 800; color: #0a4191; margin-bottom: 8px; letter-spacing: 0.2px;">Trung thực khi trả lời câu hỏi</div>
+          <div style="font-size: 1rem; color: #2a3a5a; line-height:1.6;">Hãy phân biệt giữa thực tế (<i>điều thực sự mô tả bạn</i>) với lý tưởng (<i>điều bạn muốn trở thành trong mắt người khác</i>). Kết quả của bài trắc nghiệm hoàn toàn là câu chuyện của cá nhân bạn, đừng để yếu tố bên ngoài tác động đến câu trả lời.</div>
+        </div>
+        <div class="guide-modern-item" style="background: #fffbe6; border-radius: 16px; box-shadow: 0 2px 12px #ffe06622; padding: 22px 24px; text-align: center; display: flex; flex-direction: column; justify-content: center; min-height: 180px;">
+          <div style="font-size: 1.13rem; font-weight: 800; color: #0a4191; margin-bottom: 8px; letter-spacing: 0.2px;">Kiểm tra lại định kỳ</div>
+          <div style="font-size: 1rem; color: #2a3a5a; line-height:1.6;">Chúng ta trưởng thành và thay đổi từng ngày, vậy nên kết quả MBTI cũng có thể thay đổi dựa trên nhận thức và thế giới quan tại những giai đoạn khác nhau trong cuộc đời. Tốt nhất bạn hãy làm kiểm tra MBTI lại nhiều lần để có cái nhìn tổng quát và chính xác nhất.</div>
+        </div>
+      </div>
+      <div style="text-align: center; margin-top: 28px;">
+        <a href="#" class="guide-btn" style="background: linear-gradient(90deg, #0a4191 0%, #1fa36b 100%); color: #fff; border-radius: 32px; padding: 14px 38px; font-size: 1.13rem; font-weight: 800; border: none; cursor: pointer; box-shadow: 0 2px 12px #0a419133; transition: background 0.2s, color 0.2s, transform 0.2s; text-decoration: none; display: inline-block; letter-spacing: 0.5px;">Làm bài test <span style="font-size:1.2em;vertical-align:middle;">→</span></a>
+      </div>
+      <style>
+        @media (max-width: 900px) {
+          .guide-list-modern { grid-template-columns: 1fr !important; }
+        }
+      </style>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="faq-section" id="faq">
+    <div class="container">
+      <div class="faq-title" style="font-size: 2.1rem;">Câu hỏi thường gặp về MBTI</div>
+      <div class="faq-list" style="max-width: 900px; margin: 0 auto;">
+        <div class="faq-item"><div class="faq-q" style="font-size: 1.25rem; font-weight: 800;">Trắc nghiệm MBTI là gì? <i class="fas fa-chevron-down"></i></div><div class="faq-a" style="font-size: 1.08rem;">MBTI (Myers-Briggs Type Indicator) là một bài trắc nghiệm tâm lý nổi tiếng giúp bạn khám phá sâu về tính cách, cách bạn suy nghĩ, cảm nhận và tương tác với thế giới. Dựa trên lý thuyết của Carl Jung, MBTI phân loại con người thành 16 nhóm tính cách dựa trên 4 cặp đối lập: Hướng ngoại/Hướng nội (E/I), Cảm giác/Trực giác (S/N), Lý trí/Cảm xúc (T/F), Đánh giá/Quan sát (J/P). Kết quả MBTI giúp bạn hiểu rõ bản thân, phát triển cá nhân, cải thiện các mối quan hệ và lựa chọn nghề nghiệp phù hợp hơn.</div></div>
+        <div class="faq-item"><div class="faq-q" style="font-size: 1.25rem; font-weight: 800;">Trắc nghiệm MBTI có miễn phí không? <i class="fas fa-chevron-down"></i></div><div class="faq-a" style="font-size: 1.08rem;">Bạn hoàn toàn có thể làm bài test MBTI miễn phí trên nhiều nền tảng uy tín. Tuy nhiên, một số trang web hoặc chuyên gia có thể cung cấp bản phân tích chuyên sâu, tư vấn cá nhân hóa với một khoản phí nhỏ. Đa số các bài test cơ bản đều miễn phí và đủ để bạn có cái nhìn tổng quan về tính cách của mình.</div></div>
+        <div class="faq-item"><div class="faq-q" style="font-size: 1.25rem; font-weight: 800;">MBTI có thể thay đổi kết quả không? <i class="fas fa-chevron-down"></i></div><div class="faq-a" style="font-size: 1.08rem;">Kết quả MBTI không phải là cố định suốt đời. Tính cách con người có thể phát triển, thay đổi theo thời gian, trải nghiệm sống, môi trường và nhận thức mới. Nếu bạn làm lại bài test sau một thời gian, đặc biệt là khi trải qua những thay đổi lớn trong cuộc sống, kết quả có thể khác trước. Hãy xem MBTI như một công cụ tham khảo để hiểu bản thân ở từng giai đoạn.</div></div>
+        <div class="faq-item"><div class="faq-q" style="font-size: 1.25rem; font-weight: 800;">Kết quả MBTI có thực sự chính xác? <i class="fas fa-chevron-down"></i></div><div class="faq-a" style="font-size: 1.08rem;">MBTI là một công cụ hữu ích để tự khám phá bản thân, nhưng không phải là "chân lý tuyệt đối". Độ chính xác phụ thuộc vào việc bạn trả lời trung thực, đúng với bản thân nhất. MBTI giúp bạn nhận diện xu hướng tính cách nổi trội, nhưng mỗi người vẫn là một cá thể độc đáo, có thể không hoàn toàn khớp với mô tả của một nhóm nào đó. Hãy sử dụng MBTI như một gợi ý để phát triển bản thân, không nên giới hạn mình vào một khuôn mẫu cố định.</div></div>
+        <div class="faq-item"><div class="faq-q" style="font-size: 1.25rem; font-weight: 800;">MBTI có thể định hướng nghề nghiệp? <i class="fas fa-chevron-down"></i></div><div class="faq-a" style="font-size: 1.08rem;">MBTI giúp bạn nhận biết điểm mạnh, điểm yếu, sở thích và phong cách làm việc của bản thân, từ đó gợi ý những ngành nghề, môi trường phù hợp. Tuy nhiên, MBTI chỉ là một phần trong quá trình định hướng nghề nghiệp. Để lựa chọn nghề phù hợp, bạn nên kết hợp MBTI với các yếu tố khác như kỹ năng, giá trị cá nhân, mục tiêu sống và trải nghiệm thực tế.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quote Section -->
+  <section class="quote-section">
+    <div class="container">
+      <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
+      <div class="quote-text">Timtruonghoc.vn tin rằng mỗi chúng ta sinh ra là một cá thể độc đáo, phức tạp và khó đoán nhất!</div>
+      <div class="quote-author">Hãy khám phá tính cách của bạn ngay hôm nay!</div>
+      <button class="quote-btn">Làm bài test MBTI</button>
+    </div>
+  </section>
+{% endblock %}
+{% block scripts %}
+  <script>
+    // FAQ accordion
+    document.querySelectorAll('.faq-q').forEach(q => {
+      q.addEventListener('click', function() {
+        const item = this.parentElement;
+        item.classList.toggle('active');
+      });
+    });
+  </script>
+{% endblock %}
