@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tìm Nghề Nghiệp Theo Cung Hoàng Đạo</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Tùy chỉnh font Inter */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Thêm hiệu ứng cho nút */
+        .btn-zodiac:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .btn-zodiac:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-purple-100 to-blue-200 min-h-screen flex items-center justify-center py-12">
+    <div id="app" class="bg-white p-8 md:p-12 rounded-3xl shadow-2xl max-w-4xl w-full mx-4 transform transition-all duration-300 ease-in-out scale-95 md:scale-100">
+        <!-- Tiêu đề chính -->
+        <h1 class="text-4xl md:text-5xl font-extrabold text-center text-gray-800 mb-8 leading-tight">
+            Khám Phá Nghề Nghiệp Theo Cung Hoàng Đạo
+        </h1>
+
+        <!-- Giới thiệu -->
+        <p class="text-center text-gray-600 mb-10 text-lg md:text-xl">
+            Bài trắc nghiệm này là một cách thú vị để khám phá những công việc có thể phù hợp với bạn.
+            Hãy chọn cung hoàng đạo của bạn để bắt đầu!
+        </p>
+
+        <!-- Phần chọn cung hoàng đạo -->
+        <div id="zodiac-selection" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-10">
+            <!-- Các nút cung hoàng đạo sẽ được tạo bằng JavaScript tại đây -->
+        </div>
+
+        <!-- Phần hiển thị kết quả -->
+        <div id="result-display" class="hidden bg-blue-50 p-6 md:p-8 rounded-2xl border border-blue-200 shadow-inner">
+            <h2 id="result-title" class="text-3xl md:text-4xl font-bold text-blue-800 mb-4 text-center"></h2>
+            <p id="result-dates" class="text-center text-blue-600 text-lg mb-6"></p>
+
+            <div class="mb-6">
+                <h3 class="text-2xl font-semibold text-gray-700 mb-3 border-b-2 border-blue-300 pb-2">Đặc điểm tính cách:</h3>
+                <p id="result-traits" class="text-gray-700 text-lg leading-relaxed"></p>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="text-2xl font-semibold text-gray-700 mb-3 border-b-2 border-blue-300 pb-2">Gợi ý nghề nghiệp phù hợp:</h3>
+                <ul id="result-careers" class="list-disc pl-6 space-y-2 text-gray-700 text-lg">
+                    <!-- Các nghề nghiệp sẽ được thêm bằng JavaScript -->
+                </ul>
+            </div>
+
+            <!-- Lời khuyên -->
+            <p class="text-center text-gray-600 text-base md:text-lg italic mt-6">
+                Lưu ý: Kết quả chỉ mang tính chất tham khảo và không nên coi là quyết định cuối cùng.
+                Hãy lắng nghe bản thân và khám phá những gì bạn thực sự đam mê!
+            </p>
+
+            <!-- Nút quay lại -->
+            <div class="flex justify-center mt-8">
+                <button id="reset-button" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105">
+                    Chọn lại Cung Hoàng Đạo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dữ liệu về các cung hoàng đạo và gợi ý nghề nghiệp
+        const zodiacData = {
+            "Bạch Dương": {
+                dates: "21/3 - 19/4",
+                traits: "Năng động, tiên phong, dũng cảm, nhiệt huyết, thích cạnh tranh. Luôn muốn là người dẫn đầu và không ngại thử thách.",
+                careers: [
+                    { name: "Giám đốc dự án", reason: "Khả năng lãnh đạo bẩm sinh và tinh thần tiên phong." },
+                    { name: "Doanh nhân", reason: "Dám nghĩ dám làm, không ngại rủi ro và thích tạo dựng cái mới." },
+                    { name: "Vận động viên/Huấn luyện viên", reason: "Năng lượng dồi dào, tinh thần cạnh tranh cao và ý chí chiến thắng." },
+                    { name: "Lính cứu hỏa/Cảnh sát", reason: "Dũng cảm, thích hành động và bảo vệ người khác." },
+                    { name: "Tiếp thị/Quảng cáo", reason: "Sự sáng tạo, năng động và khả năng thuyết phục." }
+                ]
+            },
+            "Kim Ngưu": {
+                dates: "20/4 - 20/5",
+                traits: "Kiên định, thực tế, đáng tin cậy, yêu thích sự ổn định và vẻ đẹp. Có khả năng quản lý tài chính tốt.",
+                careers: [
+                    { name: "Ngân hàng/Tài chính", reason: "Khả năng quản lý tiền bạc và sự ổn định." },
+                    { name: "Kiến trúc sư/Thiết kế nội thất", reason: "Yêu thích cái đẹp, sự tỉ mỉ và khả năng tạo ra giá trị bền vững." },
+                    { name: "Nông nghiệp/Làm vườn", reason: "Sự kiên nhẫn, yêu thiên nhiên và mong muốn tạo ra sản phẩm thực tế." },
+                    { name: "Đầu bếp/Chủ nhà hàng", reason: "Yêu ẩm thực, sự tinh tế và khả năng tạo ra trải nghiệm tốt." },
+                    { name: "Nghệ sĩ/Thủ công mỹ nghệ", reason: "Sự kiên nhẫn, tỉ mỉ và khả năng tạo ra tác phẩm nghệ thuật." }
+                ]
+            },
+            "Song Tử": {
+                dates: "21/5 - 20/6",
+                traits: "Thông minh, linh hoạt, giao tiếp tốt, tò mò và yêu thích sự đa dạng. Có khả năng thích nghi nhanh chóng.",
+                careers: [
+                    { name: "Nhà báo/Phóng viên", reason: "Khả năng giao tiếp, tò mò và thích khám phá thông tin." },
+                    { name: "Biên tập viên/Người viết nội dung", reason: "Kỹ năng ngôn ngữ tốt và khả năng truyền đạt ý tưởng." },
+                    { name: "Giáo viên/Giảng viên", reason: "Khả năng truyền đạt kiến thức và tương tác với nhiều người." },
+                    { name: "Nhân viên kinh doanh/Tiếp thị", reason: "Khả năng thuyết phục, giao tiếp và thích nghi với nhiều đối tượng." },
+                    { name: "Lập trình viên/Phân tích hệ thống", reason: "Tư duy logic, khả năng học hỏi nhanh và giải quyết vấn đề." }
+                ]
+            },
+            "Cự Giải": {
+                dates: "21/6 - 22/7",
+                traits: "Nhạy cảm, chu đáo, giàu lòng trắc ẩn, yêu gia đình và thích chăm sóc người khác. Có trực giác tốt.",
+                careers: [
+                    { name: "Y tá/Bác sĩ", reason: "Lòng trắc ẩn, sự quan tâm và khả năng chăm sóc người khác." },
+                    { name: "Nhà tâm lý học/Tư vấn viên", reason: "Sự nhạy cảm, khả năng lắng nghe và thấu hiểu cảm xúc." },
+                    { name: "Giáo viên mầm non/Tiểu học", reason: "Yêu trẻ con, sự kiên nhẫn và khả năng nuôi dưỡng." },
+                    { name: "Chuyên gia dinh dưỡng", reason: "Quan tâm đến sức khỏe và khả năng chăm sóc người khác." },
+                    { name: "Nghệ sĩ (âm nhạc, hội họa)", reason: "Sự nhạy cảm, giàu cảm xúc và khả năng thể hiện qua nghệ thuật." }
+                ]
+            },
+            "Sư Tử": {
+                dates: "23/7 - 22/8",
+                traits: "Tự tin, hào phóng, có tố chất lãnh đạo, thích được chú ý và tỏa sáng. Luôn muốn truyền cảm hứng.",
+                careers: [
+                    { name: "Diễn viên/Ca sĩ", reason: "Thích được chú ý, khả năng trình diễn và thu hút đám đông." },
+                    { name: "Quản lý/Lãnh đạo", reason: "Tố chất lãnh đạo bẩm sinh, khả năng truyền cảm hứng và tổ chức." },
+                    { name: "Chính trị gia", reason: "Khả năng thuyết phục, tự tin và mong muốn tạo ảnh hưởng." },
+                    { name: "Tổ chức sự kiện", reason: "Khả năng sắp xếp, thu hút sự chú ý và tạo ra những trải nghiệm đáng nhớ." },
+                    { name: "Huấn luyện viên cá nhân/Diễn giả", reason: "Khả năng truyền cảm hứng, tự tin và động lực." }
+                ]
+            },
+            "Xử Nữ": {
+                dates: "23/8 - 22/9",
+                traits: "Tỉ mỉ, phân tích, thực tế, có tổ chức và luôn hướng tới sự hoàn hảo. Rất chú ý đến chi tiết.",
+                careers: [
+                    { name: "Kế toán/Kiểm toán", reason: "Sự tỉ mỉ, khả năng phân tích số liệu và độ chính xác cao." },
+                    { name: "Nhà khoa học/Nghiên cứu", reason: "Tư duy phân tích, khả năng tập trung vào chi tiết và tìm kiếm sự thật." },
+                    { name: "Biên tập viên/Hiệu đính", reason: "Sự tỉ mỉ, khả năng phát hiện lỗi và hoàn thiện văn bản." },
+                    { name: "Chuyên gia phân tích dữ liệu", reason: "Khả năng xử lý thông tin phức tạp và đưa ra kết luận logic." },
+                    { name: "Dược sĩ/Bác sĩ", reason: "Sự cẩn trọng, tỉ mỉ và trách nhiệm cao trong công việc." }
+                ]
+            },
+            "Thiên Bình": {
+                dates: "23/9 - 22/10",
+                traits: "Công bằng, hòa nhã, có gu thẩm mỹ, giỏi ngoại giao và thích sự hài hòa. Luôn tìm kiếm sự cân bằng.",
+                careers: [
+                    { name: "Luật sư/Thẩm phán", reason: "Sự công bằng, khả năng phân tích và giải quyết tranh chấp." },
+                    { name: "Nhà ngoại giao/Quan hệ công chúng", reason: "Kỹ năng giao tiếp, khả năng hòa giải và tạo mối quan hệ tốt." },
+                    { name: "Thiết kế thời trang/Nghệ thuật", reason: "Gu thẩm mỹ tinh tế, yêu cái đẹp và khả năng sáng tạo." },
+                    { name: "Tư vấn hôn nhân/Gia đình", reason: "Khả năng lắng nghe, thấu hiểu và giúp đỡ người khác tìm sự cân bằng." },
+                    { name: "Chuyên viên tuyển dụng", reason: "Khả năng đánh giá con người, giao tiếp và tạo sự hài hòa." }
+                ]
+            },
+            "Thiên Yết": {
+                dates: "23/10 - 21/11",
+                traits: "Mạnh mẽ, bí ẩn, trực giác nhạy bén, quyết đoán và có khả năng thấu hiểu sâu sắc. Rất kiên cường.",
+                careers: [
+                    { name: "Thám tử/Điều tra viên", reason: "Khả năng phân tích sâu sắc, trực giác nhạy bén và tìm kiếm sự thật." },
+                    { name: "Nhà tâm lý học/Phân tích tâm lý", reason: "Khả năng thấu hiểu tâm lý con người và giải quyết vấn đề phức tạp." },
+                    { name: "Bác sĩ phẫu thuật", reason: "Sự quyết đoán, tập trung cao độ và khả năng chịu áp lực." },
+                    { name: "Chuyên gia an ninh mạng", reason: "Khả năng phát hiện lỗ hổng, tư duy chiến lược và bảo mật thông tin." },
+                    { name: "Nhà nghiên cứu khoa học", reason: "Sự kiên trì, khả năng đào sâu và khám phá những điều bí ẩn." }
+                ]
+            },
+            "Nhân Mã": {
+                dates: "22/11 - 21/12",
+                traits: "Yêu tự do, lạc quan, thích phiêu lưu, ham học hỏi và có tư duy mở. Luôn tìm kiếm ý nghĩa cuộc sống.",
+                careers: [
+                    { name: "Hướng dẫn viên du lịch", reason: "Yêu thích khám phá, giao tiếp và chia sẻ kiến thức." },
+                    { name: "Giáo sư/Nhà triết học", reason: "Ham học hỏi, tư duy rộng mở và khả năng truyền đạt kiến thức." },
+                    { name: "Nhà văn/Nhà báo tự do", reason: "Yêu tự do, khả năng viết lách và chia sẻ quan điểm." },
+                    { name: "Phi công/Tiếp viên hàng không", reason: "Thích di chuyển, khám phá và trải nghiệm những điều mới." },
+                    { name: "Chuyên gia phát triển phần mềm (nghiên cứu)", reason: "Tư duy sáng tạo, khả năng học hỏi công nghệ mới và giải quyết vấn đề." }
+                ]
+            },
+            "Ma Kết": {
+                dates: "22/12 - 19/1",
+                traits: "Tham vọng, có trách nhiệm, kiên nhẫn, thực tế và có tính kỷ luật cao. Luôn đặt mục tiêu và nỗ lực đạt được.",
+                careers: [
+                    { name: "Quản lý/Giám đốc điều hành", reason: "Tố chất lãnh đạo, khả năng tổ chức và định hướng mục tiêu." },
+                    { name: "Kỹ sư", reason: "Sự tỉ mỉ, khả năng giải quyết vấn đề và tính thực tế." },
+                    { name: "Chính trị gia", reason: "Tham vọng, khả năng lập kế hoạch dài hạn và tinh thần trách nhiệm." },
+                    { name: "Kiến trúc sư", reason: "Tính kỷ luật, sự tỉ mỉ và khả năng xây dựng những công trình bền vững." },
+                    { name: "Chuyên gia tài chính/Đầu tư", reason: "Khả năng phân tích, lập kế hoạch và quản lý rủi ro." }
+                ]
+            },
+            "Bảo Bình": {
+                dates: "20/1 - 18/2",
+                traits: "Độc lập, sáng tạo, thông minh, nhân đạo và có tư duy tiến bộ. Luôn tìm kiếm sự đổi mới và cải cách.",
+                careers: [
+                    { name: "Nhà khoa học/Nhà phát minh", reason: "Tư duy sáng tạo, khả năng đổi mới và khám phá những điều mới." },
+                    { name: "Lập trình viên/Chuyên gia công nghệ", reason: "Khả năng tư duy logic, giải quyết vấn đề và tạo ra công nghệ mới." },
+                    { name: "Nhà hoạt động xã hội", reason: "Tinh thần nhân đạo, mong muốn cải thiện xã hội và đấu tranh cho công bằng." },
+                    { name: "Nghệ sĩ (hiện đại, trừu tượng)", reason: "Sự độc đáo, sáng tạo và khả năng thể hiện ý tưởng khác biệt." },
+                    { name: "Phi hành gia/Nhà thiên văn học", reason: "Tư duy mở, thích khám phá những điều vượt ra ngoài giới hạn." }
+                ]
+            },
+            "Song Ngư": {
+                dates: "19/2 - 20/3",
+                traits: "Nhạy cảm, giàu trí tưởng tượng, đồng cảm, trực giác tốt và có tinh thần hy sinh. Rất nghệ sĩ.",
+                careers: [
+                    { name: "Nghệ sĩ (âm nhạc, hội họa, điện ảnh)", reason: "Trí tưởng tượng phong phú, sự nhạy cảm và khả năng thể hiện cảm xúc." },
+                    { name: "Nhà tâm lý học/Tư vấn viên", reason: "Sự đồng cảm, khả năng lắng nghe và thấu hiểu sâu sắc." },
+                    { name: "Nhân viên công tác xã hội", reason: "Lòng trắc ẩn, tinh thần hy sinh và mong muốn giúp đỡ người khác." },
+                    { name: "Bác sĩ/Y tá", reason: "Sự quan tâm, lòng nhân ái và khả năng chăm sóc bệnh nhân." },
+                    { name: "Nhà trị liệu (âm nhạc, nghệ thuật)", reason: "Khả năng sử dụng nghệ thuật để chữa lành và truyền cảm hứng." }
+                ]
+            }
+        };
+
+        const zodiacSelectionDiv = document.getElementById('zodiac-selection');
+        const resultDisplayDiv = document.getElementById('result-display');
+        const resultTitle = document.getElementById('result-title');
+        const resultDates = document.getElementById('result-dates');
+        const resultTraits = document.getElementById('result-traits');
+        const resultCareers = document.getElementById('result-careers');
+        const resetButton = document.getElementById('reset-button');
+
+        // Hàm tạo các nút cung hoàng đạo
+        function createZodiacButtons() {
+            for (const sign in zodiacData) {
+                const button = document.createElement('button');
+                button.textContent = sign;
+                button.classList.add(
+                    'btn-zodiac',
+                    'bg-white', 'text-gray-800', 'font-semibold', 'py-4', 'px-6',
+                    'rounded-xl', 'shadow-md', 'hover:bg-blue-50', 'transition-all',
+                    'duration-200', 'ease-in-out', 'transform', 'hover:scale-105',
+                    'text-lg', 'border', 'border-gray-200'
+                );
+                button.addEventListener('click', () => showResult(sign));
+                zodiacSelectionDiv.appendChild(button);
+            }
+        }
+
+        // Hàm hiển thị kết quả
+        function showResult(sign) {
+            const data = zodiacData[sign];
+            if (data) {
+                resultTitle.textContent = `Cung ${sign}`;
+                resultDates.textContent = `(${data.dates})`;
+                resultTraits.textContent = data.traits;
+
+                // Xóa các nghề nghiệp cũ trước khi thêm mới
+                resultCareers.innerHTML = '';
+                data.careers.forEach(career => {
+                    const listItem = document.createElement('li');
+                    listItem.classList.add('mb-1');
+                    listItem.innerHTML = `<strong class="text-blue-700">${career.name}:</strong> ${career.reason}`;
+                    resultCareers.appendChild(listItem);
+                });
+
+                zodiacSelectionDiv.classList.add('hidden'); // Ẩn phần chọn
+                resultDisplayDiv.classList.remove('hidden'); // Hiện phần kết quả
+            }
+        }
+
+        // Hàm đặt lại trang về trạng thái ban đầu
+        function resetApp() {
+            zodiacSelectionDiv.classList.remove('hidden'); // Hiện phần chọn
+            resultDisplayDiv.classList.add('hidden'); // Ẩn phần kết quả
+        }
+
+        // Gán sự kiện cho nút reset
+        resetButton.addEventListener('click', resetApp);
+
+        // Khởi tạo các nút khi tải trang
+        document.addEventListener('DOMContentLoaded', createZodiacButtons);
+    </script>
+</body>
+</html>

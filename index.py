@@ -55,5 +55,11 @@ def demo():
 def major_detail(major_id):
     return render_template('chitiet-nganhchung.html')
 
+
+
+@app.route("/zodiac")
+def cunghoangdao():
+    return render_template('cunghoangdao.html')
+
 if __name__ == "__main__":
     app.run(debug=True)
