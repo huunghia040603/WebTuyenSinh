@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const majorsGrid = document.getElementById('majors-grid');
     const paginationBar = document.getElementById('pagination-bar');
-    const loadingSpinner = document.getElementById('loading-spinner'); // Đảm bảo bạn đã thêm nó vào HTML như hướng dẫn trước
+    const loadingContainer = document.getElementById('loadingContainer'); // Đã đổi tên
 
     // Lấy tham chiếu đến các phần tử từ index.html
     const searchForm = document.getElementById('major-search-form'); // Form tìm kiếm
@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const API_URL = 'https://webtimtruong.pythonanywhere.com/majors-outstanding/'; 
 
+    const PAGE_SIZE = 15;
     let currentPage = 1;
     let totalPages = 1;
     // Lưu trữ các giá trị lọc hiện tại
@@ -45,6 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             let url = new URL(API_URL);
             url.searchParams.set('page', page);
+            url.searchParams.set('page_size', PAGE_SIZE); // Giới hạn 15 ngành/trang
 
             if (filters.search) {
                 url.searchParams.set('search', filters.search);
@@ -176,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Hàm render thanh phân trang (giữ nguyên, nhưng truyền filters)
     function renderPagination(count, next, previous) {
         paginationBar.innerHTML = '';
-        totalPages = Math.ceil(count / 10);
+        totalPages = Math.ceil(count / PAGE_SIZE);
 
         const prevBtn = document.createElement('button');
         prevBtn.classList.add('pagination-btn');
@@ -185,19 +187,18 @@ document.addEventListener('DOMContentLoaded', () => {
         prevBtn.addEventListener('click', () => {
             if (previous) {
                 currentPage--;
-                loadMajors(currentPage, currentFilters); // Truyền currentFilters
+                loadMajors(currentPage, currentFilters);
             }
         });
         paginationBar.appendChild(prevBtn);
 
+        // Hiển thị các nút số trang, luôn đúng tổng số trang
         const maxPageButtons = 5;
         let startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
         let endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
-
         if (endPage - startPage + 1 < maxPageButtons) {
             startPage = Math.max(1, endPage - maxPageButtons + 1);
         }
-
         for (let i = startPage; i <= endPage; i++) {
             const pageBtn = document.createElement('button');
             pageBtn.classList.add('pagination-btn');
@@ -207,27 +208,24 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             pageBtn.addEventListener('click', () => {
                 currentPage = i;
-                loadMajors(currentPage, currentFilters); // Truyền currentFilters
+                loadMajors(currentPage, currentFilters);
             });
             paginationBar.appendChild(pageBtn);
         }
-
         if (endPage < totalPages) {
             const ellipsis = document.createElement('span');
             ellipsis.style.color = '#aaa';
             ellipsis.textContent = '...';
             paginationBar.appendChild(ellipsis);
-
             const lastPageBtn = document.createElement('button');
             lastPageBtn.classList.add('pagination-btn');
             lastPageBtn.textContent = totalPages;
             lastPageBtn.addEventListener('click', () => {
                 currentPage = totalPages;
-                loadMajors(currentPage, currentFilters); // Truyền currentFilters
+                loadMajors(currentPage, currentFilters);
             });
             paginationBar.appendChild(lastPageBtn);
         }
-
         const nextBtn = document.createElement('button');
         nextBtn.classList.add('pagination-btn');
         nextBtn.innerHTML = '&gt;';
@@ -235,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
         nextBtn.addEventListener('click', () => {
             if (next) {
                 currentPage++;
-                loadMajors(currentPage, currentFilters); // Truyền currentFilters
+                loadMajors(currentPage, currentFilters);
             }
         });
         paginationBar.appendChild(nextBtn);
@@ -254,11 +252,15 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadMajors(page, filters) {
         majorsGrid.innerHTML = '';
         paginationBar.innerHTML = '';
-        loadingSpinner.style.display = 'block';
+        loadingContainer.style.display = 'flex';
+        majorsGrid.style.display = 'none';
+        paginationBar.style.display = 'none';
 
         const data = await fetchMajors(page, filters);
-        
-        loadingSpinner.style.display = 'none';
+
+        loadingContainer.style.display = 'none';
+        majorsGrid.style.display = '';
+        paginationBar.style.display = '';
 
         if (data) {
             renderMajorCards(data.results);
