@@ -1,0 +1,483 @@
+{% extends "base.html" %}
+{% block title %}Thần Số Học - Phân tích ngành nghề phù hợp{% endblock %}
+{% block stylesheets %}
+<style>
+    .thanso-container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 4px 32px #0a419122;
+        padding: 40px 28px 32px 28px;
+        margin-top: 36px;
+        margin-bottom: 36px;
+    }
+    .thanso-header {
+        text-align: center;
+        margin-bottom: 32px;
+    }
+    .thanso-title {
+        font-size: 2.5rem;
+        font-weight: 900;
+        color: #0a4191;
+        margin-bottom: 10px;
+    }
+    .thanso-desc {
+        font-size: 1.15rem;
+        color: #444;
+        margin-bottom: 18px;
+        line-height: 1.7;
+    }
+    .thanso-form {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 28px 18px 18px 18px;
+        box-shadow: 0 2px 12px #0a419111;
+        margin-bottom: 32px;
+    }
+    .thanso-form label {
+        font-weight: 700;
+        color: #0a4191;
+        margin-bottom: 6px;
+    }
+    .thanso-form input[type="text"], .thanso-form input[type="date"] {
+        padding: 12px 14px;
+        border-radius: 8px;
+        border: 1.5px solid #dbeafe;
+        font-size: 1.08rem;
+        outline: none;
+        transition: border 0.2s;
+    }
+    .thanso-form input:focus {
+        border-color: #0a4191;
+    }
+    .thanso-form button {
+        background: linear-gradient(90deg, #0a4191 0%, #1fa36b 100%);
+        color: #fff;
+        border: none;
+        border-radius: 32px;
+        padding: 14px 38px;
+        font-size: 1.13rem;
+        font-weight: 800;
+        cursor: pointer;
+        box-shadow: 0 2px 12px #0a419133;
+        transition: background 0.2s, color 0.2s, transform 0.2s;
+        margin-top: 10px;
+        align-self: center;
+    }
+    .thanso-form button:hover {
+        background: linear-gradient(90deg, #1fa36b 0%, #0a4191 100%);
+        transform: translateY(-2px);
+    }
+    .thanso-result {
+        margin-top: 32px;
+        background: #f7fbff;
+        border-radius: 14px;
+        padding: 28px 20px;
+        box-shadow: 0 2px 12px #0a419111;
+        display: none;
+    }
+    .thanso-result.active {
+        display: block;
+        animation: fadeIn 0.7s;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .thanso-section-title {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: #0a4191;
+        margin-bottom: 12px;
+        margin-top: 18px;
+    }
+    .thanso-detail {
+        color: #2a3a5a;
+        font-size: 1.08rem;
+        line-height: 1.7;
+        margin-bottom: 10px;
+    }
+    .thanso-career-list {
+        margin-top: 18px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+    }
+    .thanso-career-item {
+        background: #eaf3ff;
+        color: #0a4191;
+        border-radius: 8px;
+        padding: 10px 18px;
+        font-weight: 700;
+        font-size: 1.05rem;
+        box-shadow: 0 2px 8px #0a419111;
+    }
+    @media (max-width: 700px) {
+        .thanso-container { padding: 18px 2vw; }
+        .thanso-title { font-size: 1.5rem; }
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="thanso-container">
+    <div class="thanso-header">
+        <div class="thanso-title">Thần Số Học - Khám Phá Bản Thân & Định Hướng Nghề Nghiệp</div>
+        <div class="thanso-desc">
+            Thần số học (Numerology) là một bộ môn khoa học huyền bí nghiên cứu về ý nghĩa các con số liên quan đến cuộc đời, tính cách, vận mệnh của mỗi người dựa trên họ tên khai sinh và ngày tháng năm sinh. Thông qua các con số chủ đạo, thần số học giúp bạn hiểu rõ điểm mạnh, điểm yếu, tiềm năng phát triển và từ đó lựa chọn ngành nghề phù hợp nhất với bản thân.<br><br>
+            <b>Hãy nhập đầy đủ thông tin để nhận phân tích chi tiết và gợi ý ngành nghề phù hợp với bạn!</b>
+        </div>
+    </div>
+    <form class="thanso-form" id="thansoForm" autocomplete="off">
+        <div>
+            <label for="fullname">Họ và tên khai sinh</label>
+            <input type="text" id="fullname" name="fullname" placeholder="Nguyễn Văn A" required>
+        </div>
+        <div>
+            <label for="birthday">Ngày tháng năm sinh (Dương lịch)</label>
+            <input type="date" id="birthday" name="birthday" required>
+        </div>
+        <button type="submit">Tra cứu thần số học & ngành nghề phù hợp</button>
+    </form>
+    <div class="thanso-result" id="thansoResult">
+        <!-- Kết quả sẽ được hiển thị ở đây bằng JS -->
+    </div>
+    <div class="thanso-analysis" style="margin-top:48px; background:#f8fafc; border-radius:14px; box-shadow:0 2px 12px #0a419111; padding:32px 20px;">
+        <h2 style="color:#0a4191; font-size:1.6rem; font-weight:900; margin-bottom:18px;">Phân tích chuyên sâu về Thần số học và định hướng nghề nghiệp</h2>
+        <div style="color:#2a3a5a; font-size:1.08rem; line-height:1.7;">
+            <b>1. Thông tin tổng quan cá nhân</b><br>
+            - Họ tên khai sinh, ngày tháng năm sinh dương lịch.<br>
+            - Số chủ đạo, số linh hồn, số biểu đạt, giới tính (nếu có).<br><br>
+            <b>2. Dự đoán thành công đường đời</b><br>
+            - Phân tích các giai đoạn thuận lợi, khó khăn trong cuộc đời dựa trên số chủ đạo và biểu đồ ngày sinh.<br>
+            - Dự đoán tiềm năng sự nghiệp, điểm mạnh, điểm yếu nổi bật.<br><br>
+            <b>3. Phân tích các chỉ số quan trọng</b><br>
+            <ul style="margin: 12px 0 12px 24px;">
+                <li><b>Chỉ số đường đời (Life Path):</b> Sứ mệnh, mục đích sống, bài học lớn cần vượt qua.</li>
+                <li><b>Chỉ số thái độ (Attitude Number):</b> Cách bạn tiếp cận vấn đề, phản ứng với thử thách.</li>
+                <li><b>Chỉ số ngày sinh:</b> Tài năng bẩm sinh, món quà đặc biệt của bạn.</li>
+                <li><b>Chỉ số trưởng thành:</b> Đỉnh cao sự nghiệp, thời điểm phát triển mạnh nhất.</li>
+                <li><b>Biểu đồ ngày sinh:</b> Sự cân bằng các con số, điểm mạnh/yếu tiềm ẩn.</li>
+            </ul>
+            <b>4. Phân tích tương hợp tình duyên, hôn nhân</b><br>
+            - Dựa trên số chủ đạo, số linh hồn, số biểu đạt để dự đoán mức độ hòa hợp với đối tượng khác.<br>
+            - Gợi ý cách cải thiện các mối quan hệ.<br><br>
+            <b>5. Gợi ý ngành nghề phù hợp & định hướng phát triển</b><br>
+            - Dựa trên tổng hợp các chỉ số, đưa ra danh sách ngành nghề phù hợp nhất, giải thích lý do.<br>
+            - Gợi ý các kỹ năng nên phát triển, các lĩnh vực nên tránh.<br><br>
+            <b>6. Lời khuyên cá nhân hóa</b><br>
+            - Đưa ra lời khuyên thực tiễn về phát triển bản thân, vượt qua khó khăn, tận dụng cơ hội.<br>
+            - Nhấn mạnh tầm quan trọng của nỗ lực, trải nghiệm thực tế bên cạnh các chỉ số thần số học.<br><br>
+            <b>7. Lưu ý về ngày sinh trên giấy tờ và ngày sinh thật</b><br>
+            - Nếu ngày sinh trên giấy tờ và ngày sinh thật khác nhau, nên tra cứu cả hai để có cái nhìn toàn diện hơn về vận mệnh.<br><br>
+            <b>8. Tài liệu tham khảo, trích dẫn nguồn</b><br>
+            <ul style="margin: 12px 0 12px 24px;">
+                <li><a href="https://xem.tracuuthansohoc.com/" target="_blank" rel="noopener" style="color:#0a4191;">tracuuthansohoc.com</a></li>
+                <li>“Numerology: The Complete Guide” – Matthew Oliver Goodwin</li>
+                <li>“The Complete Book of Numerology” – David A. Phillips</li>
+                <li>“Numerology and the Divine Triangle” – Faith Javane & Dusty Bunker</li>
+            </ul>
+            <div style="margin-top:18px; font-style:italic; color:#666;">Kết quả tra cứu mang tính tham khảo, hãy kết hợp với trải nghiệm thực tế để lựa chọn hướng đi phù hợp nhất cho bản thân.<br>Tham khảo cấu trúc và nội dung từ <a href="https://xem.tracuuthansohoc.com/" target="_blank" rel="noopener" style="color:#0a4191;">tracuuthansohoc.com</a>.</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+// Bảng chuyển đổi chữ cái sang số theo thần số học Pythagoras
+const letterToNumber = {
+    A:1, Ă:1, Â:1, J:1, S:1,
+    B:2, K:2, T:2,
+    C:3, L:3, U:3, Ư:3,
+    D:4, Đ:4, M:4, V:4,
+    E:5, Ê:5, N:5, W:5,
+    F:6, O:6, X:6,
+    G:7, P:7, Y:7,
+    H:8, Q:8, Z:8,
+    I:9, R:9
+};
+const vowels = ['A','E','I','O','U','Y','Ă','Â','Ê','Ư','Ô','Ơ','U','O'];
+
+// Ý nghĩa số chủ đạo và ngành nghề phù hợp (rút gọn, có thể mở rộng)
+const lifePathMeanings = {
+    1: {
+        name: 'Thủ lĩnh',
+        desc: `
+<b>Tổng quan về Số Chủ Đạo 1 – Thủ lĩnh</b><br>
+Số 1 trong thần số học đại diện cho sự khởi đầu, độc lập, sáng tạo và khả năng lãnh đạo bẩm sinh. Những người mang số chủ đạo 1 thường là người tiên phong, có ý chí mạnh mẽ, luôn muốn tự mình mở đường, không ngại thử thách và sẵn sàng đối mặt với khó khăn để đạt được mục tiêu. Họ là biểu tượng của sự đổi mới, dám nghĩ dám làm, và thường được mọi người nhìn nhận là người dẫn đầu trong tập thể.
+
+<b>Đặc điểm tính cách chi tiết</b><br>
+Người số 1 có cá tính mạnh, tự tin, quyết đoán và rất kiên định với mục tiêu của mình. Họ không dễ bị ảnh hưởng bởi ý kiến xung quanh, luôn giữ vững lập trường và sẵn sàng bảo vệ quan điểm cá nhân. Sự độc lập là điểm nổi bật nhất, họ thích tự mình giải quyết vấn đề, không muốn dựa dẫm vào người khác. Tư duy logic, khả năng phân tích và giải quyết vấn đề nhanh nhạy giúp họ luôn tìm ra hướng đi mới, sáng tạo trong công việc và cuộc sống.
+
+<b>Ưu điểm</b><br>
+- Khả năng lãnh đạo, tổ chức tốt, truyền cảm hứng cho người khác.
+- Tư duy độc lập, sáng tạo, dám nghĩ dám làm.
+- Quyết đoán, kiên trì, không ngại khó khăn.
+- Có khả năng khởi xướng dự án, dẫn dắt tập thể vượt qua thử thách.
+- Tự tin, chủ động, luôn hướng về phía trước.
+
+<b>Điểm hạn chế</b><br>
+- Đôi khi quá cứng đầu, bảo thủ, khó tiếp thu ý kiến mới.
+- Có xu hướng độc đoán, muốn kiểm soát mọi việc.
+- Dễ cảm thấy cô đơn vì không muốn chia sẻ, hợp tác.
+- Nếu thất bại, dễ rơi vào trạng thái tự trách, mất động lực.
+
+<b>Bài học lớn trong cuộc đời</b><br>
+Người số 1 cần học cách lắng nghe, tôn trọng ý kiến của người khác, biết phối hợp và chia sẻ trách nhiệm. Sự thành công bền vững đến từ khả năng kết nối, hợp tác chứ không chỉ dựa vào sức mạnh cá nhân. Họ cũng cần học cách kiên nhẫn, không nóng vội, biết chấp nhận thất bại như một phần của quá trình trưởng thành.
+
+<b>Định hướng phát triển bản thân</b><br>
+- Phát triển kỹ năng giao tiếp, lắng nghe, làm việc nhóm.
+- Học cách phân quyền, tin tưởng và trao cơ hội cho người khác.
+- Tham gia các hoạt động cộng đồng để mở rộng mối quan hệ.
+- Đặt mục tiêu rõ ràng, xây dựng kế hoạch dài hạn.
+
+<b>Phân tích các giai đoạn cuộc đời</b><br>
+- <i>Giai đoạn trẻ:</i> Thường thể hiện sự độc lập, thích khám phá, có thể nổi loạn hoặc khác biệt với bạn bè cùng trang lứa.
+- <i>Giai đoạn trưởng thành:</i> Bắt đầu phát huy tố chất lãnh đạo, có thể khởi nghiệp, dẫn dắt nhóm, đạt thành tựu nổi bật trong công việc.
+- <i>Giai đoạn trung niên:</i> Đạt đỉnh cao sự nghiệp, có vị trí xã hội, được nhiều người kính trọng. Tuy nhiên, cần chú ý cân bằng giữa công việc và gia đình.
+- <i>Giai đoạn về già:</i> Truyền cảm hứng, kinh nghiệm cho thế hệ sau, có thể trở thành cố vấn, người hướng dẫn.
+
+<b>Quan hệ, tình duyên, gia đình</b><br>
+Người số 1 thường chủ động trong tình cảm, thích chinh phục, nhưng đôi khi thiếu sự lãng mạn, dễ bị hiểu lầm là lạnh lùng. Trong gia đình, họ là trụ cột, luôn muốn bảo vệ, che chở cho người thân. Tuy nhiên, cần tránh áp đặt ý kiến, nên học cách chia sẻ, lắng nghe để xây dựng mối quan hệ bền vững.
+
+<b>Sự nghiệp, ngành nghề phù hợp</b><br>
+- Quản lý, lãnh đạo doanh nghiệp, khởi nghiệp, chính trị gia, kỹ sư, nhà sáng lập, nhà phát minh, lập trình viên, giám đốc dự án, huấn luyện viên, nhà báo, nhà văn, nghệ sĩ độc lập.
+- Người số 1 phù hợp với môi trường cạnh tranh, năng động, nơi họ có thể phát huy tối đa sự sáng tạo và khả năng dẫn dắt.
+
+<b>Ví dụ thực tiễn</b><br>
+Nhiều doanh nhân, nhà sáng lập nổi tiếng trên thế giới mang số chủ đạo 1, như Steve Jobs (Apple), Bill Gates (Microsoft), Elon Musk (Tesla, SpaceX)... Họ đều là những người tiên phong, dám nghĩ dám làm, tạo ra sự thay đổi lớn cho xã hội.
+
+<b>Lời khuyên cá nhân hóa</b><br>
+- Hãy tin vào bản thân nhưng đừng ngại học hỏi từ người khác.
+- Đừng sợ thất bại, hãy coi đó là bài học quý giá.
+- Biết lắng nghe, chia sẻ sẽ giúp bạn thành công bền vững hơn.
+- Luôn giữ tinh thần đổi mới, sáng tạo, không ngừng phát triển bản thân.
+
+<b>Trích dẫn, nguồn tham khảo</b><br>
+- “Numerology: The Complete Guide” – Matthew Oliver Goodwin<br>
+- “The Complete Book of Numerology” – David A. Phillips<br>
+- [tracuuthansohoc.com](https://xem.tracuuthansohoc.com/)<br>
+- [numerology.com](https://www.numerology.com/)<br>
+  `
+    },
+    2: {
+        name: 'Nhà ngoại giao',
+        desc: `
+<b>Tổng quan về Số Chủ Đạo 2 – Nhà ngoại giao</b><br>
+Số 2 trong thần số học đại diện cho sự hài hòa, hợp tác, nhạy cảm và khả năng kết nối giữa con người với nhau. Những người mang số chủ đạo 2 thường là người hòa nhã, biết lắng nghe, có trực giác tốt và luôn mong muốn xây dựng môi trường xung quanh trở nên hòa hợp, yên bình. Họ là những người bạn, người đồng nghiệp, người đối tác tuyệt vời, luôn sẵn sàng hỗ trợ, chia sẻ và đồng cảm với người khác.<br><br>
+<b>Đặc điểm tính cách chi tiết</b><br>
+Người số 2 nổi bật với sự dịu dàng, tế nhị, giàu lòng trắc ẩn và khả năng cảm nhận cảm xúc của người khác. Họ rất nhạy bén với những thay đổi trong môi trường, dễ dàng nhận ra những điều nhỏ nhặt mà người khác bỏ qua. Sự kiên nhẫn, mềm mỏng giúp họ giải quyết xung đột một cách khéo léo, giữ gìn mối quan hệ tốt đẹp trong gia đình, công việc và xã hội. Người số 2 không thích sự cạnh tranh gay gắt, họ đề cao sự hợp tác, cùng phát triển và luôn tìm kiếm sự đồng thuận.<br><br>
+<b>Ưu điểm</b><br>
+- Khả năng lắng nghe, thấu hiểu, đồng cảm sâu sắc với người khác.<br>
+- Kỹ năng giao tiếp, hòa giải, xây dựng mối quan hệ bền vững.<br>
+- Tinh tế, nhạy cảm, dễ thích nghi với môi trường mới.<br>
+- Kiên nhẫn, biết chờ đợi thời cơ, không nóng vội.<br>
+- Trung thành, tận tụy, luôn hỗ trợ người thân, bạn bè.<br><br>
+<b>Điểm hạn chế</b><br>
+- Dễ bị ảnh hưởng bởi cảm xúc, đôi khi quá nhạy cảm, dễ tổn thương.<br>
+- Ngại va chạm, thiếu quyết đoán trong những tình huống cần sự mạnh mẽ.<br>
+- Có xu hướng phụ thuộc vào ý kiến người khác, thiếu tự tin vào bản thân.<br>
+- Đôi khi hy sinh quá nhiều cho người khác mà quên đi nhu cầu của chính mình.<br><br>
+<b>Bài học lớn trong cuộc đời</b><br>
+Người số 2 cần học cách cân bằng giữa việc cho đi và nhận lại, biết yêu thương bản thân, không để cảm xúc chi phối quá mức. Họ cần rèn luyện sự tự tin, dám thể hiện quan điểm cá nhân, không ngại nói “không” khi cần thiết. Sự trưởng thành đến khi họ biết đứng lên bảo vệ chính mình, đồng thời vẫn giữ được sự dịu dàng, bao dung vốn có.<br><br>
+<b>Định hướng phát triển bản thân</b><br>
+- Phát triển kỹ năng tự quyết, dám chịu trách nhiệm với lựa chọn của mình.<br>
+- Tham gia các hoạt động xã hội, tình nguyện để mở rộng mối quan hệ.<br>
+- Học cách đặt ra ranh giới cá nhân, không để người khác lợi dụng lòng tốt.<br>
+- Tìm kiếm môi trường làm việc đề cao sự hợp tác, hỗ trợ lẫn nhau.<br><br>
+<b>Phân tích các giai đoạn cuộc đời</b><br>
+- <i>Giai đoạn trẻ:</i> Thường là đứa trẻ ngoan, biết nghe lời, dễ hòa nhập với bạn bè, nhưng đôi khi nhút nhát, ngại thể hiện bản thân.<br>
+- <i>Giai đoạn trưởng thành:</i> Phát huy khả năng kết nối, xây dựng mạng lưới quan hệ rộng, có thể trở thành người trung gian, hòa giải trong tập thể.<br>
+- <i>Giai đoạn trung niên:</i> Đạt được sự ổn định trong công việc, gia đình, được nhiều người tin tưởng, yêu mến. Tuy nhiên, cần chú ý không để bản thân bị “hòa tan” trong tập thể.<br>
+- <i>Giai đoạn về già:</i> Là người giữ lửa cho gia đình, cộng đồng, truyền cảm hứng về sự bao dung, hòa hợp cho thế hệ sau.<br><br>
+<b>Quan hệ, tình duyên, gia đình</b><br>
+Người số 2 rất coi trọng tình cảm, luôn mong muốn xây dựng mối quan hệ bền vững, lâu dài. Họ là người bạn đời lý tưởng, biết quan tâm, chăm sóc, chia sẻ với đối phương. Tuy nhiên, đôi khi họ dễ bị tổn thương nếu không nhận được sự đáp lại xứng đáng. Trong gia đình, họ là người giữ gìn hòa khí, kết nối các thành viên, tạo nên không khí ấm áp, hạnh phúc.<br><br>
+<b>Sự nghiệp, ngành nghề phù hợp</b><br>
+- Nhân sự, tư vấn tâm lý, giáo viên, chăm sóc khách hàng, y tế, trợ lý, ngoại giao, truyền thông, nghệ thuật, tổ chức sự kiện, công tác xã hội.<br>
+- Người số 2 phù hợp với môi trường làm việc đề cao sự hợp tác, hỗ trợ, nơi họ có thể phát huy khả năng kết nối, xây dựng đội nhóm.<br><br>
+<b>Ví dụ thực tiễn</b><br>
+Nhiều nhà ngoại giao, nhà tâm lý học, giáo viên, nghệ sĩ nổi tiếng mang số chủ đạo 2. Họ là những người đứng sau thành công của tập thể, là “người hùng thầm lặng” giúp mọi việc diễn ra suôn sẻ, hài hòa.<br><br>
+<b>Lời khuyên cá nhân hóa</b><br>
+- Hãy tin vào giá trị của bản thân, đừng ngại thể hiện ý kiến cá nhân.<br>
+- Biết nói “không” khi cần thiết, đừng hy sinh quá nhiều mà quên đi chính mình.<br>
+- Luôn giữ sự lạc quan, bao dung, nhưng cũng cần mạnh mẽ khi đối mặt với thử thách.<br>
+- Học cách cân bằng giữa cảm xúc và lý trí để đưa ra quyết định sáng suốt.<br><br>
+<b>Trích dẫn, nguồn tham khảo</b><br>
+- “Numerology: The Complete Guide” – Matthew Oliver Goodwin<br>
+- “The Complete Book of Numerology” – David A. Phillips<br>
+- [tracuuthansohoc.com](https://xem.tracuuthansohoc.com/)<br>
+- [numerology.com](https://www.numerology.com/)<br>
+        `,
+        careers: ['Nhân sự', 'Tư vấn', 'Giáo viên', 'Chăm sóc khách hàng', 'Tâm lý học', 'Y tế', 'Trợ lý', 'Ngoại giao', 'Truyền thông', 'Nghệ thuật', 'Tổ chức sự kiện', 'Công tác xã hội']
+    },
+    3: {
+        name: 'Người sáng tạo',
+        desc: 'Bạn giàu trí tưởng tượng, lạc quan, có năng khiếu nghệ thuật, giao tiếp tốt.',
+        careers: ['Nghệ sĩ', 'Thiết kế', 'Truyền thông', 'Marketing', 'MC', 'Nhà văn', 'Diễn viên']
+    },
+    4: {
+        name: 'Người thực tế',
+        desc: 'Bạn chăm chỉ, nguyên tắc, đáng tin cậy, thích sự ổn định và có tổ chức.',
+        careers: ['Kế toán', 'Kỹ thuật', 'Quản trị', 'Xây dựng', 'Luật', 'Ngân hàng', 'Hành chính']
+    },
+    5: {
+        name: 'Nhà phiêu lưu',
+        desc: 'Bạn yêu tự do, thích khám phá, linh hoạt, thích ứng nhanh với thay đổi.',
+        careers: ['Du lịch', 'Báo chí', 'Kinh doanh', 'Tiếp thị', 'Phi công', 'Hướng dẫn viên', 'Sự kiện']
+    },
+    6: {
+        name: 'Người chăm sóc',
+        desc: 'Bạn giàu tình cảm, trách nhiệm, thích giúp đỡ, quan tâm đến gia đình và cộng đồng.',
+        careers: ['Giáo viên', 'Y tá', 'Bác sĩ', 'Nhân sự', 'Tư vấn', 'Xã hội học', 'Chăm sóc trẻ em']
+    },
+    7: {
+        name: 'Nhà triết gia',
+        desc: 'Bạn thích nghiên cứu, phân tích, có trực giác tốt, yêu thích tri thức và khám phá chiều sâu.',
+        careers: ['Nghiên cứu', 'Giảng viên', 'Khoa học', 'Tâm lý học', 'Phân tích dữ liệu', 'Triết học', 'IT']
+    },
+    8: {
+        name: 'Người quyền lực',
+        desc: 'Bạn có tố chất lãnh đạo, tham vọng, giỏi quản lý tài chính, thích thành công vật chất.',
+        careers: ['Kinh doanh', 'Quản lý', 'Tài chính', 'Bất động sản', 'CEO', 'Đầu tư', 'Luật sư']
+    },
+    9: {
+        name: 'Nhà nhân đạo',
+        desc: 'Bạn giàu lòng trắc ẩn, vị tha, thích giúp đỡ cộng đồng, hướng tới giá trị nhân văn.',
+        careers: ['Bác sĩ', 'Nhà từ thiện', 'Giáo dục', 'Xã hội học', 'Tình nguyện', 'Nghệ thuật', 'Tâm lý học']
+    },
+    11: {
+        name: 'Nhà truyền cảm hứng',
+        desc: 'Bạn có trực giác mạnh, lý tưởng cao, truyền cảm hứng cho người khác, phù hợp lĩnh vực sáng tạo, giáo dục, nghệ thuật.',
+        careers: ['Diễn giả', 'Giáo viên', 'Nghệ sĩ', 'Tư vấn', 'Tôn giáo', 'Truyền thông', 'Nhà văn']
+    },
+    22: {
+        name: 'Nhà kiến tạo',
+        desc: 'Bạn có tầm nhìn lớn, khả năng tổ chức xuất sắc, xây dựng những giá trị bền vững cho xã hội.',
+        careers: ['Doanh nhân', 'Kiến trúc sư', 'Lãnh đạo', 'Quản lý dự án', 'Kỹ sư', 'Nhà sáng lập', 'Chính trị']
+    }
+};
+
+// Tính số chủ đạo từ ngày sinh (Life Path Number)
+function calcLifePathNumber(dateStr) {
+    // dateStr: yyyy-mm-dd
+    const [y, m, d] = dateStr.split('-').map(Number);
+    let sum = d + m + y;
+    function reduce(num) {
+        if ([11,22].includes(num)) return num;
+        while (num > 9) {
+            num = num.toString().split('').reduce((a,b)=>a+Number(b),0);
+            if ([11,22].includes(num)) return num;
+        }
+        return num;
+    }
+    return reduce(sum);
+}
+// Tính số biểu đạt (Expression Number) từ họ tên
+function calcExpressionNumber(name) {
+    let sum = 0;
+    for (let char of name.toUpperCase().replace(/[^A-ZĂÂÊƯÔƠĐ]/g, '')) {
+        sum += letterToNumber[char] || 0;
+    }
+    function reduce(num) {
+        if ([11,22].includes(num)) return num;
+        while (num > 9) {
+            num = num.toString().split('').reduce((a,b)=>a+Number(b),0);
+            if ([11,22].includes(num)) return num;
+        }
+        return num;
+    }
+    return reduce(sum);
+}
+// Tính số linh hồn (Soul Urge Number) từ nguyên âm trong họ tên
+function calcSoulUrgeNumber(name) {
+    let sum = 0;
+    for (let char of name.toUpperCase()) {
+        if (vowels.includes(char)) sum += letterToNumber[char] || 0;
+    }
+    function reduce(num) {
+        if ([11,22].includes(num)) return num;
+        while (num > 9) {
+            num = num.toString().split('').reduce((a,b)=>a+Number(b),0);
+            if ([11,22].includes(num)) return num;
+        }
+        return num;
+    }
+    return reduce(sum);
+}
+
+// Phân tích ý nghĩa số linh hồn và số biểu đạt (rút gọn)
+const soulUrgeMeanings = {
+    1: 'Bạn có khát vọng độc lập, thích tự quyết định, mong muốn được công nhận.',
+    2: 'Bạn sống tình cảm, mong muốn sự hòa hợp, thích giúp đỡ người khác.',
+    3: 'Bạn yêu thích sáng tạo, nghệ thuật, giao tiếp, mong muốn thể hiện bản thân.',
+    4: 'Bạn đề cao sự ổn định, an toàn, thích xây dựng nền tảng vững chắc.',
+    5: 'Bạn yêu tự do, thích trải nghiệm mới, không thích bị ràng buộc.',
+    6: 'Bạn mong muốn chăm sóc, bảo vệ, tạo dựng mái ấm và cộng đồng.',
+    7: 'Bạn thích khám phá tri thức, có chiều sâu nội tâm, thích suy ngẫm.',
+    8: 'Bạn khao khát thành công vật chất, quyền lực, địa vị.',
+    9: 'Bạn hướng tới giá trị nhân văn, muốn cống hiến cho xã hội.',
+    11: 'Bạn có trực giác mạnh, lý tưởng cao, truyền cảm hứng cho người khác.',
+    22: 'Bạn có tầm nhìn lớn, mong muốn xây dựng giá trị bền vững.'
+};
+const expressionMeanings = {
+    1: 'Bạn thể hiện sự tự tin, chủ động, có tố chất lãnh đạo.',
+    2: 'Bạn hợp tác tốt, biết lắng nghe, dễ hòa nhập.',
+    3: 'Bạn sáng tạo, vui vẻ, truyền cảm hứng cho người khác.',
+    4: 'Bạn thực tế, kiên trì, có trách nhiệm.',
+    5: 'Bạn linh hoạt, thích nghi nhanh, giao tiếp tốt.',
+    6: 'Bạn tận tâm, chu đáo, biết quan tâm đến người khác.',
+    7: 'Bạn sâu sắc, thích nghiên cứu, phân tích.',
+    8: 'Bạn quyết đoán, có năng lực quản lý, tài chính.',
+    9: 'Bạn nhân ái, vị tha, thích giúp đỡ cộng đồng.',
+    11: 'Bạn truyền cảm hứng, sáng tạo, có lý tưởng lớn.',
+    22: 'Bạn có khả năng tổ chức, xây dựng, lãnh đạo.'
+};
+
+// Xử lý form thần số học
+const form = document.getElementById('thansoForm');
+const resultDiv = document.getElementById('thansoResult');
+form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const name = document.getElementById('fullname').value.trim();
+    const birthday = document.getElementById('birthday').value;
+    if (!name || !birthday) return;
+
+    // Tính toán các số
+    const lifePath = calcLifePathNumber(birthday);
+    const soulUrge = calcSoulUrgeNumber(name);
+    const expression = calcExpressionNumber(name);
+
+    // Lấy ý nghĩa
+    const lifePathInfo = lifePathMeanings[lifePath] || {};
+    const soulUrgeInfo = soulUrgeMeanings[soulUrge] || '';
+    const expressionInfo = expressionMeanings[expression] || '';
+
+    // Hiển thị kết quả
+    resultDiv.classList.add('active');
+    resultDiv.innerHTML = `
+        <div class="thanso-section-title">Kết quả phân tích thần số học cho <b>${name}</b></div>
+        <div class="thanso-detail"><b>Ngày sinh:</b> ${birthday.split('-').reverse().join('/')}</div>
+        <div class="thanso-detail"><b>Số chủ đạo (Life Path Number):</b> <span style="color:#0a4191;font-weight:800;">${lifePath}</span> - <b>${lifePathInfo.name || ''}</b></div>
+        <div class="thanso-detail">${lifePathInfo.desc || ''}</div>
+        <div class="thanso-section-title">Ngành nghề phù hợp với bạn</div>
+        <div class="thanso-career-list">
+            ${(lifePathInfo.careers||[]).map(c=>`<div class='thanso-career-item'>${c}</div>`).join('')}
+        </div>
+        <div class="thanso-section-title">Số linh hồn (Soul Urge Number): <span style='color:#1fa36b;font-weight:800;'>${soulUrge}</span></div>
+        <div class="thanso-detail">${soulUrgeInfo}</div>
+        <div class="thanso-section-title">Số biểu đạt (Expression Number): <span style='color:#f59e42;font-weight:800;'>${expression}</span></div>
+        <div class="thanso-detail">${expressionInfo}</div>
+        <div class="thanso-section-title">Giải thích chi tiết</div>
+        <div class="thanso-detail">
+            <b>Số chủ đạo</b> là con số quan trọng nhất, tiết lộ sứ mệnh, tiềm năng và con đường phát triển của bạn.<br>
+            <b>Số linh hồn</b> phản ánh khát vọng sâu thẳm, động lực nội tâm và giá trị bạn theo đuổi.<br>
+            <b>Số biểu đạt</b> cho biết cách bạn thể hiện bản thân ra bên ngoài, điểm mạnh nổi bật.<br>
+            <br><i>Lưu ý: Kết quả mang tính tham khảo, hãy kết hợp với trải nghiệm thực tế để lựa chọn ngành nghề phù hợp nhất!</i>
+        </div>
+    `;
+});
+</script>
+{% endblock %}

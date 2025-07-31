@@ -71,5 +71,9 @@ def cunghoangdao():
 def mbti_new():
     return render_template('mbti/mbti_new.html')
 
+@app.route("/thansohoc")
+def thansohoc():
+    return render_template('thansohoc/thansohoc.html')
+
 if __name__ == "__main__":
     app.run(debug=True)
