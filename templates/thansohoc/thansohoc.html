@@ -2,185 +2,732 @@
 {% block title %}Thần Số Học - Phân tích ngành nghề phù hợp{% endblock %}
 {% block stylesheets %}
 <style>
+    /* Numerology-style design with mystical elements */
     .thanso-container {
-        max-width: 900px;
+        max-width: 1250px;
         margin: 0 auto;
-        background: #fff;
-        border-radius: 18px;
-        box-shadow: 0 4px 32px #0a419122;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3), 0 0 40px rgba(138, 43, 226, 0.2);
         padding: 40px 28px 32px 28px;
         margin-top: 36px;
         margin-bottom: 36px;
+        position: relative;
+        overflow: hidden;
     }
+    
+    .thanso-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="stars" patternUnits="userSpaceOnUse" width="100" height="100"><circle cx="20" cy="20" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="40" r="0.5" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="80" r="0.8" fill="rgba(255,255,255,0.1)"/><circle cx="90" cy="90" r="0.3" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23stars)"/></svg>');
+        opacity: 0.3;
+        pointer-events: none;
+    }
+    
     .thanso-header {
         text-align: center;
-        margin-bottom: 32px;
+        margin-bottom: 40px;
+        position: relative;
+        z-index: 2;
     }
+    
     .thanso-title {
-        font-size: 2.5rem;
+        font-size: 2rem;
         font-weight: 900;
-        color: #0a4191;
-        margin-bottom: 10px;
+        background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 15px;
+        text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+        animation: glow 3s ease-in-out infinite alternate;
     }
+    
+    @keyframes glow {
+        from { filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.3)); }
+        to { filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.6)); }
+    }
+    
     .thanso-desc {
-        font-size: 1.15rem;
-        color: #444;
-        margin-bottom: 18px;
-        line-height: 1.7;
+        font-size: 1.2rem;
+        color: #e8e8e8;
+        margin-bottom: 25px;
+        line-height: 1.8;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
+    
     .thanso-form {
         display: flex;
         flex-direction: column;
-        gap: 18px;
-        background: #f8fafc;
-        border-radius: 12px;
-        padding: 28px 18px 18px 18px;
-        box-shadow: 0 2px 12px #0a419111;
-        margin-bottom: 32px;
+        gap: 25px;
+        background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+        border-radius: 20px;
+        padding: 35px 25px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1);
+        margin-bottom: 40px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.1);
+        position: relative;
+        z-index: 2;
+        transition: all 0.3s ease;
     }
+    
+    .thanso-form:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 45px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15);
+    }
+    
     .thanso-form label {
         font-weight: 700;
-        color: #0a4191;
-        margin-bottom: 6px;
+        color: #ffd700;
+        margin-bottom: 8px;
+        margin-left: 0;
+        font-size: 1.1rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        display: block;
     }
+    
     .thanso-form input[type="text"], .thanso-form input[type="date"] {
-        padding: 12px 14px;
-        border-radius: 8px;
-        border: 1.5px solid #dbeafe;
-        font-size: 1.08rem;
+        padding: 15px 18px;
+        border-radius: 12px;
+        border: 2px solid rgba(255, 215, 0, 0.3);
+        font-size: 1.1rem;
         outline: none;
-        transition: border 0.2s;
-    }
-    .thanso-form input:focus {
-        border-color: #0a4191;
-    }
-    .thanso-form button {
-        background: linear-gradient(90deg, #0a4191 0%, #1fa36b 100%);
+        transition: all 0.3s ease;
+        background: rgba(255,255,255,0.1);
         color: #fff;
+        backdrop-filter: blur(5px);
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    .thanso-form input::placeholder {
+        color: rgba(255,255,255,0.6);
+    }
+    
+    .thanso-form input:focus {
+        border-color: #ffd700;
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        background: rgba(255,255,255,0.15);
+    }
+    
+    .thanso-form button {
+        background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700);
+        color: #1a1a2e;
         border: none;
-        border-radius: 32px;
-        padding: 14px 38px;
-        font-size: 1.13rem;
+        border-radius: 50px;
+        padding: 18px 45px;
+        font-size: 1.2rem;
         font-weight: 800;
         cursor: pointer;
-        box-shadow: 0 2px 12px #0a419133;
-        transition: background 0.2s, color 0.2s, transform 0.2s;
-        margin-top: 10px;
+        box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
+        transition: all 0.3s ease;
+        margin-top: 15px;
         align-self: center;
+        position: relative;
+        overflow: hidden;
     }
+    
+    .thanso-form button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        transition: left 0.5s;
+    }
+    
     .thanso-form button:hover {
-        background: linear-gradient(90deg, #1fa36b 0%, #0a4191 100%);
-        transform: translateY(-2px);
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 12px 35px rgba(255, 215, 0, 0.4);
     }
+    
+    .thanso-form button:hover::before {
+        left: 100%;
+    }
+    
     .thanso-result {
-        margin-top: 32px;
-        background: #f7fbff;
-        border-radius: 14px;
-        padding: 28px 20px;
-        box-shadow: 0 2px 12px #0a419111;
+        margin-top: 40px;
+        background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+        border-radius: 20px;
+        padding: 35px 25px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1);
         display: none;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.1);
+        position: relative;
+        z-index: 2;
     }
+    
     .thanso-result.active {
         display: block;
-        animation: fadeIn 0.7s;
+        animation: slideInUp 0.8s ease-out;
     }
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(30px); }
-        to { opacity: 1; transform: translateY(0); }
+    
+    @keyframes slideInUp {
+        from { 
+            opacity: 0; 
+            transform: translateY(50px); 
+        }
+        to { 
+            opacity: 1; 
+            transform: translateY(0); 
+        }
     }
+    
     .thanso-section-title {
-        font-size: 1.35rem;
+        font-size: 1.5rem;
         font-weight: 800;
-        color: #0a4191;
-        margin-bottom: 12px;
-        margin-top: 18px;
+        color: #ffd700;
+        margin-bottom: 15px;
+        margin-top: 25px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        position: relative;
+        padding-left: 20px;
     }
+    
+    .thanso-section-title::before {
+        content: '✦';
+        position: absolute;
+        left: 0;
+        color: #ffd700;
+        font-size: 1.2rem;
+    }
+    
     .thanso-detail {
-        color: #2a3a5a;
-        font-size: 1.08rem;
-        line-height: 1.7;
-        margin-bottom: 10px;
+        color: #e8e8e8;
+        font-size: 1.1rem;
+        line-height: 1.8;
+        margin-bottom: 15px;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.3);
     }
+    
     .thanso-career-list {
-        margin-top: 18px;
+        margin-top: 20px;
         display: flex;
         flex-wrap: wrap;
-        gap: 14px;
+        gap: 15px;
     }
+    
     .thanso-career-item {
-        background: #eaf3ff;
-        color: #0a4191;
-        border-radius: 8px;
-        padding: 10px 18px;
+        background: linear-gradient(45deg, rgba(255, 215, 0, 0.2), rgba(255, 215, 0, 0.1));
+        color: #ffd700;
+        border-radius: 12px;
+        padding: 12px 20px;
         font-weight: 700;
         font-size: 1.05rem;
-        box-shadow: 0 2px 8px #0a419111;
+        box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2);
+        border: 1px solid rgba(255, 215, 0, 0.3);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        backdrop-filter: blur(5px);
     }
+    
+    .thanso-career-item:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
+        background: linear-gradient(45deg, rgba(255, 215, 0, 0.3), rgba(255, 215, 0, 0.2));
+    }
+    
+    /* Mystical elements */
+    .mystical-border {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        border: 2px solid transparent;
+        border-radius: 15px;
+        background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700) border-box;
+        -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: destination-out;
+        mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+        mask-composite: exclude;
+        opacity: 0.3;
+        animation: borderGlow 4s ease-in-out infinite;
+    }
+    
+    @keyframes borderGlow {
+        0%, 100% { opacity: 0.3; }
+        50% { opacity: 0.6; }
+    }
+    
+    /* Loading animation */
+    .loading-spinner {
+        display: none;
+        width: 50px;
+        height: 50px;
+        border: 3px solid rgba(255, 215, 0, 0.3);
+        border-top: 3px solid #ffd700;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 20px auto;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    /* Responsive design */
     @media (max-width: 700px) {
-        .thanso-container { padding: 18px 2vw; }
-        .thanso-title { font-size: 1.5rem; }
+        .thanso-container { 
+            padding: 20px 15px; 
+            margin: 20px 10px;
+        }
+        .thanso-title { 
+            font-size: 1.5rem; 
+        }
+        .thanso-form {
+            padding: 25px 20px;
+        }
+        .thanso-career-list {
+            gap: 10px;
+        }
+        .thanso-career-item {
+            padding: 10px 15px;
+            font-size: 0.95rem;
+        }
+    }
+    
+    /* Enhanced floating elements animation */
+    .floating-element {
+        position: absolute;
+        width: 6px;
+        height: 6px;
+        background: #ffd700;
+        border-radius: 50%;
+        animation: float 8s ease-in-out infinite;
+        opacity: 0.8;
+        box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+    }
+    
+    .floating-element:nth-child(1) { top: 15%; left: 8%; animation-delay: 0s; animation-duration: 6s; }
+    .floating-element:nth-child(2) { top: 55%; right: 12%; animation-delay: 2s; animation-duration: 7s; }
+    .floating-element:nth-child(3) { bottom: 25%; left: 15%; animation-delay: 4s; animation-duration: 8s; }
+    .floating-element:nth-child(4) { top: 35%; right: 25%; animation-delay: 1s; animation-duration: 9s; }
+    .floating-element:nth-child(5) { bottom: 45%; left: 35%; animation-delay: 3s; animation-duration: 6.5s; }
+    .floating-element:nth-child(6) { top: 75%; left: 45%; animation-delay: 5s; animation-duration: 7.5s; }
+    
+    @keyframes float {
+        0%, 100% { 
+            transform: translateY(0px) rotate(0deg) scale(1); 
+            opacity: 0.8; 
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+        }
+        25% { 
+            transform: translateY(-15px) rotate(90deg) scale(1.2); 
+            opacity: 1; 
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+        }
+        50% { 
+            transform: translateY(-25px) rotate(180deg) scale(1.1); 
+            opacity: 0.9; 
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+        }
+        75% { 
+            transform: translateY(-10px) rotate(270deg) scale(1.3); 
+            opacity: 1; 
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.9);
+        }
+    }
+    
+    /* Mystical sparkles */
+    .sparkle {
+        position: absolute;
+        width: 3px;
+        height: 3px;
+        background: #ffd700;
+        border-radius: 50%;
+        animation: sparkle 4s linear infinite;
+        opacity: 0;
+    }
+    
+    .sparkle:nth-child(7) { top: 10%; left: 20%; animation-delay: 0s; }
+    .sparkle:nth-child(8) { top: 40%; right: 30%; animation-delay: 1s; }
+    .sparkle:nth-child(9) { bottom: 20%; left: 40%; animation-delay: 2s; }
+    .sparkle:nth-child(10) { top: 80%; right: 10%; animation-delay: 3s; }
+    .sparkle:nth-child(11) { top: 30%; left: 60%; animation-delay: 0.5s; }
+    .sparkle:nth-child(12) { bottom: 60%; right: 50%; animation-delay: 1.5s; }
+    
+    @keyframes sparkle {
+        0%, 100% { 
+            opacity: 0; 
+            transform: scale(0) rotate(0deg); 
+            box-shadow: 0 0 0 rgba(255, 215, 0, 0);
+        }
+        50% { 
+            opacity: 1; 
+            transform: scale(1.5) rotate(180deg); 
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+        }
+    }
+    
+    /* Energy waves */
+    .energy-wave {
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        border: 2px solid rgba(255, 215, 0, 0.3);
+        border-radius: 50%;
+        animation: energyWave 6s ease-out infinite;
+        opacity: 0;
+    }
+    
+    .energy-wave:nth-child(13) { top: 50%; left: 50%; transform: translate(-50%, -50%); animation-delay: 0s; }
+    .energy-wave:nth-child(14) { top: 50%; left: 50%; transform: translate(-50%, -50%); animation-delay: 2s; }
+    .energy-wave:nth-child(15) { top: 50%; left: 50%; transform: translate(-50%, -50%); animation-delay: 4s; }
+    
+    @keyframes energyWave {
+        0% { 
+            width: 0; 
+            height: 0; 
+            opacity: 0.8; 
+            border-width: 3px;
+        }
+        100% { 
+            width: 300px; 
+            height: 300px; 
+            opacity: 0; 
+            border-width: 1px;
+        }
+    }
+    
+    /* Pulsing glow effect */
+    .pulse-glow {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-radius: 20px;
+        background: radial-gradient(circle at center, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+        animation: pulseGlow 4s ease-in-out infinite;
+        pointer-events: none;
+    }
+    
+    @keyframes pulseGlow {
+        0%, 100% { opacity: 0.3; transform: scale(1); }
+        50% { opacity: 0.6; transform: scale(1.05); }
+    }
+    
+    /* Enhanced button effects */
+    .thanso-form button {
+        background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700);
+        color: #1a1a2e;
+        border: none;
+        border-radius: 50px;
+        padding: 18px 45px;
+        font-size: 1.2rem;
+        font-weight: 800;
+        cursor: pointer;
+        box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
+        transition: all 0.3s ease;
+        margin-top: 15px;
+        align-self: center;
+        position: relative;
+        overflow: hidden;
+        animation: buttonGlow 3s ease-in-out infinite;
+    }
+    
+    @keyframes buttonGlow {
+        0%, 100% { box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3); }
+        50% { box-shadow: 0 8px 35px rgba(255, 215, 0, 0.5), 0 0 20px rgba(255, 215, 0, 0.3); }
+    }
+    
+    .thanso-form button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+        transition: left 0.6s;
+    }
+    
+    .thanso-form button:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 12px 35px rgba(255, 215, 0, 0.4), 0 0 30px rgba(255, 215, 0, 0.2);
+        animation: none;
+    }
+    
+    .thanso-form button:hover::before {
+        left: 100%;
+    }
+    
+    /* Enhanced form hover effects */
+    .thanso-form:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 45px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15);
+        animation: formGlow 4s ease-in-out infinite;
+    }
+    
+    @keyframes formGlow {
+        0%, 100% { 
+            box-shadow: 0 20px 45px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+        50% { 
+            box-shadow: 0 20px 45px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15), 0 0 30px rgba(255, 215, 0, 0.1);
+        }
+    }
+    
+    /* Enhanced input focus effects */
+    .thanso-form input:focus {
+        border-color: #ffd700;
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.3), 0 0 40px rgba(255, 215, 0, 0.1);
+        background: rgba(255,255,255,0.15);
+        animation: inputPulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes inputPulse {
+        0%, 100% { 
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3), 0 0 40px rgba(255, 215, 0, 0.1);
+        }
+        50% { 
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.4), 0 0 50px rgba(255, 215, 0, 0.15);
+        }
+    }
+    
+    /* Enhanced career items */
+    .thanso-career-item {
+        background: linear-gradient(45deg, rgba(255, 215, 0, 0.2), rgba(255, 215, 0, 0.1));
+        color: #ffd700;
+        border-radius: 12px;
+        padding: 12px 20px;
+        font-weight: 700;
+        font-size: 1.05rem;
+        box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2);
+        border: 1px solid rgba(255, 215, 0, 0.3);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        backdrop-filter: blur(5px);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .thanso-career-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.2), transparent);
+        transition: left 0.5s;
+    }
+    
+    .thanso-career-item:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3), 0 0 20px rgba(255, 215, 0, 0.2);
+        background: linear-gradient(45deg, rgba(255, 215, 0, 0.3), rgba(255, 215, 0, 0.2));
+        animation: careerGlow 2s ease-in-out infinite;
+    }
+    
+    .thanso-career-item:hover::before {
+        left: 100%;
+    }
+    
+    @keyframes careerGlow {
+        0%, 100% { 
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3), 0 0 20px rgba(255, 215, 0, 0.2);
+        }
+        50% { 
+            box-shadow: 0 8px 30px rgba(255, 215, 0, 0.4), 0 0 25px rgba(255, 215, 0, 0.3);
+        }
+    }
+    
+    /* Enhanced result animation */
+    .thanso-result.active {
+        display: block;
+        animation: slideInUp 0.8s ease-out, resultGlow 3s ease-in-out infinite 0.8s;
+    }
+    
+    @keyframes resultGlow {
+        0%, 100% { 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+        50% { 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1), 0 0 30px rgba(255, 215, 0, 0.1);
+        }
+    }
+    
+    /* Enhanced title animation */
+    .thanso-title {
+        font-size: 2rem;
+        font-weight: 900;
+        background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 15px;
+        text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+        animation: glow 3s ease-in-out infinite alternate, titleFloat 6s ease-in-out infinite;
+    }
+    
+    @keyframes titleFloat {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-5px); }
+    }
+    
+    /* Enhanced loading spinner */
+    .loading-spinner {
+        display: none;
+        width: 60px;
+        height: 60px;
+        border: 4px solid rgba(255, 215, 0, 0.3);
+        border-top: 4px solid #ffd700;
+        border-radius: 50%;
+        animation: spin 1s linear infinite, spinnerGlow 2s ease-in-out infinite;
+        margin: 20px auto;
+        position: relative;
+    }
+    
+    .loading-spinner::before {
+        content: '';
+        position: absolute;
+        top: -10px;
+        left: -10px;
+        right: -10px;
+        bottom: -10px;
+        border: 2px solid rgba(255, 215, 0, 0.2);
+        border-radius: 50%;
+        animation: spin 2s linear infinite reverse;
+    }
+    
+    @keyframes spinnerGlow {
+        0%, 100% { 
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+        50% { 
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5), 0 0 40px rgba(255, 215, 0, 0.2);
+        }
     }
 </style>
 {% endblock %}
 {% block content %}
 <div class="thanso-container">
+    <!-- Mystical border effect -->
+    <div class="mystical-border"></div>
+    
+    <!-- Enhanced floating elements for mystical atmosphere -->
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    
+    <!-- Mystical sparkles -->
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+    
+    <!-- Energy waves -->
+    <div class="energy-wave"></div>
+    <div class="energy-wave"></div>
+    <div class="energy-wave"></div>
+    
+    <!-- Pulsing glow effect -->
+    <div class="pulse-glow"></div>
+    
     <div class="thanso-header">
-        <div class="thanso-title">Thần Số Học - Khám Phá Bản Thân & Định Hướng Nghề Nghiệp</div>
+        <div class="thanso-title">🔮 Thần Số Học - Khám Phá Bản Thân & Định Hướng Nghề Nghiệp ✨</div>
         <div class="thanso-desc">
-            Thần số học (Numerology) là một bộ môn khoa học huyền bí nghiên cứu về ý nghĩa các con số liên quan đến cuộc đời, tính cách, vận mệnh của mỗi người dựa trên họ tên khai sinh và ngày tháng năm sinh. Thông qua các con số chủ đạo, thần số học giúp bạn hiểu rõ điểm mạnh, điểm yếu, tiềm năng phát triển và từ đó lựa chọn ngành nghề phù hợp nhất với bản thân.<br><br>
-            <b>Hãy nhập đầy đủ thông tin để nhận phân tích chi tiết và gợi ý ngành nghề phù hợp với bạn!</b>
+            <span style="color: #ffd700; font-weight: 700;">Thần số học (Numerology)</span> là một bộ môn khoa học huyền bí nghiên cứu về ý nghĩa các con số liên quan đến cuộc đời, tính cách, vận mệnh của mỗi người dựa trên họ tên khai sinh và ngày tháng năm sinh. Thông qua các con số chủ đạo, thần số học giúp bạn hiểu rõ điểm mạnh, điểm yếu, tiềm năng phát triển và từ đó lựa chọn ngành nghề phù hợp nhất với bản thân.<br><br>
+            <span style="color: #ffd700; font-weight: 700; font-size: 1.1rem;">🌟 Hãy nhập đầy đủ thông tin để nhận phân tích chi tiết và gợi ý ngành nghề phù hợp với bạn!</span>
         </div>
     </div>
+    
     <form class="thanso-form" id="thansoForm" autocomplete="off">
         <div>
-            <label for="fullname">Họ và tên khai sinh</label>
-            <input type="text" id="fullname" name="fullname" placeholder="Nguyễn Văn A" required>
-        </div>
-        <div>
-            <label for="birthday">Ngày tháng năm sinh (Dương lịch)</label>
+            <label for="fullname">📝 Họ và tên khai sinh</label>
+            <input type="text" id="fullname" name="fullname" placeholder="Ví dụ: Nguyễn Văn A" required>
+        
+            <label for="birthday">📅 Ngày tháng năm sinh (Dương lịch)</label>
             <input type="date" id="birthday" name="birthday" required>
         </div>
-        <button type="submit">Tra cứu thần số học & ngành nghề phù hợp</button>
+        <button type="submit">🔮 Tra cứu thần số học & ngành nghề phù hợp ✨</button>
     </form>
+    
+    <!-- Loading spinner -->
+    <div class="loading-spinner" id="loadingSpinner"></div>
+    
     <div class="thanso-result" id="thansoResult">
         <!-- Kết quả sẽ được hiển thị ở đây bằng JS -->
     </div>
-    <div class="thanso-analysis" style="margin-top:48px; background:#f8fafc; border-radius:14px; box-shadow:0 2px 12px #0a419111; padding:32px 20px;">
-        <h2 style="color:#0a4191; font-size:1.6rem; font-weight:900; margin-bottom:18px;">Phân tích chuyên sâu về Thần số học và định hướng nghề nghiệp</h2>
-        <div style="color:#2a3a5a; font-size:1.08rem; line-height:1.7;">
-            <b>1. Thông tin tổng quan cá nhân</b><br>
-            - Họ tên khai sinh, ngày tháng năm sinh dương lịch.<br>
-            - Số chủ đạo, số linh hồn, số biểu đạt, giới tính (nếu có).<br><br>
-            <b>2. Dự đoán thành công đường đời</b><br>
-            - Phân tích các giai đoạn thuận lợi, khó khăn trong cuộc đời dựa trên số chủ đạo và biểu đồ ngày sinh.<br>
-            - Dự đoán tiềm năng sự nghiệp, điểm mạnh, điểm yếu nổi bật.<br><br>
-            <b>3. Phân tích các chỉ số quan trọng</b><br>
-            <ul style="margin: 12px 0 12px 24px;">
-                <li><b>Chỉ số đường đời (Life Path):</b> Sứ mệnh, mục đích sống, bài học lớn cần vượt qua.</li>
-                <li><b>Chỉ số thái độ (Attitude Number):</b> Cách bạn tiếp cận vấn đề, phản ứng với thử thách.</li>
-                <li><b>Chỉ số ngày sinh:</b> Tài năng bẩm sinh, món quà đặc biệt của bạn.</li>
-                <li><b>Chỉ số trưởng thành:</b> Đỉnh cao sự nghiệp, thời điểm phát triển mạnh nhất.</li>
-                <li><b>Biểu đồ ngày sinh:</b> Sự cân bằng các con số, điểm mạnh/yếu tiềm ẩn.</li>
-            </ul>
-            <b>4. Phân tích tương hợp tình duyên, hôn nhân</b><br>
-            - Dựa trên số chủ đạo, số linh hồn, số biểu đạt để dự đoán mức độ hòa hợp với đối tượng khác.<br>
-            - Gợi ý cách cải thiện các mối quan hệ.<br><br>
-            <b>5. Gợi ý ngành nghề phù hợp & định hướng phát triển</b><br>
-            - Dựa trên tổng hợp các chỉ số, đưa ra danh sách ngành nghề phù hợp nhất, giải thích lý do.<br>
-            - Gợi ý các kỹ năng nên phát triển, các lĩnh vực nên tránh.<br><br>
-            <b>6. Lời khuyên cá nhân hóa</b><br>
-            - Đưa ra lời khuyên thực tiễn về phát triển bản thân, vượt qua khó khăn, tận dụng cơ hội.<br>
-            - Nhấn mạnh tầm quan trọng của nỗ lực, trải nghiệm thực tế bên cạnh các chỉ số thần số học.<br><br>
-            <b>7. Lưu ý về ngày sinh trên giấy tờ và ngày sinh thật</b><br>
-            - Nếu ngày sinh trên giấy tờ và ngày sinh thật khác nhau, nên tra cứu cả hai để có cái nhìn toàn diện hơn về vận mệnh.<br><br>
-            <b>8. Tài liệu tham khảo, trích dẫn nguồn</b><br>
-            <ul style="margin: 12px 0 12px 24px;">
-                <li><a href="https://xem.tracuuthansohoc.com/" target="_blank" rel="noopener" style="color:#0a4191;">tracuuthansohoc.com</a></li>
-                <li>“Numerology: The Complete Guide” – Matthew Oliver Goodwin</li>
-                <li>“The Complete Book of Numerology” – David A. Phillips</li>
-                <li>“Numerology and the Divine Triangle” – Faith Javane & Dusty Bunker</li>
-            </ul>
-            <div style="margin-top:18px; font-style:italic; color:#666;">Kết quả tra cứu mang tính tham khảo, hãy kết hợp với trải nghiệm thực tế để lựa chọn hướng đi phù hợp nhất cho bản thân.<br>Tham khảo cấu trúc và nội dung từ <a href="https://xem.tracuuthansohoc.com/" target="_blank" rel="noopener" style="color:#0a4191;">tracuuthansohoc.com</a>.</div>
+    
+    <div class="thanso-analysis" style="margin-top:48px; background:linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05)); border-radius:20px; box-shadow:0 15px 35px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1); padding:35px 25px; backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.1);">
+        <h2 style="color:#ffd700; font-size:1.8rem; font-weight:900; margin-bottom:25px; text-shadow:0 2px 4px rgba(0,0,0,0.3);">📚 Phân tích chuyên sâu về Thần số học và định hướng nghề nghiệp</h2>
+        <div style="color:#e8e8e8; font-size:1.1rem; line-height:1.8; text-shadow:0 1px 2px rgba(0,0,0,0.3);">
+            <div style="margin-bottom:20px;">
+                <span style="color:#ffd700; font-weight:700;">1. Thông tin tổng quan cá nhân</span><br>
+                - Họ tên khai sinh, ngày tháng năm sinh dương lịch.<br>
+                - Số chủ đạo, số linh hồn, số biểu đạt, giới tính (nếu có).
+            </div>
+            
+            <div style="margin-bottom:20px;">
+                <span style="color:#ffd700; font-weight:700;">2. Dự đoán thành công đường đời</span><br>
+                - Phân tích các giai đoạn thuận lợi, khó khăn trong cuộc đời dựa trên số chủ đạo và biểu đồ ngày sinh.<br>
+                - Dự đoán tiềm năng sự nghiệp, điểm mạnh, điểm yếu nổi bật.
+            </div>
+            
+            <div style="margin-bottom:20px;">
+                <span style="color:#ffd700; font-weight:700;">3. Phân tích các chỉ số quan trọng</span><br>
+                <ul style="margin: 15px 0 15px 30px; color:#e8e8e8;">
+                    <li><span style="color:#ffd700; font-weight:700;">Chỉ số đường đời (Life Path):</span> Sứ mệnh, mục đích sống, bài học lớn cần vượt qua.</li>
+                    <li><span style="color:#ffd700; font-weight:700;">Chỉ số thái độ (Attitude Number):</span> Cách bạn tiếp cận vấn đề, phản ứng với thử thách.</li>
+                    <li><span style="color:#ffd700; font-weight:700;">Chỉ số ngày sinh:</span> Tài năng bẩm sinh, món quà đặc biệt của bạn.</li>
+                    <li><span style="color:#ffd700; font-weight:700;">Chỉ số trưởng thành:</span> Đỉnh cao sự nghiệp, thời điểm phát triển mạnh nhất.</li>
+                    <li><span style="color:#ffd700; font-weight:700;">Biểu đồ ngày sinh:</span> Sự cân bằng các con số, điểm mạnh/yếu tiềm ẩn.</li>
+                </ul>
+            </div>
+            
+            <div style="margin-bottom:20px;">
+                <span style="color:#ffd700; font-weight:700;">4. Phân tích tương hợp tình duyên, hôn nhân</span><br>
+                - Dựa trên số chủ đạo, số linh hồn, số biểu đạt để dự đoán mức độ hòa hợp với đối tượng khác.<br>
+                - Gợi ý cách cải thiện các mối quan hệ.
+            </div>
+            
+            <div style="margin-bottom:20px;">
+                <span style="color:#ffd700; font-weight:700;">5. Gợi ý ngành nghề phù hợp & định hướng phát triển</span><br>
+                - Dựa trên tổng hợp các chỉ số, đưa ra danh sách ngành nghề phù hợp nhất, giải thích lý do.<br>
+                - Gợi ý các kỹ năng nên phát triển, các lĩnh vực nên tránh.
+            </div>
+            
+            <div style="margin-bottom:20px;">
+                <span style="color:#ffd700; font-weight:700;">6. Lời khuyên cá nhân hóa</span><br>
+                - Đưa ra lời khuyên thực tiễn về phát triển bản thân, vượt qua khó khăn, tận dụng cơ hội.<br>
+                - Nhấn mạnh tầm quan trọng của nỗ lực, trải nghiệm thực tế bên cạnh các chỉ số thần số học.
+            </div>
+            
+            <div style="margin-bottom:20px;">
+                <span style="color:#ffd700; font-weight:700;">7. Lưu ý về ngày sinh trên giấy tờ và ngày sinh thật</span><br>
+                - Nếu ngày sinh trên giấy tờ và ngày sinh thật khác nhau, nên tra cứu cả hai để có cái nhìn toàn diện hơn về vận mệnh.
+            </div>
+            
+            <div style="margin-bottom:20px;">
+                <span style="color:#ffd700; font-weight:700;">8. Tài liệu tham khảo, trích dẫn nguồn</span><br>
+                <ul style="margin: 15px 0 15px 30px; color:#e8e8e8;">
+                    <li><a href="https://xem.tracuuthansohoc.com/" target="_blank" rel="noopener" style="color:#ffd700;">tracuuthansohoc.com</a></li>
+                    <li>"Numerology: The Complete Guide" – Matthew Oliver Goodwin</li>
+                    <li>"The Complete Book of Numerology" – David A. Phillips</li>
+                    <li>"Numerology and the Divine Triangle" – Faith Javane & Dusty Bunker</li>
+                </ul>
+            </div>
+            
+            <div style="margin-top:25px; font-style:italic; color:#ccc; padding:20px; background:rgba(255,215,0,0.1); border-radius:12px; border-left:4px solid #ffd700;">
+                <span style="color:#ffd700; font-weight:700;">💡 Lưu ý:</span> Kết quả tra cứu mang tính tham khảo, hãy kết hợp với trải nghiệm thực tế để lựa chọn hướng đi phù hợp nhất cho bản thân.<br>Tham khảo cấu trúc và nội dung từ <a href="https://xem.tracuuthansohoc.com/" target="_blank" rel="noopener" style="color:#ffd700;">tracuuthansohoc.com</a>.
+            </div>
         </div>
     </div>
 </div>
@@ -257,8 +804,8 @@ Nhiều doanh nhân, nhà sáng lập nổi tiếng trên thế giới mang số
 - Luôn giữ tinh thần đổi mới, sáng tạo, không ngừng phát triển bản thân.
 
 <b>Trích dẫn, nguồn tham khảo</b><br>
-- “Numerology: The Complete Guide” – Matthew Oliver Goodwin<br>
-- “The Complete Book of Numerology” – David A. Phillips<br>
+- "Numerology: The Complete Guide" – Matthew Oliver Goodwin<br>
+- "The Complete Book of Numerology" – David A. Phillips<br>
 - [tracuuthansohoc.com](https://xem.tracuuthansohoc.com/)<br>
 - [numerology.com](https://www.numerology.com/)<br>
   `
@@ -282,32 +829,32 @@ Người số 2 nổi bật với sự dịu dàng, tế nhị, giàu lòng tr�
 - Có xu hướng phụ thuộc vào ý kiến người khác, thiếu tự tin vào bản thân.<br>
 - Đôi khi hy sinh quá nhiều cho người khác mà quên đi nhu cầu của chính mình.<br><br>
 <b>Bài học lớn trong cuộc đời</b><br>
-Người số 2 cần học cách cân bằng giữa việc cho đi và nhận lại, biết yêu thương bản thân, không để cảm xúc chi phối quá mức. Họ cần rèn luyện sự tự tin, dám thể hiện quan điểm cá nhân, không ngại nói “không” khi cần thiết. Sự trưởng thành đến khi họ biết đứng lên bảo vệ chính mình, đồng thời vẫn giữ được sự dịu dàng, bao dung vốn có.<br><br>
+Người số 2 cần học cách cân bằng giữa việc cho đi và nhận lại, biết yêu thương bản thân, không để cảm xúc chi phối quá mức. Họ cần rèn luyện sự tự tin, dám thể hiện quan điểm cá nhân, không ngại nói "không" khi cần thiết. Sự trưởng thành đến khi họ biết đứng lên bảo vệ chính mình, đồng thời vẫn giữ được sự dịu dàng, bao dung vốn có.<br><br>
 <b>Định hướng phát triển bản thân</b><br>
 - Phát triển kỹ năng tự quyết, dám chịu trách nhiệm với lựa chọn của mình.<br>
 - Tham gia các hoạt động xã hội, tình nguyện để mở rộng mối quan hệ.<br>
 - Học cách đặt ra ranh giới cá nhân, không để người khác lợi dụng lòng tốt.<br>
 - Tìm kiếm môi trường làm việc đề cao sự hợp tác, hỗ trợ lẫn nhau.<br><br>
 <b>Phân tích các giai đoạn cuộc đời</b><br>
-- <i>Giai đoạn trẻ:</i> Thường là đứa trẻ ngoan, biết nghe lời, dễ hòa nhập với bạn bè, nhưng đôi khi nhút nhát, ngại thể hiện bản thân.<br>
-- <i>Giai đoạn trưởng thành:</i> Phát huy khả năng kết nối, xây dựng mạng lưới quan hệ rộng, có thể trở thành người trung gian, hòa giải trong tập thể.<br>
-- <i>Giai đoạn trung niên:</i> Đạt được sự ổn định trong công việc, gia đình, được nhiều người tin tưởng, yêu mến. Tuy nhiên, cần chú ý không để bản thân bị “hòa tan” trong tập thể.<br>
-- <i>Giai đoạn về già:</i> Là người giữ lửa cho gia đình, cộng đồng, truyền cảm hứng về sự bao dung, hòa hợp cho thế hệ sau.<br><br>
+- <i>Giai đoạn trẻ:</i> Thường là đứa trẻ ngoan, biết nghe lời, thích giúp đỡ, chăm sóc người thân.<br>
+- <i>Giai đoạn trưởng thành:</i> Phát huy khả năng xây dựng, bảo vệ gia đình, cộng đồng, có thể thành công trong các lĩnh vực giáo dục, y tế, xã hội.<br>
+- <i>Giai đoạn trung niên:</i> Đạt được sự ổn định trong công việc, gia đình, là chỗ dựa tinh thần cho người thân.<br>
+- <i>Giai đoạn về già:</i> Truyền đạt kinh nghiệm, giá trị sống cho thế hệ sau, là người giữ gìn truyền thống gia đình.<br><br>
 <b>Quan hệ, tình duyên, gia đình</b><br>
 Người số 2 rất coi trọng tình cảm, luôn mong muốn xây dựng mối quan hệ bền vững, lâu dài. Họ là người bạn đời lý tưởng, biết quan tâm, chăm sóc, chia sẻ với đối phương. Tuy nhiên, đôi khi họ dễ bị tổn thương nếu không nhận được sự đáp lại xứng đáng. Trong gia đình, họ là người giữ gìn hòa khí, kết nối các thành viên, tạo nên không khí ấm áp, hạnh phúc.<br><br>
 <b>Sự nghiệp, ngành nghề phù hợp</b><br>
 - Nhân sự, tư vấn tâm lý, giáo viên, chăm sóc khách hàng, y tế, trợ lý, ngoại giao, truyền thông, nghệ thuật, tổ chức sự kiện, công tác xã hội.<br>
 - Người số 2 phù hợp với môi trường làm việc đề cao sự hợp tác, hỗ trợ, nơi họ có thể phát huy khả năng kết nối, xây dựng đội nhóm.<br><br>
 <b>Ví dụ thực tiễn</b><br>
-Nhiều nhà ngoại giao, nhà tâm lý học, giáo viên, nghệ sĩ nổi tiếng mang số chủ đạo 2. Họ là những người đứng sau thành công của tập thể, là “người hùng thầm lặng” giúp mọi việc diễn ra suôn sẻ, hài hòa.<br><br>
+Nhiều nhà ngoại giao, nhà tâm lý học, giáo viên, nghệ sĩ nổi tiếng mang số chủ đạo 2. Họ là những người đứng sau thành công của tập thể, là "người hùng thầm lặng" giúp mọi việc diễn ra suôn sẻ, hài hòa.<br><br>
 <b>Lời khuyên cá nhân hóa</b><br>
 - Hãy tin vào giá trị của bản thân, đừng ngại thể hiện ý kiến cá nhân.<br>
-- Biết nói “không” khi cần thiết, đừng hy sinh quá nhiều mà quên đi chính mình.<br>
+- Biết nói "không" khi cần thiết, đừng hy sinh quá nhiều mà quên đi chính mình.<br>
 - Luôn giữ sự lạc quan, bao dung, nhưng cũng cần mạnh mẽ khi đối mặt với thử thách.<br>
 - Học cách cân bằng giữa cảm xúc và lý trí để đưa ra quyết định sáng suốt.<br><br>
 <b>Trích dẫn, nguồn tham khảo</b><br>
-- “Numerology: The Complete Guide” – Matthew Oliver Goodwin<br>
-- “The Complete Book of Numerology” – David A. Phillips<br>
+- "Numerology: The Complete Guide" – Matthew Oliver Goodwin<br>
+- "The Complete Book of Numerology" – David A. Phillips<br>
 - [tracuuthansohoc.com](https://xem.tracuuthansohoc.com/)<br>
 - [numerology.com](https://www.numerology.com/)<br>
         `,
@@ -315,48 +862,461 @@ Nhiều nhà ngoại giao, nhà tâm lý học, giáo viên, nghệ sĩ nổi ti
     },
     3: {
         name: 'Người sáng tạo',
-        desc: 'Bạn giàu trí tưởng tượng, lạc quan, có năng khiếu nghệ thuật, giao tiếp tốt.',
-        careers: ['Nghệ sĩ', 'Thiết kế', 'Truyền thông', 'Marketing', 'MC', 'Nhà văn', 'Diễn viên']
+        desc: `
+<b>Tổng quan về Số Chủ Đạo 3 – Người sáng tạo</b><br>
+Số 3 trong thần số học đại diện cho sự sáng tạo, lạc quan, giao tiếp và khả năng truyền cảm hứng. Những người mang số chủ đạo 3 thường có trí tưởng tượng phong phú, năng khiếu nghệ thuật, khả năng biểu đạt cảm xúc tốt và luôn mang lại nguồn năng lượng tích cực cho những người xung quanh. Họ là biểu tượng của sự vui vẻ, hài hước, sáng tạo không ngừng và luôn biết cách làm mới bản thân cũng như môi trường sống.<br><br>
+<b>Đặc điểm tính cách chi tiết</b><br>
+Người số 3 nổi bật với sự hoạt bát, cởi mở, dễ gần, thích giao tiếp và kết nối với mọi người. Họ có khả năng truyền đạt ý tưởng, cảm xúc một cách tự nhiên, cuốn hút, thường là trung tâm của các cuộc vui, sự kiện. Sự sáng tạo, trí tưởng tượng giúp họ luôn tìm ra giải pháp mới, độc đáo cho vấn đề. Tuy nhiên, họ cũng dễ bị phân tán năng lượng, thiếu kiên trì với những việc đòi hỏi sự ổn định lâu dài.<br><br>
+<b>Ưu điểm</b><br>
+- Sáng tạo, trí tưởng tượng phong phú, năng khiếu nghệ thuật.<br>
+- Giao tiếp tốt, truyền cảm hứng, tạo không khí vui vẻ.<br>
+- Lạc quan, yêu đời, dễ thích nghi với môi trường mới.<br>
+- Biết cách làm mới bản thân, không ngại thử thách.<br>
+- Dễ kết bạn, xây dựng mối quan hệ xã hội rộng rãi.<br><br>
+<b>Điểm hạn chế</b><br>
+- Dễ bị phân tán năng lượng, thiếu kiên trì với mục tiêu dài hạn.<br>
+- Đôi khi sống quá cảm tính, dễ bị ảnh hưởng bởi cảm xúc nhất thời.<br>
+- Có xu hướng lãng phí tài năng nếu không có định hướng rõ ràng.<br>
+- Dễ chán nản với những công việc lặp đi lặp lại, thiếu sáng tạo.<br><br>
+<b>Bài học lớn trong cuộc đời</b><br>
+Người số 3 cần học cách kiên trì, xây dựng mục tiêu rõ ràng và theo đuổi đến cùng. Họ nên rèn luyện khả năng kiểm soát cảm xúc, biết cân bằng giữa tự do sáng tạo và trách nhiệm với bản thân, gia đình, xã hội. Sự thành công đến khi họ biết tận dụng sự sáng tạo, lạc quan để phát triển bản thân một cách bền vững, không bị cuốn theo những thay đổi nhất thời.<br><br>
+<b>Định hướng phát triển bản thân</b><br>
+- Đặt mục tiêu cụ thể, xây dựng kế hoạch hành động rõ ràng.<br>
+- Học cách kiên nhẫn, hoàn thành công việc đến cùng.<br>
+- Tham gia các hoạt động nghệ thuật, sáng tạo để phát huy thế mạnh.<br>
+- Rèn luyện kỹ năng quản lý thời gian, tập trung vào những việc quan trọng.<br><br>
+<b>Phân tích các giai đoạn cuộc đời</b><br>
+- <i>Giai đoạn trẻ:</i> Thường là đứa trẻ hoạt bát, vui vẻ, thích khám phá, dễ kết bạn.<br>
+- <i>Giai đoạn trưởng thành:</i> Phát huy khả năng giao tiếp, sáng tạo, có thể thành công trong các lĩnh vực nghệ thuật, truyền thông.<br>
+- <i>Giai đoạn trung niên:</i> Đạt được nhiều thành tựu nhờ sự lạc quan, sáng tạo, nhưng cần chú ý giữ vững định hướng, tránh thay đổi quá nhiều.<br>
+- <i>Giai đoạn về già:</i> Truyền cảm hứng, kinh nghiệm sống cho thế hệ sau, có thể trở thành người hướng dẫn, cố vấn.<br><br>
+<b>Quan hệ, tình duyên, gia đình</b><br>
+Người số 3 yêu thích sự tự do trong tình cảm, không thích bị ràng buộc quá mức. Họ là người bạn đời thú vị, luôn mang lại sự mới mẻ, bất ngờ cho đối phương. Tuy nhiên, cần học cách cam kết, xây dựng mối quan hệ bền vững, tránh để cảm xúc nhất thời ảnh hưởng đến hạnh phúc lâu dài. Trong gia đình, họ là người truyền cảm hứng, tạo không khí vui vẻ, năng động.<br><br>
+<b>Sự nghiệp, ngành nghề phù hợp</b><br>
+- Nghệ sĩ, thiết kế, truyền thông, marketing, MC, nhà văn, diễn viên, sáng tạo nội dung, quảng cáo, giáo viên nghệ thuật, tổ chức sự kiện.<br>
+- Người số 3 phù hợp với môi trường làm việc năng động, sáng tạo, nơi họ có thể phát huy tối đa sự linh hoạt, thích nghi và khả năng giao tiếp.<br><br>
+<b>Ví dụ thực tiễn</b><br>
+Nhiều nghệ sĩ, nhà văn, diễn viên, MC nổi tiếng mang số chủ đạo 3. Họ là những người luôn tiên phong trong việc sáng tạo, đổi mới, mang lại nguồn cảm hứng bất tận cho cộng đồng.<br><br>
+<b>Lời khuyên cá nhân hóa</b><br>
+- Hãy kiên trì với mục tiêu, đừng bỏ cuộc giữa chừng.<br>
+- Biết cân bằng giữa tự do sáng tạo và trách nhiệm xã hội.<br>
+- Luôn giữ tinh thần lạc quan, sáng tạo, nhưng cũng cần thực tế, có kế hoạch rõ ràng.<br>
+- Học cách kiểm soát cảm xúc, tránh bị cuốn theo những thay đổi nhất thời.<br><br>
+<b>Trích dẫn, nguồn tham khảo</b><br>
+- "Numerology: The Complete Guide" – Matthew Oliver Goodwin<br>
+- "The Complete Book of Numerology" – David A. Phillips<br>
+- [tracuuthansohoc.com](https://xem.tracuuthansohoc.com/)<br>
+- [numerology.com](https://www.numerology.com/)<br>
+  `,
+        careers: ['Nghệ sĩ', 'Thiết kế', 'Truyền thông', 'Marketing', 'MC', 'Nhà văn', 'Diễn viên', 'Sáng tạo nội dung', 'Quảng cáo', 'Giáo viên nghệ thuật', 'Tổ chức sự kiện']
     },
     4: {
         name: 'Người thực tế',
-        desc: 'Bạn chăm chỉ, nguyên tắc, đáng tin cậy, thích sự ổn định và có tổ chức.',
-        careers: ['Kế toán', 'Kỹ thuật', 'Quản trị', 'Xây dựng', 'Luật', 'Ngân hàng', 'Hành chính']
+        desc: `
+<b>Tổng quan về Số Chủ Đạo 4 – Người thực tế</b><br>
+Số 4 trong thần số học đại diện cho sự ổn định, thực tế, nguyên tắc và xây dựng nền tảng vững chắc. Những người mang số chủ đạo 4 thường rất chăm chỉ, kiên trì, có trách nhiệm và luôn hướng tới sự an toàn, bền vững trong cuộc sống. Họ là những người bạn, đồng nghiệp, nhân viên, lãnh đạo đáng tin cậy, luôn hoàn thành tốt nhiệm vụ được giao và là chỗ dựa vững chắc cho gia đình, tập thể.<br><br>
+<b>Đặc điểm tính cách chi tiết</b><br>
+Người số 4 nổi bật với sự cẩn trọng, tỉ mỉ, có kế hoạch rõ ràng trong mọi việc. Họ không thích sự mạo hiểm, luôn cân nhắc kỹ lưỡng trước khi đưa ra quyết định. Sự trung thực, nguyên tắc giúp họ xây dựng được niềm tin với mọi người xung quanh. Họ thích làm việc theo quy trình, có hệ thống, không ngại khó khăn, sẵn sàng vượt qua thử thách để đạt được mục tiêu.<br><br>
+<b>Ưu điểm</b><br>
+- Chăm chỉ, kiên trì, có trách nhiệm cao.<br>
+- Nguyên tắc, trung thực, đáng tin cậy.<br>
+- Tổ chức, quản lý công việc tốt, có kế hoạch rõ ràng.<br>
+- Kiên nhẫn, không ngại khó khăn, thử thách.<br>
+- Luôn hướng tới sự ổn định, bền vững.<br><br>
+<b>Điểm hạn chế</b><br>
+- Đôi khi quá cứng nhắc, bảo thủ, khó thích nghi với thay đổi.<br>
+- Thiếu sự linh hoạt, sáng tạo trong một số tình huống.<br>
+- Dễ bị áp lực, căng thẳng khi mọi việc không theo kế hoạch.<br>
+- Có xu hướng lo lắng quá mức về tương lai.<br><br>
+<b>Bài học lớn trong cuộc đời</b><br>
+Người số 4 cần học cách linh hoạt, thích nghi với sự thay đổi, biết chấp nhận rủi ro hợp lý để phát triển bản thân. Họ nên rèn luyện khả năng sáng tạo, đổi mới tư duy, không nên quá khắt khe với bản thân và người khác. Sự thành công đến khi họ biết cân bằng giữa nguyên tắc và sự linh hoạt, giữa công việc và cuộc sống cá nhân.<br><br>
+<b>Định hướng phát triển bản thân</b><br>
+- Học cách chấp nhận thay đổi, thử sức với những điều mới mẻ.<br>
+- Phát triển kỹ năng sáng tạo, giải quyết vấn đề linh hoạt.<br>
+- Tham gia các hoạt động nhóm để mở rộng mối quan hệ.<br>
+- Biết nghỉ ngơi, thư giãn, tránh làm việc quá sức.<br><br>
+<b>Phân tích các giai đoạn cuộc đời</b><br>
+- <i>Giai đoạn trẻ:</i> Thường là đứa trẻ ngoan, chăm chỉ, có trách nhiệm, nhưng đôi khi quá nghiêm túc, ít vui chơi.<br>
+- <i>Giai đoạn trưởng thành:</i> Phát huy khả năng tổ chức, quản lý, có thể thành công trong các lĩnh vực đòi hỏi sự kiên trì, bền bỉ.<br>
+- <i>Giai đoạn trung niên:</i> Đạt được sự ổn định trong công việc, gia đình, là chỗ dựa tinh thần cho người thân.<br>
+- <i>Giai đoạn về già:</i> Truyền đạt kinh nghiệm, giá trị sống cho thế hệ sau, là người giữ gìn truyền thống gia đình.<br><br>
+<b>Quan hệ, tình duyên, gia đình</b><br>
+Người số 4 rất coi trọng gia đình, luôn nỗ lực xây dựng mái ấm ổn định, hạnh phúc. Họ là người bạn đời, cha mẹ, con cái tận tụy, luôn quan tâm, chăm sóc người thân. Tuy nhiên, cần học cách thể hiện cảm xúc, tránh quá nghiêm khắc, khô khan trong các mối quan hệ.<br><br>
+<b>Sự nghiệp, ngành nghề phù hợp</b><br>
+- Kế toán, kiểm toán, kỹ thuật, xây dựng, quản trị, luật, ngân hàng, hành chính, quản lý dự án, giáo viên, nghiên cứu khoa học, nông nghiệp, bất động sản.<br>
+- Người số 4 phù hợp với môi trường làm việc ổn định, có quy trình rõ ràng, nơi họ có thể phát huy tối đa sự kiên trì, tổ chức, quản lý.<br><br>
+<b>Ví dụ thực tiễn</b><br>
+Nhiều kỹ sư, kế toán, nhà quản lý, nhà khoa học nổi tiếng mang số chủ đạo 4. Họ là những người xây dựng nền tảng vững chắc cho tổ chức, cộng đồng, xã hội.<br><br>
+<b>Lời khuyên cá nhân hóa</b><br>
+- Hãy linh hoạt, sáng tạo hơn trong công việc và cuộc sống.<br>
+- Đừng quá khắt khe với bản thân, hãy biết tận hưởng niềm vui nhỏ bé.<br>
+- Biết chia sẻ, thể hiện cảm xúc với người thân, bạn bè.<br>
+- Luôn giữ vững giá trị cốt lõi, nhưng cũng cần mở lòng với cái mới.<br><br>
+<b>Trích dẫn, nguồn tham khảo</b><br>
+- "Numerology: The Complete Guide" – Matthew Oliver Goodwin<br>
+- "The Complete Book of Numerology" – David A. Phillips<br>
+- [tracuuthansohoc.com](https://xem.tracuuthansohoc.com/)<br>
+- [numerology.com](https://www.numerology.com/)<br>
+    `,
+        careers: [
+            'Kế toán', 'Kiểm toán', 'Kỹ thuật', 'Xây dựng', 'Quản trị', 'Luật', 'Ngân hàng', 'Hành chính', 'Quản lý dự án', 'Giáo viên', 'Nghiên cứu khoa học', 'Nông nghiệp', 'Bất động sản'
+        ]
     },
     5: {
         name: 'Nhà phiêu lưu',
-        desc: 'Bạn yêu tự do, thích khám phá, linh hoạt, thích ứng nhanh với thay đổi.',
-        careers: ['Du lịch', 'Báo chí', 'Kinh doanh', 'Tiếp thị', 'Phi công', 'Hướng dẫn viên', 'Sự kiện']
-    },
+        desc: `
+<b>Tổng quan về Số Chủ Đạo 5 – Nhà phiêu lưu</b><br>
+Số 5 trong thần số học đại diện cho sự tự do, phiêu lưu, thay đổi và thích nghi. Những người mang số chủ đạo 5 thường có tinh thần khám phá mạnh mẽ, yêu thích trải nghiệm mới, không ngại thử thách và luôn tìm kiếm sự đổi mới trong cuộc sống. Họ là biểu tượng của sự linh hoạt, năng động, sáng tạo và luôn sẵn sàng bước ra khỏi vùng an toàn để chinh phục những chân trời mới.
+
+<b>Đặc điểm tính cách chi tiết</b><br>
+Người số 5 nổi bật với sự tò mò, ham học hỏi, thích giao tiếp và kết nối với nhiều người. Họ có khả năng thích nghi nhanh với môi trường mới, dễ dàng hòa nhập và tạo dựng các mối quan hệ xã hội rộng rãi. Sự linh hoạt, năng động giúp họ luôn tràn đầy năng lượng, không ngại thay đổi, sẵn sàng đón nhận những cơ hội mới. Tuy nhiên, họ cũng dễ cảm thấy nhàm chán nếu phải lặp đi lặp lại một công việc hoặc sống trong môi trường quá gò bó.
+
+<b>Ưu điểm</b><br>
+- Tinh thần tự do, yêu thích khám phá, trải nghiệm mới.
+- Linh hoạt, thích nghi nhanh với mọi hoàn cảnh.
+- Giao tiếp tốt, dễ tạo thiện cảm với người khác.
+- Sáng tạo, năng động, luôn tìm kiếm sự đổi mới.
+- Dám nghĩ dám làm, không ngại thử thách.
+
+<b>Điểm hạn chế</b><br>
+- Dễ mất kiên nhẫn, thiếu sự kiên trì với những việc đòi hỏi sự ổn định lâu dài.
+- Có xu hướng thay đổi quá nhanh, thiếu định hướng rõ ràng.
+- Đôi khi sống quá cảm tính, dễ bị cuốn theo cảm xúc nhất thời.
+- Dễ bị phân tán năng lượng, khó tập trung vào một mục tiêu cụ thể.
+
+<b>Bài học lớn trong cuộc đời</b><br>
+Người số 5 cần học cách kiên trì, xây dựng mục tiêu rõ ràng và theo đuổi đến cùng. Họ nên rèn luyện khả năng kiểm soát cảm xúc, biết cân bằng giữa tự do sáng tạo và trách nhiệm với bản thân, gia đình, xã hội. Sự thành công đến khi họ biết tận dụng sự linh hoạt, sáng tạo để phát triển bản thân một cách bền vững, không bị cuốn theo những thay đổi nhất thời.
+
+<b>Định hướng phát triển bản thân</b><br>
+- Đặt mục tiêu cụ thể, xây dựng kế hoạch hành động rõ ràng.
+- Học cách kiên nhẫn, hoàn thành công việc đến cùng.
+- Tham gia các hoạt động trải nghiệm, du lịch, khám phá để phát huy thế mạnh.
+- Rèn luyện kỹ năng quản lý thời gian, tập trung vào những việc quan trọng.
+
+<b>Phân tích các giai đoạn cuộc đời</b><br>
+- <i>Giai đoạn trẻ:</i> Thường là đứa trẻ hiếu động, tò mò, thích khám phá, dễ kết bạn.<br>
+- <i>Giai đoạn trưởng thành:</i> Phát huy khả năng giao tiếp, sáng tạo, có thể thành công trong các lĩnh vực nghệ thuật, truyền thông.<br>
+- <i>Giai đoạn trung niên:</i> Đạt được nhiều thành tựu nhờ sự lạc quan, sáng tạo, nhưng cần chú ý giữ vững định hướng, tránh thay đổi quá nhiều.<br>
+- <i>Giai đoạn về già:</i> Truyền cảm hứng, kinh nghiệm sống cho thế hệ sau, có thể trở thành người hướng dẫn, cố vấn.<br><br>
+<b>Quan hệ, tình duyên, gia đình</b><br>
+Người số 5 yêu thích sự tự do trong tình cảm, không thích bị ràng buộc quá mức. Họ là người bạn đời thú vị, luôn mang lại sự mới mẻ, bất ngờ cho đối phương. Tuy nhiên, cần học cách cam kết, xây dựng mối quan hệ bền vững, tránh để cảm xúc nhất thời ảnh hưởng đến hạnh phúc lâu dài. Trong gia đình, họ là người truyền cảm hứng, tạo không khí vui vẻ, năng động.<br><br>
+<b>Sự nghiệp, ngành nghề phù hợp</b><br>
+- Du lịch, báo chí, kinh doanh, tiếp thị, phi công, hướng dẫn viên, sự kiện, truyền thông, nghệ thuật, sáng tạo nội dung, công nghệ mới.
+- Người số 5 phù hợp với môi trường làm việc năng động, sáng tạo, nơi họ có thể phát huy tối đa sự linh hoạt, thích nghi và khả năng giao tiếp.<br><br>
+<b>Ví dụ thực tiễn</b><br>
+Nhiều nhà báo, hướng dẫn viên du lịch, doanh nhân, nghệ sĩ nổi tiếng mang số chủ đạo 5. Họ là những người luôn tiên phong trong việc khám phá, đổi mới, mang lại nguồn cảm hứng bất tận cho cộng đồng.<br><br>
+<b>Lời khuyên cá nhân hóa</b><br>
+- Hãy kiên trì với mục tiêu, đừng bỏ cuộc giữa chừng.<br>
+- Biết cân bằng giữa tự do sáng tạo và trách nhiệm xã hội.<br>
+- Luôn giữ tinh thần lạc quan, sáng tạo, nhưng cũng cần thực tế, có kế hoạch rõ ràng.<br>
+- Học cách kiểm soát cảm xúc, tránh bị cuốn theo những thay đổi nhất thời.<br><br>
+<b>Trích dẫn, nguồn tham khảo</b><br>
+- "Numerology: The Complete Guide" – Matthew Oliver Goodwin<br>
+- "The Complete Book of Numerology" – David A. Phillips<br>
+- [tracuuthansohoc.com](https://xem.tracuuthansohoc.com/)<br>
+- [numerology.com](https://www.numerology.com/)<br>
+  `,
+  careers: ['Du lịch', 'Báo chí', 'Kinh doanh', 'Tiếp thị', 'Phi công', 'Hướng dẫn viên', 'Sự kiện', 'Truyền thông', 'Nghệ thuật', 'Sáng tạo nội dung', 'Công nghệ mới']
+},
     6: {
         name: 'Người chăm sóc',
-        desc: 'Bạn giàu tình cảm, trách nhiệm, thích giúp đỡ, quan tâm đến gia đình và cộng đồng.',
-        careers: ['Giáo viên', 'Y tá', 'Bác sĩ', 'Nhân sự', 'Tư vấn', 'Xã hội học', 'Chăm sóc trẻ em']
+        desc: `
+<b>Tổng quan về Số Chủ Đạo 6 – Người chăm sóc</b><br>
+Số 6 trong thần số học đại diện cho tình yêu thương, trách nhiệm, sự tận tâm và mong muốn xây dựng một cộng đồng, gia đình hạnh phúc. Những người mang số chủ đạo 6 thường rất giàu tình cảm, biết quan tâm, chăm sóc người khác, luôn đặt lợi ích của tập thể, gia đình lên trên bản thân. Họ là biểu tượng của sự hy sinh, lòng vị tha, luôn sẵn sàng giúp đỡ, bảo vệ những người yếu thế.<br><br>
+<b>Đặc điểm tính cách chi tiết</b><br>
+Người số 6 nổi bật với sự dịu dàng, chu đáo, biết lắng nghe, chia sẻ. Họ có trực giác tốt, dễ cảm nhận được cảm xúc, nhu cầu của người khác. Sự tận tâm, trách nhiệm giúp họ luôn hoàn thành tốt vai trò trong gia đình, công việc, xã hội. Họ thích xây dựng môi trường sống hài hòa, ấm áp, là chỗ dựa tinh thần vững chắc cho người thân, bạn bè.<br><br>
+<b>Ưu điểm</b><br>
+- Giàu tình cảm, biết quan tâm, chăm sóc người khác.<br>
+- Trách nhiệm, tận tâm, luôn hoàn thành tốt nhiệm vụ.<br>
+- Lòng vị tha, sẵn sàng hy sinh vì người thân, cộng đồng.<br>
+- Kỹ năng giao tiếp, hòa giải, xây dựng mối quan hệ bền vững.<br>
+- Sáng tạo, có năng khiếu nghệ thuật, thẩm mỹ.<br><br>
+<b>Điểm hạn chế</b><br>
+- Đôi khi ôm đồm quá nhiều việc, dễ bị áp lực, căng thẳng.<br>
+- Có xu hướng hy sinh bản thân quá mức, quên đi nhu cầu cá nhân.<br>
+- Dễ bị lợi dụng lòng tốt, thiếu sự quyết đoán trong một số tình huống.<br>
+- Đôi khi quá nhạy cảm, dễ bị tổn thương bởi lời nói, hành động của người khác.<br><br>
+<b>Bài học lớn trong cuộc đời</b><br>
+Người số 6 cần học cách cân bằng giữa việc cho đi và nhận lại, biết yêu thương, chăm sóc bản thân, không để cảm xúc chi phối quá mức. Họ nên rèn luyện sự quyết đoán, biết nói "không" khi cần thiết, tránh ôm đồm quá nhiều việc. Sự thành công đến khi họ biết phát huy lòng vị tha, trách nhiệm một cách hợp lý, không để bản thân bị kiệt sức.<br><br>
+<b>Định hướng phát triển bản thân</b><br>
+- Học cách đặt ra ranh giới cá nhân, không để người khác lợi dụng lòng tốt.<br>
+- Phát triển kỹ năng quản lý thời gian, ưu tiên cho bản thân.<br>
+- Tham gia các hoạt động cộng đồng, từ thiện để phát huy thế mạnh.<br>
+- Rèn luyện sự quyết đoán, dám chịu trách nhiệm với lựa chọn của mình.<br><br>
+<b>Phân tích các giai đoạn cuộc đời</b><br>
+- <i>Giai đoạn trẻ:</i> Thường là đứa trẻ ngoan, biết nghe lời, thích giúp đỡ, chăm sóc người thân.<br>
+- <i>Giai đoạn trưởng thành:</i> Phát huy khả năng xây dựng, bảo vệ gia đình, cộng đồng, có thể thành công trong các lĩnh vực giáo dục, y tế, xã hội.<br>
+- <i>Giai đoạn trung niên:</i> Đạt được sự ổn định trong công việc, gia đình, là chỗ dựa tinh thần cho người thân.<br>
+- <i>Giai đoạn về già:</i> Truyền đạt kinh nghiệm, giá trị sống cho thế hệ sau, là người giữ gìn truyền thống gia đình.<br><br>
+<b>Quan hệ, tình duyên, gia đình</b><br>
+Người số 6 rất coi trọng gia đình, luôn nỗ lực xây dựng mái ấm ổn định, hạnh phúc. Họ là người bạn đời, cha mẹ, con cái tận tụy, luôn quan tâm, chăm sóc người thân. Tuy nhiên, cần học cách thể hiện cảm xúc, tránh quá nghiêm khắc, khô khan trong các mối quan hệ.<br><br>
+<b>Sự nghiệp, ngành nghề phù hợp</b><br>
+- Giáo viên, y tá, bác sĩ, nhân sự, tư vấn, xã hội học, chăm sóc trẻ em, nghệ thuật, thiết kế nội thất, tổ chức sự kiện, công tác xã hội.<br>
+- Người số 6 phù hợp với môi trường làm việc đề cao sự hợp tác, hỗ trợ, nơi họ có thể phát huy khả năng kết nối, xây dựng đội nhóm.<br><br>
+<b>Ví dụ thực tiễn</b><br>
+Nhiều giáo viên, bác sĩ, nhà hoạt động xã hội, nghệ sĩ nổi tiếng mang số chủ đạo 6. Họ là những người luôn mang lại sự ấm áp, yêu thương, truyền cảm hứng cho cộng đồng.<br><br>
+<b>Lời khuyên cá nhân hóa</b><br>
+- Hãy biết yêu thương, chăm sóc bản thân trước khi giúp đỡ người khác.<br>
+- Biết nói "không" khi cần thiết, đừng ôm đồm quá nhiều việc.<br>
+- Luôn giữ tinh thần lạc quan, sáng tạo, nhưng cũng cần thực tế, có kế hoạch rõ ràng.<br>
+- Học cách kiểm soát cảm xúc, tránh bị cuốn theo những thay đổi nhất thời.<br><br>
+<b>Trích dẫn, nguồn tham khảo</b><br>
+- "Numerology: The Complete Guide" – Matthew Oliver Goodwin<br>
+- "The Complete Book of Numerology" – David A. Phillips<br>
+- [tracuuthansohoc.com](https://xem.tracuuthansohoc.com/)<br>
+- [numerology.com](https://www.numerology.com/)<br>
+        `,
+        careers: ['Giáo viên', 'Y tá', 'Bác sĩ', 'Nhân sự', 'Tư vấn', 'Xã hội học', 'Chăm sóc trẻ em', 'Nghệ thuật', 'Thiết kế nội thất', 'Tổ chức sự kiện', 'Công tác xã hội']
     },
     7: {
         name: 'Nhà triết gia',
-        desc: 'Bạn thích nghiên cứu, phân tích, có trực giác tốt, yêu thích tri thức và khám phá chiều sâu.',
-        careers: ['Nghiên cứu', 'Giảng viên', 'Khoa học', 'Tâm lý học', 'Phân tích dữ liệu', 'Triết học', 'IT']
+        desc: `
+<b>Tổng quan về Số Chủ Đạo 7 – Nhà triết gia</b><br>
+Số 7 trong thần số học đại diện cho trí tuệ, chiều sâu nội tâm, khả năng phân tích, nghiên cứu và khám phá tri thức. Những người mang số chủ đạo 7 thường có trực giác mạnh, thích suy ngẫm, tìm hiểu bản chất của sự vật, hiện tượng. Họ là biểu tượng của sự thông thái, sâu sắc, luôn khao khát khám phá những điều bí ẩn của cuộc sống.<br><br>
+<b>Đặc điểm tính cách chi tiết</b><br>
+Người số 7 nổi bật với sự thông minh, nhạy bén, có khả năng phân tích, tổng hợp thông tin tốt. Họ thích làm việc độc lập, không thích bị ràng buộc bởi khuôn mẫu, quy tắc cứng nhắc. Sự sâu sắc, trực giác giúp họ dễ dàng nhận ra bản chất vấn đề, đưa ra giải pháp sáng tạo. Tuy nhiên, họ cũng dễ rơi vào trạng thái cô lập, xa cách nếu không biết cân bằng giữa nội tâm và cuộc sống xã hội.<br><br>
+<b>Ưu điểm</b><br>
+- Trí tuệ, khả năng phân tích, nghiên cứu sâu sắc.<br>
+- Trực giác mạnh, nhạy bén với những điều ẩn giấu.<br>
+- Sáng tạo, độc lập, không ngại thử thách.<br>
+- Khả năng tập trung cao, kiên trì với mục tiêu.<br>
+- Yêu thích khám phá tri thức, luôn học hỏi, phát triển bản thân.<br><br>
+<b>Điểm hạn chế</b><br>
+- Dễ rơi vào trạng thái cô lập, xa cách với mọi người.<br>
+- Đôi khi quá lý trí, thiếu sự linh hoạt trong giao tiếp.<br>
+- Có xu hướng nghi ngờ, khó tin tưởng người khác.<br>
+- Dễ bị áp lực, căng thẳng khi không đạt được kỳ vọng.<br><br>
+<b>Bài học lớn trong cuộc đời</b><br>
+Người số 7 cần học cách cân bằng giữa nội tâm và cuộc sống xã hội, biết mở lòng, chia sẻ cảm xúc với người thân, bạn bè. Họ nên rèn luyện kỹ năng giao tiếp, hợp tác, tránh cô lập bản thân. Sự thành công đến khi họ biết tận dụng trí tuệ, trực giác để phát triển bản thân, đồng thời xây dựng mối quan hệ xã hội bền vững.<br><br>
+<b>Định hướng phát triển bản thân</b><br>
+- Học cách mở lòng, chia sẻ cảm xúc với người khác.<br>
+- Phát triển kỹ năng giao tiếp, hợp tác, làm việc nhóm.<br>
+- Tham gia các hoạt động nghiên cứu, học thuật để phát huy thế mạnh.<br>
+- Rèn luyện sự linh hoạt, thích nghi với môi trường mới.<br><br>
+<b>Phân tích các giai đoạn cuộc đời</b><br>
+- <i>Giai đoạn trẻ:</i> Thường là đứa trẻ thông minh, tò mò, thích khám phá, nhưng đôi khi sống nội tâm, ít chia sẻ.<br>
+- <i>Giai đoạn trưởng thành:</i> Phát huy khả năng nghiên cứu, phân tích, có thể thành công trong các lĩnh vực khoa học, giáo dục.<br>
+- <i>Giai đoạn trung niên:</i> Đạt được nhiều thành tựu nhờ sự kiên trì, tập trung, nhưng cần chú ý cân bằng giữa công việc và cuộc sống.<br>
+- <i>Giai đoạn về già:</i> Truyền đạt tri thức, kinh nghiệm sống cho thế hệ sau, là người hướng dẫn, cố vấn.<br><br>
+<b>Quan hệ, tình duyên, gia đình</b><br>
+Người số 7 thường sống nội tâm, ít thể hiện cảm xúc, nhưng rất sâu sắc, chân thành trong tình cảm. Họ là người bạn đời, cha mẹ, con cái tận tụy, luôn quan tâm, chăm sóc người thân. Tuy nhiên, cần học cách thể hiện cảm xúc, tránh quá nghiêm khắc, khô khan trong các mối quan hệ.<br><br>
+<b>Sự nghiệp, ngành nghề phù hợp</b><br>
+- Nghiên cứu, giảng viên, khoa học, tâm lý học, phân tích dữ liệu, triết học, IT, y học, nghệ thuật, sáng tạo nội dung.<br>
+- Người số 7 phù hợp với môi trường làm việc độc lập, sáng tạo, nơi họ có thể phát huy tối đa trí tuệ, khả năng phân tích.<br><br>
+<b>Ví dụ thực tiễn</b><br>
+Nhiều nhà khoa học, giáo sư, triết gia, nghệ sĩ nổi tiếng mang số chủ đạo 7. Họ là những người luôn tiên phong trong việc nghiên cứu, khám phá, mang lại tri thức mới cho cộng đồng.<br><br>
+<b>Lời khuyên cá nhân hóa</b><br>
+- Hãy mở lòng, chia sẻ cảm xúc với người thân, bạn bè.<br>
+- Biết cân bằng giữa công việc và cuộc sống cá nhân.<br>
+- Luôn giữ tinh thần học hỏi, phát triển bản thân.<br>
+- Học cách kiểm soát cảm xúc, tránh bị cuốn theo những thay đổi nhất thời.<br><br>
+<b>Trích dẫn, nguồn tham khảo</b><br>
+- "Numerology: The Complete Guide" – Matthew Oliver Goodwin<br>
+- "The Complete Book of Numerology" – David A. Phillips<br>
+- [tracuuthansohoc.com](https://xem.tracuuthansohoc.com/)<br>
+- [numerology.com](https://www.numerology.com/)<br>
+        `,
+        careers: ['Nghiên cứu', 'Giảng viên', 'Khoa học', 'Tâm lý học', 'Phân tích dữ liệu', 'Triết học', 'IT', 'Y học', 'Nghệ thuật', 'Sáng tạo nội dung']
     },
     8: {
         name: 'Người quyền lực',
-        desc: 'Bạn có tố chất lãnh đạo, tham vọng, giỏi quản lý tài chính, thích thành công vật chất.',
-        careers: ['Kinh doanh', 'Quản lý', 'Tài chính', 'Bất động sản', 'CEO', 'Đầu tư', 'Luật sư']
+        desc: `
+<b>Tổng quan về Số Chủ Đạo 8 – Người quyền lực</b><br>
+Số 8 trong thần số học đại diện cho quyền lực, tham vọng, khả năng quản lý tài chính và khát vọng thành công vật chất. Những người mang số chủ đạo 8 thường có tố chất lãnh đạo, tư duy chiến lược, khả năng tổ chức và kiểm soát tốt. Họ là biểu tượng của sự mạnh mẽ, quyết đoán, luôn hướng tới mục tiêu lớn và không ngại đối mặt với thử thách để đạt được thành tựu vượt trội.<br><br>
+<b>Đặc điểm tính cách chi tiết</b><br>
+Người số 8 nổi bật với sự tự tin, bản lĩnh, có ý chí mạnh mẽ và tinh thần cạnh tranh cao. Họ có khả năng nhìn xa trông rộng, lập kế hoạch dài hạn và kiên trì theo đuổi mục tiêu. Sự thực tế, logic giúp họ đưa ra quyết định chính xác, hiệu quả trong công việc và cuộc sống. Họ thích kiểm soát, quản lý mọi việc, không dễ bị ảnh hưởng bởi cảm xúc nhất thời.<br><br>
+<b>Ưu điểm</b><br>
+- Khả năng lãnh đạo, quản lý tài chính, tổ chức tốt.<br>
+- Tư duy chiến lược, quyết đoán, kiên trì với mục tiêu.<br>
+- Bản lĩnh, dám nghĩ dám làm, không ngại thử thách.<br>
+- Tinh thần cạnh tranh, luôn hướng tới thành công vật chất.<br>
+- Khả năng kiểm soát cảm xúc, giữ vững lập trường.<br><br>
+<b>Điểm hạn chế</b><br>
+- Đôi khi quá cứng nhắc, bảo thủ, khó tiếp thu ý kiến mới.<br>
+- Có xu hướng đặt nặng vật chất, dễ bỏ qua giá trị tinh thần.<br>
+- Dễ bị áp lực, căng thẳng khi không đạt được kỳ vọng.<br>
+- Đôi khi thiếu sự linh hoạt, mềm dẻo trong giao tiếp.<br><br>
+<b>Bài học lớn trong cuộc đời</b><br>
+Người số 8 cần học cách cân bằng giữa thành công vật chất và giá trị tinh thần, biết chia sẻ, hợp tác với người khác. Họ nên rèn luyện sự linh hoạt, biết lắng nghe, tôn trọng ý kiến của tập thể. Sự thành công bền vững đến khi họ biết kết hợp giữa sức mạnh cá nhân và sự hỗ trợ của cộng đồng.<br><br>
+<b>Định hướng phát triển bản thân</b><br>
+- Học cách chia sẻ, hợp tác, xây dựng đội nhóm vững mạnh.<br>
+- Phát triển kỹ năng giao tiếp, lắng nghe, thấu hiểu người khác.<br>
+- Rèn luyện sự linh hoạt, thích nghi với môi trường mới.<br>
+- Đặt mục tiêu rõ ràng, xây dựng kế hoạch dài hạn.<br><br>
+<b>Phân tích các giai đoạn cuộc đời</b><br>
+- <i>Giai đoạn trẻ:</i> Thường là đứa trẻ mạnh mẽ, độc lập, thích cạnh tranh, thể hiện bản thân.<br>
+- <i>Giai đoạn trưởng thành:</i> Phát huy khả năng lãnh đạo, quản lý, có thể thành công trong các lĩnh vực kinh doanh, tài chính.<br>
+- <i>Giai đoạn trung niên:</i> Đạt được nhiều thành tựu vật chất, vị trí xã hội cao, nhưng cần chú ý cân bằng giữa công việc và gia đình.<br>
+- <i>Giai đoạn về già:</i> Truyền đạt kinh nghiệm, giá trị sống cho thế hệ sau, là người hướng dẫn, cố vấn.<br><br>
+<b>Quan hệ, tình duyên, gia đình</b><br>
+Người số 8 thường chủ động trong tình cảm, thích kiểm soát, bảo vệ người thân. Họ là người bạn đời, cha mẹ, con cái tận tụy, luôn quan tâm, chăm sóc gia đình. Tuy nhiên, cần học cách thể hiện cảm xúc, tránh quá nghiêm khắc, khô khan trong các mối quan hệ.<br><br>
+<b>Sự nghiệp, ngành nghề phù hợp</b><br>
+- Kinh doanh, quản lý, tài chính, bất động sản, CEO, đầu tư, luật sư, ngân hàng, quản trị dự án, kỹ sư, nhà sáng lập, chính trị.<br>
+- Người số 8 phù hợp với môi trường làm việc cạnh tranh, năng động, nơi họ có thể phát huy tối đa khả năng lãnh đạo, quản lý.<br><br>
+<b>Ví dụ thực tiễn</b><br>
+Nhiều doanh nhân, nhà lãnh đạo, CEO, nhà đầu tư nổi tiếng mang số chủ đạo 8. Họ là những người tạo ra sự thay đổi lớn cho xã hội, truyền cảm hứng về ý chí, nghị lực vươn lên.<br><br>
+<b>Lời khuyên cá nhân hóa</b><br>
+- Hãy biết cân bằng giữa công việc và cuộc sống cá nhân.<br>
+- Biết lắng nghe, chia sẻ sẽ giúp bạn thành công bền vững hơn.<br>
+- Luôn giữ tinh thần đổi mới, sáng tạo, không ngừng phát triển bản thân.<br>
+- Đừng quá đặt nặng vật chất, hãy trân trọng giá trị tinh thần.<br><br>
+<b>Trích dẫn, nguồn tham khảo</b><br>
+- "Numerology: The Complete Guide" – Matthew Oliver Goodwin<br>
+- "The Complete Book of Numerology" – David A. Phillips<br>
+- [tracuuthansohoc.com](https://xem.tracuuthansohoc.com/)<br>
+- [numerology.com](https://www.numerology.com/)<br>
+        `,
+        careers: ['Kinh doanh', 'Quản lý', 'Tài chính', 'Bất động sản', 'CEO', 'Đầu tư', 'Luật sư', 'Ngân hàng', 'Quản trị dự án', 'Kỹ sư', 'Nhà sáng lập', 'Chính trị']
     },
     9: {
         name: 'Nhà nhân đạo',
-        desc: 'Bạn giàu lòng trắc ẩn, vị tha, thích giúp đỡ cộng đồng, hướng tới giá trị nhân văn.',
-        careers: ['Bác sĩ', 'Nhà từ thiện', 'Giáo dục', 'Xã hội học', 'Tình nguyện', 'Nghệ thuật', 'Tâm lý học']
+        desc: `
+<b>Tổng quan về Số Chủ Đạo 9 – Nhà nhân đạo</b><br>
+Số 9 trong thần số học đại diện cho lòng nhân ái, vị tha, lý tưởng sống cao đẹp và khát vọng cống hiến cho cộng đồng, xã hội. Những người mang số chủ đạo 9 thường rất giàu lòng trắc ẩn, luôn mong muốn giúp đỡ, chia sẻ, mang lại giá trị tốt đẹp cho cuộc đời. Họ là biểu tượng của sự bao dung, độ lượng, luôn hướng tới những mục tiêu lớn lao, vượt lên trên lợi ích cá nhân.<br><br>
+<b>Đặc điểm tính cách chi tiết</b><br>
+Người số 9 nổi bật với sự rộng lượng, vị tha, biết cảm thông, chia sẻ với mọi người. Họ có lý tưởng sống cao đẹp, luôn hướng tới sự công bằng, bình đẳng, mong muốn xây dựng một xã hội tốt đẹp hơn. Sự nhạy cảm, trực giác giúp họ dễ dàng nhận ra nỗi đau, khó khăn của người khác, từ đó sẵn sàng giúp đỡ, hỗ trợ khi cần thiết.<br><br>
+<b>Ưu điểm</b><br>
+- Lòng nhân ái, vị tha, bao dung, độ lượng.<br>
+- Lý tưởng sống cao đẹp, khát vọng cống hiến cho cộng đồng.<br>
+- Khả năng truyền cảm hứng, động viên, hỗ trợ người khác.<br>
+- Sáng tạo, nghệ thuật, có trực giác tốt.<br>
+- Dễ thích nghi, linh hoạt, biết cảm thông, chia sẻ.<br><br>
+<b>Điểm hạn chế</b><br>
+- Đôi khi quá lý tưởng hóa, dễ thất vọng khi thực tế không như mong đợi.<br>
+- Có xu hướng hy sinh bản thân quá mức, quên đi nhu cầu cá nhân.<br>
+- Dễ bị lợi dụng lòng tốt, thiếu sự quyết đoán trong một số tình huống.<br>
+- Đôi khi quá nhạy cảm, dễ bị tổn thương bởi lời nói, hành động của người khác.<br><br>
+<b>Bài học lớn trong cuộc đời</b><br>
+Người số 9 cần học cách cân bằng giữa lý tưởng và thực tế, biết yêu thương, chăm sóc bản thân, không để cảm xúc chi phối quá mức. Họ nên rèn luyện sự quyết đoán, biết nói "không" khi cần thiết, tránh ôm đồm quá nhiều việc. Sự thành công đến khi họ biết phát huy lòng vị tha, lý tưởng sống một cách hợp lý, không để bản thân bị kiệt sức.<br><br>
+<b>Định hướng phát triển bản thân</b><br>
+- Học cách đặt ra ranh giới cá nhân, không để người khác lợi dụng lòng tốt.<br>
+- Phát triển kỹ năng quản lý thời gian, ưu tiên cho bản thân.<br>
+- Tham gia các hoạt động cộng đồng, từ thiện để phát huy thế mạnh.<br>
+- Rèn luyện sự quyết đoán, dám chịu trách nhiệm với lựa chọn của mình.<br><br>
+<b>Phân tích các giai đoạn cuộc đời</b><br>
+- <i>Giai đoạn trẻ:</i> Thường là đứa trẻ ngoan, biết nghe lời, thích giúp đỡ, chia sẻ với bạn bè.<br>
+- <i>Giai đoạn trưởng thành:</i> Phát huy khả năng truyền cảm hứng, hỗ trợ cộng đồng, có thể thành công trong các lĩnh vực giáo dục, xã hội.<br>
+- <i>Giai đoạn trung niên:</i> Đạt được sự ổn định trong công việc, gia đình, là chỗ dựa tinh thần cho người thân.<br>
+- <i>Giai đoạn về già:</i> Truyền đạt kinh nghiệm, giá trị sống cho thế hệ sau, là người giữ gìn truyền thống gia đình.<br><br>
+<b>Quan hệ, tình duyên, gia đình</b><br>
+Người số 9 rất coi trọng gia đình, luôn nỗ lực xây dựng mái ấm ổn định, hạnh phúc. Họ là người bạn đời, cha mẹ, con cái tận tụy, luôn quan tâm, chăm sóc người thân. Tuy nhiên, cần học cách thể hiện cảm xúc, tránh quá nghiêm khắc, khô khan trong các mối quan hệ.<br><br>
+<b>Sự nghiệp, ngành nghề phù hợp</b><br>
+- Bác sĩ, nhà từ thiện, giáo dục, xã hội học, tình nguyện, nghệ thuật, tâm lý học, truyền thông, luật, nghiên cứu xã hội, tổ chức phi chính phủ.<br>
+- Người số 9 phù hợp với môi trường làm việc đề cao giá trị nhân văn, nơi họ có thể phát huy tối đa lòng nhân ái, lý tưởng sống.<br><br>
+<b>Ví dụ thực tiễn</b><br>
+Nhiều nhà hoạt động xã hội, bác sĩ, nghệ sĩ, nhà giáo nổi tiếng mang số chủ đạo 9. Họ là những người luôn truyền cảm hứng về lòng nhân ái, sự cống hiến cho cộng đồng.<br><br>
+<b>Lời khuyên cá nhân hóa</b><br>
+- Hãy biết yêu thương, chăm sóc bản thân trước khi giúp đỡ người khác.<br>
+- Biết nói "không" khi cần thiết, đừng ôm đồm quá nhiều việc.<br>
+- Luôn giữ tinh thần lạc quan, sáng tạo, nhưng cũng cần thực tế, có kế hoạch rõ ràng.<br>
+- Học cách kiểm soát cảm xúc, tránh bị cuốn theo những thay đổi nhất thời.<br><br>
+<b>Trích dẫn, nguồn tham khảo</b><br>
+- "Numerology: The Complete Guide" – Matthew Oliver Goodwin<br>
+- "The Complete Book of Numerology" – David A. Phillips<br>
+- [tracuuthansohoc.com](https://xem.tracuuthansohoc.com/)<br>
+- [numerology.com](https://www.numerology.com/)<br>
+        `,
+        careers: ['Bác sĩ', 'Nhà từ thiện', 'Giáo dục', 'Xã hội học', 'Tình nguyện', 'Nghệ thuật', 'Tâm lý học', 'Truyền thông', 'Luật', 'Nghiên cứu xã hội', 'Tổ chức phi chính phủ']
     },
     11: {
         name: 'Nhà truyền cảm hứng',
-        desc: 'Bạn có trực giác mạnh, lý tưởng cao, truyền cảm hứng cho người khác, phù hợp lĩnh vực sáng tạo, giáo dục, nghệ thuật.',
-        careers: ['Diễn giả', 'Giáo viên', 'Nghệ sĩ', 'Tư vấn', 'Tôn giáo', 'Truyền thông', 'Nhà văn']
+        desc: `
+<b>Tổng quan về Số Chủ Đạo 11 – Nhà truyền cảm hứng</b><br>
+Số 11 là một trong hai số chủ đạo bậc thầy (Master Number) trong thần số học, đại diện cho trực giác mạnh mẽ, lý tưởng cao đẹp, khả năng truyền cảm hứng và dẫn dắt tinh thần cho cộng đồng. Những người mang số chủ đạo 11 thường sở hữu năng lượng tâm linh lớn, nhạy cảm với thế giới xung quanh, có tầm nhìn xa và khát vọng tạo ra sự thay đổi tích cực cho xã hội.<br><br>
+<b>Đặc điểm tính cách chi tiết</b><br>
+Người số 11 nổi bật với trực giác sắc bén, khả năng cảm nhận sâu sắc về con người, sự vật, hiện tượng. Họ thường có lý tưởng sống lớn, mong muốn cống hiến, truyền cảm hứng, giúp đỡ người khác phát triển. Sự sáng tạo, trí tưởng tượng phong phú giúp họ dễ dàng thành công trong các lĩnh vực nghệ thuật, giáo dục, tâm linh. Tuy nhiên, họ cũng dễ bị áp lực bởi kỳ vọng lớn, đôi khi cảm thấy cô đơn, lạc lõng giữa đám đông.<br><br>
+<b>Ưu điểm</b><br>
+- Trực giác mạnh, nhạy cảm, thấu hiểu sâu sắc.<br>
+- Lý tưởng sống cao đẹp, truyền cảm hứng cho cộng đồng.<br>
+- Sáng tạo, nghệ thuật, có khả năng dẫn dắt tinh thần.<br>
+- Khả năng kết nối tâm linh, cảm nhận năng lượng vũ trụ.<br>
+- Tầm nhìn xa, khát vọng tạo ra sự thay đổi tích cực.<br><br>
+<b>Điểm hạn chế</b><br>
+- Dễ bị áp lực, căng thẳng bởi kỳ vọng lớn.<br>
+- Đôi khi sống nội tâm, khó chia sẻ cảm xúc với người khác.<br>
+- Có xu hướng lý tưởng hóa, dễ thất vọng khi thực tế không như mong đợi.<br>
+- Dễ bị ảnh hưởng bởi cảm xúc, năng lượng tiêu cực xung quanh.<br><br>
+<b>Bài học lớn trong cuộc đời</b><br>
+Người số 11 cần học cách cân bằng giữa lý tưởng và thực tế, biết chăm sóc sức khỏe tinh thần, không để bản thân bị kiệt sức bởi áp lực. Họ nên rèn luyện kỹ năng giao tiếp, chia sẻ cảm xúc, xây dựng mối quan hệ xã hội bền vững. Sự thành công đến khi họ biết tận dụng năng lượng tâm linh, trực giác để phát triển bản thân và giúp đỡ cộng đồng.<br><br>
+<b>Định hướng phát triển bản thân</b><br>
+- Học cách kiểm soát cảm xúc, bảo vệ năng lượng cá nhân.<br>
+- Phát triển kỹ năng giao tiếp, hợp tác, làm việc nhóm.<br>
+- Tham gia các hoạt động nghệ thuật, giáo dục, tâm linh để phát huy thế mạnh.<br>
+- Rèn luyện sự kiên nhẫn, bền bỉ với mục tiêu lớn.<br><br>
+<b>Phân tích các giai đoạn cuộc đời</b><br>
+- <i>Giai đoạn trẻ:</i> Thường là đứa trẻ nhạy cảm, sáng tạo, có trí tưởng tượng phong phú, đôi khi sống nội tâm.<br>
+- <i>Giai đoạn trưởng thành:</i> Phát huy khả năng truyền cảm hứng, dẫn dắt tinh thần, có thể thành công trong các lĩnh vực nghệ thuật, giáo dục, tâm linh.<br>
+- <i>Giai đoạn trung niên:</i> Đạt được nhiều thành tựu nhờ sự sáng tạo, lý tưởng sống, nhưng cần chú ý cân bằng giữa công việc và cuộc sống.<br>
+- <i>Giai đoạn về già:</i> Truyền đạt tri thức, cảm hứng sống cho thế hệ sau, là người hướng dẫn, cố vấn.<br><br>
+<b>Quan hệ, tình duyên, gia đình</b><br>
+Người số 11 rất sâu sắc, chân thành trong tình cảm, luôn mong muốn xây dựng mối quan hệ bền vững, lâu dài. Họ là người bạn đời, cha mẹ, con cái tận tụy, luôn quan tâm, chăm sóc người thân. Tuy nhiên, cần học cách thể hiện cảm xúc, tránh quá lý tưởng hóa trong các mối quan hệ.<br><br>
+<b>Sự nghiệp, ngành nghề phù hợp</b><br>
+- Diễn giả, giáo viên, nghệ sĩ, tư vấn, tôn giáo, truyền thông, nhà văn, nhà hoạt động xã hội, tâm lý học, sáng tạo nội dung, nghiên cứu tâm linh.<br>
+- Người số 11 phù hợp với môi trường làm việc sáng tạo, nhân văn, nơi họ có thể phát huy tối đa khả năng truyền cảm hứng, dẫn dắt tinh thần.<br><br>
+<b>Ví dụ thực tiễn</b><br>
+Nhiều diễn giả, nghệ sĩ, nhà giáo, nhà hoạt động xã hội nổi tiếng mang số chủ đạo 11. Họ là những người luôn truyền cảm hứng, động lực cho cộng đồng, xã hội.<br><br>
+<b>Lời khuyên cá nhân hóa</b><br>
+- Hãy biết yêu thương, chăm sóc bản thân trước khi giúp đỡ người khác.<br>
+- Biết nói "không" khi cần thiết, đừng ôm đồm quá nhiều việc.<br>
+- Luôn giữ tinh thần lạc quan, sáng tạo, nhưng cũng cần thực tế, có kế hoạch rõ ràng.<br>
+- Học cách kiểm soát cảm xúc, tránh bị cuốn theo những thay đổi nhất thời.<br><br>
+<b>Trích dẫn, nguồn tham khảo</b><br>
+- "Numerology: The Complete Guide" – Matthew Oliver Goodwin<br>
+- "The Complete Book of Numerology" – David A. Phillips<br>
+- [tracuuthansohoc.com](https://xem.tracuuthansohoc.com/)<br>
+- [numerology.com](https://www.numerology.com/)<br>
+        `,
+        careers: ['Diễn giả', 'Giáo viên', 'Nghệ sĩ', 'Tư vấn', 'Tôn giáo', 'Truyền thông', 'Nhà văn', 'Nhà hoạt động xã hội', 'Tâm lý học', 'Sáng tạo nội dung', 'Nghiên cứu tâm linh']
     },
     22: {
         name: 'Nhà kiến tạo',
-        desc: 'Bạn có tầm nhìn lớn, khả năng tổ chức xuất sắc, xây dựng những giá trị bền vững cho xã hội.',
-        careers: ['Doanh nhân', 'Kiến trúc sư', 'Lãnh đạo', 'Quản lý dự án', 'Kỹ sư', 'Nhà sáng lập', 'Chính trị']
+        desc: `
+<b>Tổng quan về Số Chủ Đạo 22 – Nhà kiến tạo</b><br>
+Số 22 là số chủ đạo bậc thầy (Master Number) mạnh nhất trong thần số học, đại diện cho tầm nhìn lớn, khả năng tổ chức xuất sắc, xây dựng những giá trị bền vững cho xã hội. Những người mang số chủ đạo 22 thường sở hữu năng lượng mạnh mẽ, tư duy thực tế kết hợp với lý tưởng cao đẹp, có khả năng biến ước mơ lớn thành hiện thực thông qua hành động cụ thể, thiết thực.<br><br>
+<b>Đặc điểm tính cách chi tiết</b><br>
+Người số 22 nổi bật với tầm nhìn xa, khả năng lập kế hoạch, tổ chức, quản lý dự án lớn. Họ có ý chí mạnh mẽ, kiên trì, không ngại thử thách, luôn hướng tới mục tiêu lớn lao, mang lại giá trị cho cộng đồng, xã hội. Sự kết hợp giữa lý tưởng và thực tế giúp họ dễ dàng thành công trong các lĩnh vực đòi hỏi sự sáng tạo, đổi mới, xây dựng nền tảng vững chắc.<br><br>
+<b>Ưu điểm</b><br>
+- Tầm nhìn lớn, khả năng tổ chức, quản lý xuất sắc.<br>
+- Ý chí mạnh mẽ, kiên trì, không ngại thử thách.<br>
+- Kết hợp hài hòa giữa lý tưởng và thực tế.<br>
+- Khả năng xây dựng, kiến tạo giá trị bền vững cho xã hội.<br>
+- Sáng tạo, đổi mới, truyền cảm hứng cho cộng đồng.<br><br>
+<b>Điểm hạn chế</b><br>
+- Đôi khi quá tham vọng, dễ bị áp lực bởi mục tiêu lớn.<br>
+- Có xu hướng kiểm soát, áp đặt ý kiến cá nhân.<br>
+- Dễ bị căng thẳng, mệt mỏi khi không đạt được kỳ vọng.<br>
+- Đôi khi thiếu sự linh hoạt, mềm dẻo trong giao tiếp.<br><br>
+<b>Bài học lớn trong cuộc đời</b><br>
+Người số 22 cần học cách cân bằng giữa công việc và cuộc sống cá nhân, biết chia sẻ, hợp tác với người khác. Họ nên rèn luyện sự linh hoạt, biết lắng nghe, tôn trọng ý kiến của tập thể. Sự thành công bền vững đến khi họ biết kết hợp giữa sức mạnh cá nhân và sự hỗ trợ của cộng đồng.<br><br>
+<b>Định hướng phát triển bản thân</b><br>
+- Học cách chia sẻ, hợp tác, xây dựng đội nhóm vững mạnh.<br>
+- Phát triển kỹ năng giao tiếp, lắng nghe, thấu hiểu người khác.<br>
+- Rèn luyện sự linh hoạt, thích nghi với môi trường mới.<br>
+- Đặt mục tiêu rõ ràng, xây dựng kế hoạch dài hạn.<br><br>
+<b>Phân tích các giai đoạn cuộc đời</b><br>
+- <i>Giai đoạn trẻ:</i> Thường là đứa trẻ mạnh mẽ, độc lập, thích khám phá, thể hiện bản thân.<br>
+- <i>Giai đoạn trưởng thành:</i> Phát huy khả năng tổ chức, quản lý, có thể thành công trong các lĩnh vực xây dựng, kinh doanh, khoa học.<br>
+- <i>Giai đoạn trung niên:</i> Đạt được nhiều thành tựu lớn, vị trí xã hội cao, nhưng cần chú ý cân bằng giữa công việc và gia đình.<br>
+- <i>Giai đoạn về già:</i> Truyền đạt kinh nghiệm, giá trị sống cho thế hệ sau, là người hướng dẫn, cố vấn.<br><br>
+<b>Quan hệ, tình duyên, gia đình</b><br>
+Người số 22 thường chủ động trong tình cảm, thích kiểm soát, bảo vệ người thân. Họ là người bạn đời, cha mẹ, con cái tận tụy, luôn quan tâm, chăm sóc gia đình. Tuy nhiên, cần học cách thể hiện cảm xúc, tránh quá nghiêm khắc, khô khan trong các mối quan hệ.<br><br>
+<b>Sự nghiệp, ngành nghề phù hợp</b><br>
+- Doanh nhân, kiến trúc sư, lãnh đạo, quản lý dự án, kỹ sư, nhà sáng lập, chính trị, nhà hoạt động xã hội, giáo dục, nghiên cứu khoa học, xây dựng cộng đồng.<br>
+- Người số 22 phù hợp với môi trường làm việc lớn, đòi hỏi sự sáng tạo, đổi mới, nơi họ có thể phát huy tối đa khả năng tổ chức, kiến tạo giá trị.<br><br>
+<b>Ví dụ thực tiễn</b><br>
+Nhiều doanh nhân, kiến trúc sư, nhà lãnh đạo, nhà sáng lập nổi tiếng mang số chủ đạo 22. Họ là những người tạo ra sự thay đổi lớn cho xã hội, truyền cảm hứng về ý chí, nghị lực vươn lên.<br><br>
+<b>Lời khuyên cá nhân hóa</b><br>
+- Hãy biết cân bằng giữa công việc và cuộc sống cá nhân.<br>
+- Biết lắng nghe, chia sẻ sẽ giúp bạn thành công bền vững hơn.<br>
+- Luôn giữ tinh thần đổi mới, sáng tạo, không ngừng phát triển bản thân.<br>
+- Đừng quá đặt nặng mục tiêu, hãy trân trọng giá trị tinh thần.<br><br>
+<b>Trích dẫn, nguồn tham khảo</b><br>
+- "Numerology: The Complete Guide" – Matthew Oliver Goodwin<br>
+- "The Complete Book of Numerology" – David A. Phillips<br>
+- [tracuuthansohoc.com](https://xem.tracuuthansohoc.com/)<br>
+- [numerology.com](https://www.numerology.com/)<br>
+        `,
+        careers: ['Doanh nhân', 'Kiến trúc sư', 'Lãnh đạo', 'Quản lý dự án', 'Kỹ sư', 'Nhà sáng lập', 'Chính trị', 'Nhà hoạt động xã hội', 'Giáo dục', 'Nghiên cứu khoa học', 'Xây dựng cộng đồng']
     }
 };
 
@@ -436,48 +1396,312 @@ const expressionMeanings = {
     22: 'Bạn có khả năng tổ chức, xây dựng, lãnh đạo.'
 };
 
-// Xử lý form thần số học
+// Xử lý form thần số học với hiệu ứng loading và animation
 const form = document.getElementById('thansoForm');
 const resultDiv = document.getElementById('thansoResult');
+const loadingSpinner = document.getElementById('loadingSpinner');
+
 form.addEventListener('submit', function(e) {
     e.preventDefault();
     const name = document.getElementById('fullname').value.trim();
     const birthday = document.getElementById('birthday').value;
     if (!name || !birthday) return;
 
-    // Tính toán các số
-    const lifePath = calcLifePathNumber(birthday);
-    const soulUrge = calcSoulUrgeNumber(name);
-    const expression = calcExpressionNumber(name);
+    // Hiển thị loading spinner
+    loadingSpinner.style.display = 'block';
+    resultDiv.classList.remove('active');
+    resultDiv.style.display = 'none';
 
-    // Lấy ý nghĩa
-    const lifePathInfo = lifePathMeanings[lifePath] || {};
-    const soulUrgeInfo = soulUrgeMeanings[soulUrge] || '';
-    const expressionInfo = expressionMeanings[expression] || '';
+    // Simulate mystical calculation time
+    setTimeout(() => {
+        // Tính toán các số
+        const lifePath = calcLifePathNumber(birthday);
+        const soulUrge = calcSoulUrgeNumber(name);
+        const expression = calcExpressionNumber(name);
 
-    // Hiển thị kết quả
-    resultDiv.classList.add('active');
-    resultDiv.innerHTML = `
-        <div class="thanso-section-title">Kết quả phân tích thần số học cho <b>${name}</b></div>
-        <div class="thanso-detail"><b>Ngày sinh:</b> ${birthday.split('-').reverse().join('/')}</div>
-        <div class="thanso-detail"><b>Số chủ đạo (Life Path Number):</b> <span style="color:#0a4191;font-weight:800;">${lifePath}</span> - <b>${lifePathInfo.name || ''}</b></div>
-        <div class="thanso-detail">${lifePathInfo.desc || ''}</div>
-        <div class="thanso-section-title">Ngành nghề phù hợp với bạn</div>
-        <div class="thanso-career-list">
-            ${(lifePathInfo.careers||[]).map(c=>`<div class='thanso-career-item'>${c}</div>`).join('')}
-        </div>
-        <div class="thanso-section-title">Số linh hồn (Soul Urge Number): <span style='color:#1fa36b;font-weight:800;'>${soulUrge}</span></div>
-        <div class="thanso-detail">${soulUrgeInfo}</div>
-        <div class="thanso-section-title">Số biểu đạt (Expression Number): <span style='color:#f59e42;font-weight:800;'>${expression}</span></div>
-        <div class="thanso-detail">${expressionInfo}</div>
-        <div class="thanso-section-title">Giải thích chi tiết</div>
-        <div class="thanso-detail">
-            <b>Số chủ đạo</b> là con số quan trọng nhất, tiết lộ sứ mệnh, tiềm năng và con đường phát triển của bạn.<br>
-            <b>Số linh hồn</b> phản ánh khát vọng sâu thẳm, động lực nội tâm và giá trị bạn theo đuổi.<br>
-            <b>Số biểu đạt</b> cho biết cách bạn thể hiện bản thân ra bên ngoài, điểm mạnh nổi bật.<br>
-            <br><i>Lưu ý: Kết quả mang tính tham khảo, hãy kết hợp với trải nghiệm thực tế để lựa chọn ngành nghề phù hợp nhất!</i>
-        </div>
+        // Lấy ý nghĩa
+        const lifePathInfo = lifePathMeanings[lifePath] || {};
+        const soulUrgeInfo = soulUrgeMeanings[soulUrge] || '';
+        const expressionInfo = expressionMeanings[expression] || '';
+
+        // Ẩn loading spinner
+        loadingSpinner.style.display = 'none';
+
+        // Hiển thị kết quả với animation
+        resultDiv.style.display = 'block';
+        resultDiv.classList.add('active');
+        resultDiv.innerHTML = `
+            <div class="thanso-section-title">🔮 Kết quả phân tích thần số học cho <span style="color:#ffd700;font-weight:800;">${name}</span> ✨</div>
+            <div class="thanso-detail"><span style="color:#ffd700;font-weight:700;">📅 Ngày sinh:</span> ${birthday.split('-').reverse().join('/')}</div>
+            <div class="thanso-detail"><span style="color:#ffd700;font-weight:700;">🌟 Số chủ đạo (Life Path Number):</span> <span style="color:#ffd700;font-weight:800;font-size:1.2rem;">${lifePath}</span> - <span style="color:#ffd700;font-weight:700;">${lifePathInfo.name || ''}</span></div>
+            <div class="thanso-detail">${lifePathInfo.desc || ''}</div>
+            <div class="thanso-section-title">💼 Ngành nghề phù hợp với bạn</div>
+            <div class="thanso-career-list">
+                ${(lifePathInfo.careers||[]).map(c=>`<div class='thanso-career-item'>${c}</div>`).join('')}
+            </div>
+            <div class="thanso-section-title">💫 Số linh hồn (Soul Urge Number): <span style='color:#ffd700;font-weight:800;font-size:1.2rem;'>${soulUrge}</span></div>
+            <div class="thanso-detail">${soulUrgeInfo}</div>
+            <div class="thanso-section-title">🎭 Số biểu đạt (Expression Number): <span style='color:#ffd700;font-weight:800;font-size:1.2rem;'>${expression}</span></div>
+            <div class="thanso-detail">${expressionInfo}</div>
+            <div class="thanso-section-title">📖 Giải thích chi tiết</div>
+            <div class="thanso-detail">
+                <span style="color:#ffd700;font-weight:700;">🌟 Số chủ đạo</span> là con số quan trọng nhất, tiết lộ sứ mệnh, tiềm năng và con đường phát triển của bạn.<br>
+                <span style="color:#ffd700;font-weight:700;">💫 Số linh hồn</span> phản ánh khát vọng sâu thẳm, động lực nội tâm và giá trị bạn theo đuổi.<br>
+                <span style="color:#ffd700;font-weight:700;">🎭 Số biểu đạt</span> cho biết cách bạn thể hiện bản thân ra bên ngoài, điểm mạnh nổi bật.<br>
+                <br><span style="color:#ffd700;font-style:italic;">💡 Lưu ý: Kết quả mang tính tham khảo, hãy kết hợp với trải nghiệm thực tế để lựa chọn ngành nghề phù hợp nhất!</span>
+            </div>
+        `;
+
+        // Add smooth scroll to result
+        resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 2000); // 2 second delay for mystical effect
+});
+
+// Enhanced interactive effects
+document.addEventListener('DOMContentLoaded', function() {
+    const inputs = document.querySelectorAll('.thanso-form input');
+    const form = document.querySelector('.thanso-form');
+    const button = document.querySelector('.thanso-form button');
+    
+    // Enhanced input effects
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.style.transform = 'scale(1.02)';
+            this.style.boxShadow = '0 0 25px rgba(255, 215, 0, 0.4)';
+            
+            // Add sparkle effect on focus
+            createSparkle(this);
+        });
+        
+        input.addEventListener('blur', function() {
+            this.style.transform = 'scale(1)';
+            this.style.boxShadow = '0 0 20px rgba(255, 215, 0, 0.3)';
+        });
+        
+        input.addEventListener('input', function() {
+            if (this.value.length > 0) {
+                this.style.borderColor = '#ffd700';
+                this.style.boxShadow = '0 0 20px rgba(255, 215, 0, 0.3)';
+            }
+        });
+    });
+
+    // Enhanced form hover effects
+    form.addEventListener('mouseenter', function() {
+        createEnergyWave();
+    });
+
+    // Enhanced button effects
+    button.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-3px) scale(1.05)';
+        createSparkle(this);
+    });
+
+    button.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0) scale(1)';
+    });
+
+    // Enhanced career items effects
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('thanso-career-item')) {
+            e.target.style.transform = 'scale(1.1)';
+            createSparkle(e.target);
+            
+            // Add ripple effect
+            createRipple(e.target, e);
+            
+            setTimeout(() => {
+                e.target.style.transform = 'scale(1.05)';
+            }, 200);
+        }
+    });
+
+    // Add mouse move effects
+    document.addEventListener('mousemove', function(e) {
+        const sparkles = document.querySelectorAll('.sparkle');
+        sparkles.forEach((sparkle, index) => {
+            const rect = sparkle.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            const distance = Math.sqrt(Math.pow(e.clientX - centerX, 2) + Math.pow(e.clientY - centerY, 2));
+            
+            if (distance < 100) {
+                sparkle.style.transform = 'scale(1.5)';
+                sparkle.style.opacity = '1';
+            } else {
+                sparkle.style.transform = 'scale(1)';
+                sparkle.style.opacity = '0.6';
+            }
+        });
+    });
+
+    // Create sparkle effect function
+    function createSparkle(element) {
+        const sparkle = document.createElement('div');
+        sparkle.style.position = 'absolute';
+        sparkle.style.width = '4px';
+        sparkle.style.height = '4px';
+        sparkle.style.background = '#ffd700';
+        sparkle.style.borderRadius = '50%';
+        sparkle.style.pointerEvents = 'none';
+        sparkle.style.zIndex = '1000';
+        sparkle.style.animation = 'sparkle 1s ease-out forwards';
+        
+        const rect = element.getBoundingClientRect();
+        sparkle.style.left = (rect.left + Math.random() * rect.width) + 'px';
+        sparkle.style.top = (rect.top + Math.random() * rect.height) + 'px';
+        
+        document.body.appendChild(sparkle);
+        
+        setTimeout(() => {
+            sparkle.remove();
+        }, 1000);
+    }
+
+    // Create energy wave effect
+    function createEnergyWave() {
+        const wave = document.createElement('div');
+        wave.style.position = 'fixed';
+        wave.style.width = '0';
+        wave.style.height = '0';
+        wave.style.border = '2px solid rgba(255, 215, 0, 0.3)';
+        wave.style.borderRadius = '50%';
+        wave.style.top = '50%';
+        wave.style.left = '50%';
+        wave.style.transform = 'translate(-50%, -50%)';
+        wave.style.pointerEvents = 'none';
+        wave.style.zIndex = '999';
+        wave.style.animation = 'energyWave 3s ease-out forwards';
+        
+        document.body.appendChild(wave);
+        
+        setTimeout(() => {
+            wave.remove();
+        }, 3000);
+    }
+
+    // Create ripple effect
+    function createRipple(element, event) {
+        const ripple = document.createElement('div');
+        ripple.style.position = 'absolute';
+        ripple.style.width = '0';
+        ripple.style.height = '0';
+        ripple.style.border = '2px solid rgba(255, 215, 0, 0.6)';
+        ripple.style.borderRadius = '50%';
+        ripple.style.pointerEvents = 'none';
+        ripple.style.zIndex = '1001';
+        ripple.style.animation = 'ripple 0.6s ease-out forwards';
+        
+        const rect = element.getBoundingClientRect();
+        ripple.style.left = (event.clientX - rect.left) + 'px';
+        ripple.style.top = (event.clientY - rect.top) + 'px';
+        
+        element.style.position = 'relative';
+        element.appendChild(ripple);
+        
+        setTimeout(() => {
+            ripple.remove();
+        }, 600);
+    }
+
+    // Add CSS for new animations
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes ripple {
+            0% {
+                width: 0;
+                height: 0;
+                opacity: 1;
+            }
+            100% {
+                width: 100px;
+                height: 100px;
+                opacity: 0;
+            }
+        }
+        
+        @keyframes sparkle {
+            0% {
+                transform: scale(0) rotate(0deg);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.5) rotate(180deg);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(0) rotate(360deg);
+                opacity: 0;
+            }
+        }
     `;
+    document.head.appendChild(style);
+
+    // Add typing effect to title
+    const title = document.querySelector('.thanso-title');
+    if (title) {
+        const text = title.textContent;
+        title.textContent = '';
+        let i = 0;
+        
+        function typeWriter() {
+            if (i < text.length) {
+                title.textContent += text.charAt(i);
+                i++;
+                setTimeout(typeWriter, 100);
+            }
+        }
+        
+        // Start typing effect after page load
+        setTimeout(typeWriter, 1000);
+    }
+
+    // Add particle trail effect
+    let isMouseDown = false;
+    document.addEventListener('mousedown', () => isMouseDown = true);
+    document.addEventListener('mouseup', () => isMouseDown = false);
+    
+    document.addEventListener('mousemove', function(e) {
+        if (isMouseDown) {
+            createParticle(e.clientX, e.clientY);
+        }
+    });
+
+    function createParticle(x, y) {
+        const particle = document.createElement('div');
+        particle.style.position = 'fixed';
+        particle.style.width = '3px';
+        particle.style.height = '3px';
+        particle.style.background = '#ffd700';
+        particle.style.borderRadius = '50%';
+        particle.style.left = x + 'px';
+        particle.style.top = y + 'px';
+        particle.style.pointerEvents = 'none';
+        particle.style.zIndex = '1000';
+        particle.style.animation = 'particleFade 1s ease-out forwards';
+        
+        document.body.appendChild(particle);
+        
+        setTimeout(() => {
+            particle.remove();
+        }, 1000);
+    }
+
+    // Add CSS for particle animation
+    const particleStyle = document.createElement('style');
+    particleStyle.textContent = `
+        @keyframes particleFade {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0);
+            }
+        }
+    `;
+    document.head.appendChild(particleStyle);
 });
 </script>
 {% endblock %}
