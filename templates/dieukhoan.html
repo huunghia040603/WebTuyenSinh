@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% block title %}Điều Khoản Hợp Tác Tuyển Sinh{% endblock %}
+{% block stylesheets %}
+    <!-- Cài đặt font chữ Inter và CSS tùy chỉnh -->
+     <style>
+        /* Tối ưu hóa hiển thị trên mọi thiết bị */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
+
+
+
+        .container {
+            background-color: #fff;
+            padding: 3rem;
+            border-radius: 1rem;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            max-width: 1250px;
+            width: 100%;
+            border: 1px solid #e5e7eb;
+            transform: translateY(0);
+            transition: transform 0.3s ease-in-out;
+            margin: 30px auto;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
+        .main-title, .section-title {
+            color: #1e3a8a;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-title {
+            font-size: 2.5rem;
+            text-align: center;
+            border-bottom: 3px solid #f59e0b;
+            padding-bottom: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.75rem;
+            margin-top: 2rem;
+            border-left: 5px solid #f59e0b;
+            padding-left: 1rem;
+        }
+
+        .paragraph {
+            margin-bottom: 1rem;
+            text-align: justify;
+        }
+
+        .list {
+            list-style-type: none;
+            margin-bottom: 1rem;
+            padding-left: 0;
+        }
+
+        .list-item {
+            background-color: #f9fafb;
+            /* border-left: 3px solid #1e40af; */
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .list-item:hover {
+            background-color: #f3f4f6;
+        }
+
+        .strong-text {
+            color: #1e3a8a;
+            font-weight: 700;
+        }
+
+        .note {
+            font-style: italic;
+            color: #6b7280;
+            margin-top: 2rem;
+            border-top: 1px dashed #d1d5db;
+            padding-top: 1rem;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+
+<body>
+    <div class="container">
+        <h1 class="main-title">Điều Khoản Hợp Tác Tuyển Sinh</h1>
+        <p class="paragraph">Đây là các điều khoản và điều kiện chi tiết cho việc hợp tác đăng tin tuyển sinh giữa <strong class="strong-text">timtruonghoc.vn</strong> và các Đối Tác. Bằng việc đăng ký và sử dụng dịch vụ của chúng tôi, Đối Tác cam kết tuân thủ các điều khoản sau.</p>
+
+        <h2 class="section-title">1. Mục đích và Phạm vi Hợp tác</h2>
+        <p class="paragraph">Mục đích hợp tác là nhằm quảng bá các chương trình tuyển sinh của Đối Tác trên nền tảng của chúng tôi. Phạm vi hợp tác bao gồm:</p>
+        <ul class="list">
+            <li class="list-item">Đăng tải tin tuyển sinh, quảng cáo, và các hoạt động truyền thông liên quan.</li>
+            <li class="list-item">Hỗ trợ Đối Tác tiếp cận đúng đối tượng mục tiêu, gia tăng hiệu quả tuyển sinh.</li>
+        </ul>
+
+        <h2 class="section-title">2. Trách nhiệm của chúng tôi</h2>
+        <p class="paragraph">Chúng tôi có các trách nhiệm sau trong quá trình hợp tác:</p>
+        <ul class="list">
+            <li class="list-item"><strong class="strong-text">Cung cấp và duy trì nền tảng:</strong> Chúng tôi sẽ duy trì một nền tảng trực tuyến ổn định, an toàn và dễ sử dụng để Đối Tác đăng tải thông tin. Chúng tôi cam kết hệ thống hoạt động liên tục 24/7, trừ các trường hợp bảo trì định kỳ có thông báo trước.</li>
+            <li class="list-item"><strong class="strong-text">Hỗ trợ kỹ thuật và tư vấn:</strong> Chúng tôi sẽ cung cấp hỗ trợ kỹ thuật cần thiết trong quá trình đăng tin. Ngoài ra, chúng tôi có thể tư vấn cách tối ưu hóa nội dung để đạt hiệu quả cao nhất.</li>
+            <li class="list-item"><strong class="strong-text">Kiểm duyệt và quyền từ chối:</strong> Chúng tôi có quyền kiểm duyệt mọi nội dung trước khi đăng tải. Chúng tôi có quyền từ chối hoặc gỡ bỏ các tin đăng vi phạm các điều khoản này, chính sách của chúng tôi, hoặc pháp luật hiện hành.</li>
+            <li class="list-item"><strong class="strong-text">Cung cấp báo cáo:</strong> Chúng tôi sẽ cung cấp cho Đối Tác báo cáo thống kê định kỳ về lượt truy cập, lượt tương tác và lượt đăng ký (nếu có) liên quan đến tin tuyển sinh.</li>
+        </ul>
+
+        <h2 class="section-title">3. Trách nhiệm của Đối Tác</h2>
+        <p class="paragraph">Đối Tác có các trách nhiệm sau trong quá trình hợp tác:</p>
+        <ul class="list">
+            <li class="list-item"><strong class="strong-text">Tính chính xác của thông tin:</strong> Đối Tác cam kết mọi thông tin đăng tải (nội dung, hình ảnh, học phí, điều kiện,...) phải chính xác, đầy đủ và trung thực. Đối Tác chịu trách nhiệm hoàn toàn trước pháp luật về tính hợp pháp của các nội dung này và phải thông báo cho chúng tôi về bất kỳ thay đổi nào.</li>
+            <li class="list-item"><strong class="strong-text">Bản quyền và sở hữu trí tuệ:</strong> Đối Tác cam kết các nội dung, hình ảnh, video được sử dụng không vi phạm bản quyền hoặc sở hữu trí tuệ của bên thứ ba. Đối Tác sẽ chịu mọi trách nhiệm pháp lý nếu có tranh chấp phát sinh.</li>
+            <li class="list-item"><strong class="strong-text">Tuân thủ quy định:</strong> Đối Tác cam kết tuân thủ nghiêm ngặt các quy định, chính sách và tiêu chuẩn đăng tin do chúng tôi đưa ra.</li>
+        </ul>
+
+        <h2 class="section-title">4. Bảo mật Thông tin</h2>
+        <p class="paragraph">Hai bên cam kết bảo mật mọi thông tin đã trao đổi trong quá trình hợp tác. Mọi nội dung, hình ảnh, hoặc dữ liệu do Đối Tác cung cấp vẫn thuộc sở hữu của Đối Tác. Tuy nhiên, Đối Tác cấp cho chúng tôi quyền sử dụng và quảng bá các nội dung này trong phạm vi của thỏa thuận hợp tác.</p>
+
+        <h2 class="section-title">5. Quy trình Đăng tin và Kiểm duyệt</h2>
+        <ul class="list">
+            <li class="list-item">Đối Tác gửi yêu cầu hợp tác và cung cấp thông tin cần thiết.</li>
+            <li class="list-item">Chúng tôi sẽ tiếp nhận và xem xét hồ sơ.</li>
+            <li class="list-item">Sau khi chấp thuận, chúng tôi sẽ cấp quyền để Đối Tác có thể đăng tải thông tin.</li>
+            <li class="list-item">Mọi tin đăng đều phải qua quy trình kiểm duyệt của chúng tôi trước khi hiển thị công khai.</li>
+            <li class="list-item">Thời gian kiểm duyệt không quá <strong class="strong-text">[Số giờ]</strong> giờ làm việc.</li>
+        </ul>
+
+        <h2 class="section-title">6. Chấm dứt Hợp tác</h2>
+        <p class="paragraph">Chúng tôi có quyền đơn phương chấm dứt hợp tác nếu Đối Tác vi phạm nghiêm trọng các điều khoản đã cam kết hoặc vi phạm pháp luật hiện hành. Việc chấm dứt sẽ được thông báo bằng văn bản trước ít nhất <strong class="strong-text">[Số ngày]</strong> ngày.</p>
+        
+        <h2 class="section-title">7. Điều khoản Chung</h2>
+        <ul class="list">
+            <li class="list-item"><strong class="strong-text">Hiệu lực:</strong> Thỏa thuận này có hiệu lực ngay khi Đối Tác đăng ký thành công trên nền tảng của chúng tôi.</li>
+            <li class="list-item"><strong class="strong-text">Giải quyết tranh chấp:</strong> Mọi tranh chấp phát sinh sẽ được giải quyết trên tinh thần hợp tác và thiện chí. Nếu không thể giải quyết, các bên sẽ đưa vụ việc ra Tòa án có thẩm quyền để xử lý theo pháp luật Việt Nam.</li>
+        </ul>
+
+        <div class="note">Nếu có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi để được giải đáp.</div>
+    </div>
+</body>
+{% endblock %}
+

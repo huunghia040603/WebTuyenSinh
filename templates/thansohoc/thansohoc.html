@@ -52,12 +52,179 @@
         to { filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.6)); }
     }
     
+    /* Enhanced particle animation */
+    @keyframes particle-float {
+        0% {
+            transform: translateY(100vh) translateX(0) rotate(0deg);
+            opacity: 0;
+        }
+        10% {
+            opacity: 1;
+        }
+        90% {
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(-100px) translateX(100px) rotate(360deg);
+            opacity: 0;
+        }
+    }
+    
+    /* Mystical orb animation */
+    @keyframes orb-pulse {
+        0%, 100% {
+            transform: scale(1) rotate(0deg);
+            box-shadow: 0 0 20px rgba(138, 43, 226, 0.6), 0 0 40px rgba(255, 215, 0, 0.3);
+        }
+        50% {
+            transform: scale(1.2) rotate(180deg);
+            box-shadow: 0 0 40px rgba(138, 43, 226, 0.8), 0 0 80px rgba(255, 215, 0, 0.5);
+        }
+    }
+    
+    /* Floating particles */
+    .particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: radial-gradient(circle, #ffd700, #ffed4e);
+        border-radius: 50%;
+        animation: particle-float 8s linear infinite;
+        pointer-events: none;
+        z-index: 1;
+    }
+    
+    .particle:nth-child(odd) {
+        animation-duration: 10s;
+        background: radial-gradient(circle, #8a2be2, #9370db);
+    }
+    
+    .particle:nth-child(3n) {
+        animation-duration: 12s;
+        width: 2px;
+        height: 2px;
+    }
+    
+    /* Mystical orbs */
+    .mystical-orb {
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 30% 30%, rgba(255, 215, 0, 0.8), rgba(138, 43, 226, 0.4));
+        animation: orb-pulse 4s ease-in-out infinite;
+        pointer-events: none;
+        z-index: 1;
+    }
+    
+    .mystical-orb:nth-child(2) {
+        top: 20%;
+        right: 10%;
+        animation-delay: -1s;
+        width: 40px;
+        height: 40px;
+    }
+    
+    .mystical-orb:nth-child(3) {
+        bottom: 30%;
+        left: 5%;
+        animation-delay: -2s;
+        width: 50px;
+        height: 50px;
+    }
+    
+    /* Enhanced scroll animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .fade-in-up {
+        animation: fadeInUp 0.8s ease-out forwards;
+    }
+    
+    /* Shimmer effect for buttons */
+    @keyframes shimmer {
+        0% {
+            background-position: -200% center;
+        }
+        100% {
+            background-position: 200% center;
+        }
+    }
+    
+    /* Mouse following particle effect */
+    .cursor-trail {
+        position: fixed;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 9999;
+        mix-blend-mode: screen;
+        animation: cursor-fade 1s ease-out forwards;
+    }
+    
+    .cursor-trail.golden {
+        background: radial-gradient(circle, #ffd700, #ffed4e);
+        box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+    }
+    
+    .cursor-trail.purple {
+        background: radial-gradient(circle, #8a2be2, #9370db);
+        box-shadow: 0 0 10px rgba(138, 43, 226, 0.8);
+    }
+    
+    .cursor-trail.sparkle {
+        background: radial-gradient(circle, #fff, #ffd700);
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.9);
+        width: 4px;
+        height: 4px;
+    }
+    
+    @keyframes cursor-fade {
+        0% {
+            opacity: 1;
+            transform: scale(1) rotate(0deg);
+        }
+        100% {
+            opacity: 0;
+            transform: scale(0.3) rotate(180deg);
+        }
+    }
+    
+    /* Enhanced cursor effect on hover */
+    .thanso-container:hover .cursor-trail {
+        animation-duration: 1.5s;
+    }
+    
+    /* Magic wand cursor effect */
+    .magic-cursor {
+        position: fixed;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255, 215, 0, 0.3), transparent);
+        border: 2px solid rgba(255, 215, 0, 0.6);
+        pointer-events: none;
+        z-index: 9998;
+        transition: all 0.1s ease;
+        mix-blend-mode: screen;
+    }
+    
     .thanso-desc {
-        font-size: 1.2rem;
+        font-size: 1rem;
         color: #e8e8e8;
         margin-bottom: 25px;
         line-height: 1.8;
         text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        font-style: italic;
     }
     
     .thanso-form {
@@ -84,6 +251,7 @@
     .thanso-form label {
         font-weight: 700;
         color: #ffd700;
+        margin-top: 15px;
         margin-bottom: 8px;
         margin-left: 0;
         font-size: 1.1rem;
@@ -566,7 +734,8 @@
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-        margin-bottom: 15px;
+        margin-top: 20px;
+        margin-bottom: 45px;
         text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
         animation: glow 3s ease-in-out infinite alternate, titleFloat 6s ease-in-out infinite;
     }
@@ -726,8 +895,7 @@
             </div>
             
             <div style="margin-top:25px; font-style:italic; color:#ccc; padding:20px; background:rgba(255,215,0,0.1); border-radius:12px; border-left:4px solid #ffd700;">
-                <span style="color:#ffd700; font-weight:700;">💡 Lưu ý:</span> Kết quả tra cứu mang tính tham khảo, hãy kết hợp với trải nghiệm thực tế để lựa chọn hướng đi phù hợp nhất cho bản thân.<br>Tham khảo cấu trúc và nội dung từ <a href="https://xem.tracuuthansohoc.com/" target="_blank" rel="noopener" style="color:#ffd700;">tracuuthansohoc.com</a>.
-            </div>
+                <span style="color:#ffd700; font-weight:700;">💡 Lưu ý:</span> Kết quả tra cứu mang tính tham khảo, hãy kết hợp với trải nghiệm thực tế để lựa chọn hướng đi phù hợp nhất cho bản thân.
         </div>
     </div>
 </div>
@@ -1452,8 +1620,24 @@ form.addEventListener('submit', function(e) {
             </div>
         `;
 
-        // Add smooth scroll to result
-        resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Ensure page scrolling remains functional
+        // Remove forced scroll to allow natural user scrolling
+        // Optional: Add gentle scroll hint without forcing position
+        setTimeout(() => {
+            // Only scroll if result is not visible in viewport
+            const rect = resultDiv.getBoundingClientRect();
+            const isVisible = rect.top >= 0 && rect.bottom <= window.innerHeight;
+            
+            if (!isVisible) {
+                // Gentle scroll with offset to keep some context visible
+                const elementTop = resultDiv.offsetTop;
+                const offset = 100; // Keep some space above
+                window.scrollTo({
+                    top: elementTop - offset,
+                    behavior: 'smooth'
+                });
+            }
+        }, 100);
     }, 2000); // 2 second delay for mystical effect
 });
 
@@ -1656,38 +1840,96 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(typeWriter, 1000);
     }
 
-    // Add particle trail effect
-    let isMouseDown = false;
-    document.addEventListener('mousedown', () => isMouseDown = true);
-    document.addEventListener('mouseup', () => isMouseDown = false);
+    // Enhanced mouse-following particle effect
+    let mouseX = 0, mouseY = 0;
+    let particles = [];
+    let particleCount = 0;
+    const maxParticles = 50;
     
+    // Create magic cursor
+    const magicCursor = document.createElement('div');
+    magicCursor.className = 'magic-cursor';
+    document.body.appendChild(magicCursor);
+    
+    // Track mouse movement
     document.addEventListener('mousemove', function(e) {
-        if (isMouseDown) {
-            createParticle(e.clientX, e.clientY);
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        
+        // Update magic cursor position
+        magicCursor.style.left = (mouseX - 10) + 'px';
+        magicCursor.style.top = (mouseY - 10) + 'px';
+        
+        // Create trailing particles
+        if (particleCount < maxParticles) {
+            createCursorTrail(mouseX, mouseY);
         }
     });
-
-    function createParticle(x, y) {
-        const particle = document.createElement('div');
-        particle.style.position = 'fixed';
-        particle.style.width = '3px';
-        particle.style.height = '3px';
-        particle.style.background = '#ffd700';
-        particle.style.borderRadius = '50%';
-        particle.style.left = x + 'px';
-        particle.style.top = y + 'px';
-        particle.style.pointerEvents = 'none';
-        particle.style.zIndex = '1000';
-        particle.style.animation = 'particleFade 1s ease-out forwards';
+    
+    // Enhanced cursor trail creation
+    function createCursorTrail(x, y) {
+        const types = ['golden', 'purple', 'sparkle'];
+        const type = types[Math.floor(Math.random() * types.length)];
         
-        document.body.appendChild(particle);
+        const trail = document.createElement('div');
+        trail.className = `cursor-trail ${type}`;
         
+        // Add random offset for more natural effect
+        const offsetX = (Math.random() - 0.5) * 20;
+        const offsetY = (Math.random() - 0.5) * 20;
+        
+        trail.style.left = (x + offsetX) + 'px';
+        trail.style.top = (y + offsetY) + 'px';
+        
+        document.body.appendChild(trail);
+        particleCount++;
+        
+        // Remove particle after animation
         setTimeout(() => {
-            particle.remove();
+            if (trail.parentNode) {
+                trail.parentNode.removeChild(trail);
+                particleCount--;
+            }
         }, 1000);
     }
+    
+    // Enhanced hover effects for form elements
+    const formElements = document.querySelectorAll('.thanso-form input, .thanso-form button');
+    formElements.forEach(element => {
+        element.addEventListener('mouseenter', function() {
+            // Create burst of particles on hover
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    const rect = this.getBoundingClientRect();
+                    const x = rect.left + Math.random() * rect.width;
+                    const y = rect.top + Math.random() * rect.height;
+                    createCursorTrail(x, y);
+                }, i * 50);
+            }
+        });
+    });
 
-    // Add CSS for particle animation
+    // Add floating mystical orbs and particles to container
+    const thansoContainer = document.querySelector('.thanso-container');
+    if (thansoContainer) {
+        // Add mystical orbs
+        for (let i = 0; i < 3; i++) {
+            const orb = document.createElement('div');
+            orb.className = 'mystical-orb';
+            thansoContainer.appendChild(orb);
+        }
+        
+        // Add floating particles
+        for (let i = 0; i < 15; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 8 + 's';
+            thansoContainer.appendChild(particle);
+        }
+    }
+    
+    // Add CSS for enhanced particle animations
     const particleStyle = document.createElement('style');
     particleStyle.textContent = `
         @keyframes particleFade {

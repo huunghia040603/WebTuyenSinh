@@ -1,5 +1,5 @@
 // Khai báo các biến và hằng số
-const API_URL = 'https://webtimtruong.pythonanywhere.com/all_major_has_pagi/';
+const API_URL = 'https://timtruonghoc.pythonanywhere.com/all_major_has_pagi/';
 const majorsGrid = document.getElementById('majorsGrid');
 const prevPageButton = document.getElementById('prevPage');
 const nextPageButton = document.getElementById('nextPage');
@@ -123,7 +123,41 @@ function renderMajors(majors) {
        
         const tuitionFeeBox = document.createElement('div');
         tuitionFeeBox.classList.add('info-box', 'small');
-        tuitionFeeBox.innerHTML = `Học phí: ${major.tuition_fee_per_year || 'Đang cập nhật'}`;
+        
+        // Cập nhật hiển thị học phí từ model Major
+        let tuitionDisplay = 'Đang cập nhật';
+        
+        // Debug: Log thông tin học phí
+        console.log('Major tuition data (nganhchung):', {
+            major_id: major.all_major_id,
+            min_tuition: major.min_tuition_fee_per_year,
+            max_tuition: major.max_tuition_fee_per_year,
+            old_tuition: major.tuition_fee_per_year
+        });
+        
+        // Ưu tiên thông tin học phí mới từ model Major
+        if (major.min_tuition_fee_per_year && major.max_tuition_fee_per_year) {
+            const min = major.min_tuition_fee_per_year;
+            const max = major.max_tuition_fee_per_year;
+            
+            if (min === "0" && max === "0") {
+                tuitionDisplay = 'Miễn phí';
+            } else if (min === max) {
+                tuitionDisplay = `${min} triệu/năm`;
+            } else {
+                tuitionDisplay = `${min} - ${max} triệu/năm`;
+            }
+        } else if (major.min_tuition_fee_per_year) {
+            tuitionDisplay = `Từ ${major.min_tuition_fee_per_year} triệu/năm`;
+        } else if (major.max_tuition_fee_per_year) {
+            tuitionDisplay = `Đến ${major.max_tuition_fee_per_year} triệu/năm`;
+        } else {
+            // Fallback về thông tin học phí cũ nếu không có thông tin mới
+            tuitionDisplay = major.tuition_fee_per_year || 'Đang cập nhật';
+        }
+        
+        console.log('Final tuition display (nganhchung):', tuitionDisplay);
+        tuitionFeeBox.innerHTML = `Học phí: ${tuitionDisplay}`;
        
         const opportunitiesBox = document.createElement('div');
         opportunitiesBox.classList.add('info-box', 'small', 'vang');

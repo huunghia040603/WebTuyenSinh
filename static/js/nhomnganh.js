@@ -1,9 +1,9 @@
 // Đặt toàn bộ code trong sự kiện DOMContentLoaded để đảm bảo các phần tử HTML đã được tải.
 document.addEventListener('DOMContentLoaded', (event) => {
     // URL của API nhóm ngành
-    const API_URL = 'https://webtimtruong.pythonanywhere.com/fieldgroups/';
+    const API_URL = 'https://timtruonghoc.pythonanywhere.com/fieldgroups/';
     // URL của API ngành học chi tiết, sử dụng template literal để thêm field_id
-    const MAJOR_API_URL = 'https://webtimtruong.pythonanywhere.com/all_major/?field_id=';
+    const MAJOR_API_URL = 'https://timtruonghoc.pythonanywhere.com/all_major/?field_id=';
 
     // Lấy phần tử DOM nơi bạn muốn hiển thị các nhóm ngành
     const nhomnganhGrid = document.getElementById('nhomnganh-grid');

@@ -233,7 +233,7 @@ function createFloatLogo(item, idx) {
 }
 // Fetch outstanding universities
 async function fetchOutstandingUniversities() {
-    const res = await fetch('https://webtimtruong.pythonanywhere.com/schools/?tag=outstanding');
+    const res = await fetch('https://timtruonghoc.pythonanywhere.com/schools/?tag=outstanding');
     const data = await res.json();
     return data.results || [];
 }
