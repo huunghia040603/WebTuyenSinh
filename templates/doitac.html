@@ -182,22 +182,31 @@
 const marquee = document.getElementById('doitac-slider-marquee');
 const floatLogos = document.getElementById('doitac-float-logos');
 const usedTops = [];
-function random(min, max) { return Math.random() * (max - min) + min; }
+
+function random(min, max) {
+    return Math.random() * (max - min) + min;
+}
+
 function getNonOverlapTop(size) {
     const total = usedTops.length + 1;
     const band = (floatLogos.offsetHeight || 220) / total;
     let idx = usedTops.length;
-    let base = band * idx + band/2 - size/2;
+    let base = band * idx + band / 2 - size / 2;
     usedTops.push(base);
     if (base < 0) base = 0;
     if (base + size > (floatLogos.offsetHeight || 220)) base = (floatLogos.offsetHeight || 220) - size;
     return base;
 }
+
 function createFloatLogo(item, idx) {
+    // Đảm bảo item.img và item.link tồn tại trước khi sử dụng
+    const imgUrl = item.img || '/static/images/logo/default_logo.jpg'; // Sử dụng ảnh mặc định nếu không có
+    const linkUrl = item.link || '#'; // Sử dụng '#' hoặc một link mặc định nếu không có
+
     const size = random(50, 100);
     const div = document.createElement('a');
     div.className = 'doitac-float-logo';
-    div.href = item.link;
+    div.href = linkUrl;
     div.target = '_blank';
     div.style.width = div.style.height = size + 'px';
     div.style.top = getNonOverlapTop(size) + 'px';
@@ -228,46 +237,64 @@ function createFloatLogo(item, idx) {
         div.style.transform = 'scale(1) rotate(0deg)';
     });
 
-    div.innerHTML = `<img src="${item.img}" alt="logo">`;
+    div.innerHTML = `<img src="${imgUrl}" alt="logo">`;
     floatLogos.appendChild(div);
 }
+
 // Fetch outstanding universities
 async function fetchOutstandingUniversities() {
-    const res = await fetch('https://webtimtruong.pythonanywhere.com/schools/?tag=outstanding');
-    const data = await res.json();
-    return data.results || [];
+    try {
+        const res = await fetch('https://timtruonghoc.pythonanywhere.com/schools_outstanding/');
+        if (!res.ok) { // Kiểm tra nếu phản hồi không thành công (ví dụ: 404, 500)
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        const data = await res.json();
+        // Đảm bảo data.results là một mảng hoặc trả về mảng rỗng
+        return data.results && Array.isArray(data.results) ? data.results : data; // API trả về trực tiếp mảng, không có results
+    } catch (error) {
+        console.error("Lỗi khi fetch dữ liệu trường nổi bật:", error);
+        return []; // Trả về mảng rỗng nếu có lỗi
+    }
 }
 
 async function renderOutstandingLogos() {
     const universities = await fetchOutstandingUniversities();
+
     // Render slider
     marquee.innerHTML = '';
+    // Lặp qua dữ liệu 2 lần để tạo hiệu ứng marquee liên tục
     for (let k = 0; k < 2; k++) {
         universities.forEach(u => {
             const card = document.createElement('a');
             card.className = 'doitac-logo-card';
-            card.href = '/' + u.short_code; // chuyển đến trang chi tiết trường
+            // Sử dụng u.short_code nếu có, hoặc tên nếu không
+            const linkPath = u.short_code ? '/' + u.short_code : (u.name_vn ? '/' + u.name_vn.toLowerCase().replace(/\s/g, '-') : '#');
+            card.href = linkPath;
             card.innerHTML = `
-            <!-- <span class="doitac-top-badge"> TOP </span> -->
-                <img src="${u.logo || '/static/images/logo/1.jpg'}" class="doitac-logo-img" alt="${u.name}">`;
+                <img src="${u.logo || '/static/images/logo/1.jpg'}" class="doitac-logo-img" alt="${u.name_vn || 'logo'}">`; // Sử dụng name_vn cho alt text
             marquee.appendChild(card);
         });
     }
+
     // Render float logos
     floatLogos.innerHTML = '';
-    usedTops.length = 0;
+    usedTops.length = 0; // Đặt lại mảng usedTops cho mỗi lần render
+
+    // Lặp qua danh sách trường để tạo float logos
     universities.forEach((u, i) => {
+        // Tạo 2 float logo cho mỗi trường để tăng số lượng hiển thị, nếu cần
         createFloatLogo({
-            img: u.logo || '/static/images/logo/1.jpg',
-            link: '/' + u.short_code
+            img: u.logo, // Truyền trực tiếp u.logo
+            link: u.short_code ? '/' + u.short_code : (u.name_vn ? '/' + u.name_vn.toLowerCase().replace(/\s/g, '-') : '#') // Đảm bảo link tồn tại
         }, i);
         createFloatLogo({
-            img: u.logo || '/static/images/logo/1.jpg',
-            link: '/' + u.short_code
-        }, i);
-       
+            img: u.logo,
+            link: u.short_code ? '/' + u.short_code : (u.name_vn ? '/' + u.name_vn.toLowerCase().replace(/\s/g, '-') : '#')
+        }, i + universities.length); // Đảm bảo chỉ số idx khác nhau cho animation
     });
 }
-renderOutstandingLogos();
+
+// Gọi hàm render khi DOM đã sẵn sàng
+document.addEventListener('DOMContentLoaded', renderOutstandingLogos);
 </script>
 {% endblock %} 

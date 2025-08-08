@@ -521,6 +521,10 @@
                 font-size: 0.8rem;
                 padding: 0.25rem 0.7rem;
             }
+            .profile {
+            margin-right: 20px;
+            }
+
             .hotline-label {
                 font-size: 0.8rem;
             }
@@ -571,8 +575,20 @@
                         </div>
                     </button>
                 </div>
-                <a href="/dangky" class="auth-btn auth-btn-register">Đăng ký</a>
-                <a href="/dangnhap" class="auth-btn auth-btn-login">Đăng nhập</a>
+               
+                <div class="auth-actions">
+                    <div id="auth-buttons-container" style="display: flex; align-items: center; gap: 0.4rem;">
+                        <a href="/dangky" id="register-btn" class="auth-btn auth-btn-register">Đăng ký</a>
+                        <a href="/dangnhap" id="login-btn" class="auth-btn auth-btn-login">Đăng nhập</a>
+                    </div>
+
+                    <div id="user-profile-actions" style="display: none;">
+                        <a href="/account" style="margin-right: 18px; size: 25px; font-size: 22px;">
+                            <i class="fa-solid fa-user" style="color: #ffffff;"></i>
+                        </a>
+                        <a href="#" id="logout-btn" class="auth-btn auth-btn-logout">Đăng xuất</a>
+                    </div>
+                </div>
                 <a href="#" class="auth-btn auth-btn-post">Đăng tin tuyển sinh</a>
             </div>
         </div>
@@ -719,9 +735,51 @@
     </nav>
 
   
-
+    
     <script>
-        // Mobile menu slide and accordion
+        document.addEventListener('DOMContentLoaded', function() {
+
+    
+        // --- LOGIC AUTH (ĐĂNG NHẬP/ĐĂNG XUẤT) ---
+        // Lấy các phần tử HTML cần thiết
+        const loginBtn = document.getElementById('login-btn');
+        const registerBtn = document.getElementById('register-btn');
+        const userProfileActions = document.getElementById('user-profile-actions');
+        const userAvatar = document.getElementById('user-avatar');
+        const logoutBtn = document.getElementById('logout-btn'); 
+
+        // Hàm giả định để lấy dữ liệu người dùng
+        const AuthManager = {
+            getUserData: () => JSON.parse(localStorage.getItem('userData')),
+            clearUserData: () => {
+            localStorage.removeItem('userData');
+            localStorage.removeItem('accessToken'); // Xóa cả accessToken nếu bạn lưu riêng
+        }
+        };
+        
+        const userData = AuthManager.getUserData();
+
+        if (userData) {
+            // Người dùng đã đăng nhập
+            const { auth_token } = userData;
+
+            userProfileActions.style.display = 'flex';
+          
+
+            loginBtn.style.display = 'none';
+            registerBtn.style.display = 'none';
+
+            logoutBtn.addEventListener('click', () => {
+                AuthManager.clearUserData();
+                window.location.reload(); // Hoặc chuyển hướng đến trang chủ
+            });
+
+        } else {
+            // Người dùng chưa đăng nhập
+            loginBtn.style.display = 'block';
+            registerBtn.style.display = 'block';
+            userProfileActions.style.display = 'none';
+        }})
         const mobileMenuBtn = document.getElementById('mobile-menu-button');
         const mobileMenu = document.getElementById('mobile-menu');
         const mobileOverlay = document.getElementById('mobile-menu-overlay');

@@ -15,7 +15,7 @@ window.addEventListener('load', function () {
     }
 
     // API endpoint
-    const baseUrl = 'https://webtimtruong.pythonanywhere.com/all_major/';
+    const baseUrl = 'https://timtruonghoc.pythonanywhere.com/all_major/';
     
     // Load dữ liệu ngành học
     async function loadMajorData() {

@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const locationFilter = document.getElementById('location-filter');
     const admissionScoreFilter = document.getElementById('admission-score-filter');
 
-    const API_URL = 'https://webtimtruong.pythonanywhere.com/majors-outstanding/'; 
+    const API_URL = 'https://timtruonghoc.pythonanywhere.com/majors-outstanding/'; 
 
     const PAGE_SIZE = 15;
     let currentPage = 1;

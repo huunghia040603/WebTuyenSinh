@@ -15,7 +15,7 @@ window.addEventListener('load', function () {
     }
 
     // API endpoint
-    const baseUrl = 'https://webtimtruong.pythonanywhere.com/schools/';
+    const baseUrl = 'https://timtruonghoc.pythonanywhere.com/schools/';
     
     // Load dữ liệu trường học
     async function loadUniversityData() {

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Trang Cá nhân</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f0ed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .profile-card {
+            display: flex;
+            max-width: 800px;
+            width: 100%;
+            background-color: #ffffff;
+            border: 1px solid #dcdcdc;
+            padding: 30px;
+            box-sizing: border-box;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .left-column {
+            flex: 1;
+            padding-right: 80px;
+            border-right: 1px solid #dcdcdc;
+        }
+
+        .right-column {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-left: 40px;
+        }
+        
+        .profile-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        
+        /* Cấu trúc CSS mới để hiển thị label và value trên cùng một hàng */
+        .info-group-inline {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center; /* Căn chỉnh theo chiều dọc */
+            gap: 20px; /* Khoảng cách giữa label và value */
+        }
+        
+        /* Điều chỉnh kích thước và căn chỉnh cho các label */
+        .info-label {
+            font-weight: bold;
+            color: #666;
+           /* Đảm bảo label có cùng độ rộng để căn chỉnh */
+        }
+
+        /* Tên trường Email cần có khoảng cách lớn hơn */
+        .info-label.email-label {
+            text-transform: none; /* Bỏ uppercase cho email */
+            min-width: 15px;
+        }
+        
+        .info-value {
+            font-size: 1rem;
+            color: #333;
+        }
+
+        .user-photo {
+            width: 100%;
+            max-width: 300px;
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1rem;
+            color: #888;
+            object-fit: cover;
+        }
+
+        .edit-btn{
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 20px;
+            margin-left: 120px;
+        }
+        
+        .save-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 20px;
+            margin-left: 20px;
+            width: 130px;
+        }
+        .cancel-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 20px;
+            margin-left: 30px;
+        }
+        .edit-btn:hover, .save-btn:hover, .cancel-btn:hover {
+            background-color: #0056b3;
+        }
+
+        #edit-form .form-group {
+            margin-bottom: 15px;
+        }
+        #edit-form .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        #edit-form .form-group input, #edit-form .form-group select {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            margin-left: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .profile-card {
+                flex-direction: column;
+                padding: 20px;
+            }
+            .left-column {
+                padding-right: 0;
+                border-right: none;
+                border-bottom: 1px solid #dcdcdc;
+                margin-bottom: 20px;
+            }
+            .right-column {
+                padding-left: 0;
+            }
+        }
+            #edit-form .form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+#edit-form .form-group label {
+    font-weight: bold;
+}
+#edit-form .form-group input, 
+#edit-form .form-group select,
+#edit-form .form-group span {
+    flex: 1; 
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-left: 10px;
+}
+#edit-form .form-group span {
+    border: none;
+    padding: 8px 0;
+}
+.name-group {
+    display: flex;
+    gap: 15px;
+}
+.name-group .form-group {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 0;
+    gap: 10px;
+}
+.name-group .form-group label {
+    flex: 0 0 auto;
+    min-width: 40px;
+}
+.name-group .form-group input {
+    flex: 1;
+}
+    </style>
+</head>
+<body>
+    <div class="profile-card">
+        <div id="user-info" class="left-column">
+            <h1 class="profile-title" id="profile-title-display"></h1>
+            
+            <div class="info-group-inline">
+                <div class="info-label email-label">Email:</div>
+                <div id="email-value" class="info-value"></div>
+            </div>
+
+            <div class="info-group-inline">
+                <div class="info-label">Ngày sinh:</div>
+                <div id="date-value" class="info-value"></div>
+            </div>
+
+            <div class="info-group-inline">
+                <div class="info-label">Giới tính:</div>
+                <div id="sex-value" class="info-value"></div>
+            </div>
+
+            <div class="info-group-inline">
+                <div class="info-label">Nơi sống:</div>
+                <div id="live-value" class="info-value"></div>
+            </div>
+            <button id="edit-btn" class="edit-btn">Chỉnh sửa</button>
+        </div>
+
+
+        <div id="edit-form" class="left-column" style="display: none;">
+    <h1 class="profile-title" id="profile-title-edit"></h1>
+    <form id="profile-form">
+        <div class="name-group">
+            <div class="form-group">
+                <label>Họ:</label>
+                <input type="text" id="edit-last-name" >
+            </div>
+            <div class="form-group">
+                <label>Tên:</label>
+                <input type="text" id="edit-first-name" >
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Email:</label>
+            <span id="edit-email"></span>
+        </div>
+        <div class="form-group">
+            <label>Ngày sinh:</label>
+            <input type="date" id="edit-date">
+        </div>
+        <div class="form-group">
+            <label>Giới tính:</label>
+            <select id="edit-sex">
+                <option value="">Chưa cập nhật</option>
+                <option value="male">Nam</option>
+                <option value="female">Nữ</option>
+                <option value="other">Khác</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Nơi sống:</label>
+            <input type="text" id="edit-live">
+        </div>
+
+        <div style="display: flex; margin-left: 40px; gap: 10px; margin-top: 20px;">
+            <button type="submit" class="save-btn">Lưu thông tin</button>
+            <button type="button" id="cancel-edit-btn" class="cancel-btn">Hủy</button>
+        </div>
+    </form>
+</div>
+        <div class="right-column">
+            <img id="user-photo" src="" alt="USER PHOTO" class="user-photo">
+            <input type="file" id="user-photo-upload" accept="image/*" style="display: none;">
+        </div>
+    </div>
+    <script src="/static/js/auth.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="/static/js/account.js"></script>
+</body>
+</html>

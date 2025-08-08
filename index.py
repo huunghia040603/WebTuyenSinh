@@ -19,6 +19,11 @@ def dai_hoc_hcm():
 def page_not_found(e):
     return render_template('404.html'), 404
 
+@app.route("/account")
+def account():
+    return render_template('account.html')
+
+
 @app.route("/dangnhap")
 def dangnhap():
     return render_template('dangnhap.html')
@@ -71,5 +76,11 @@ def cunghoangdao():
 def mbti_new():
     return render_template('mbti/mbti_new.html')
 
+@app.route("/social")
+def social_callback_view():
+    print("Social Callback - Request Args:", request.args) 
+    return render_template('social_callback.html')
+
+    
 if __name__ == "__main__":
     app.run(debug=True)

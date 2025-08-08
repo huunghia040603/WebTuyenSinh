@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
         currentPage = page;
 
-        const baseUrl = 'https://webtimtruong.pythonanywhere.com/schools/';
+        const baseUrl = 'https://timtruonghoc.pythonanywhere.com/schools/';
         const params = new URLSearchParams();
 
         if (currentSearchTerm) {

@@ -1,5 +1,5 @@
 // Khai báo các biến và hằng số
-const API_URL = 'https://webtimtruong.pythonanywhere.com/all_major_has_pagi/';
+const API_URL = 'https://timtruonghoc.pythonanywhere.com/all_major_has_pagi/';
 const majorsGrid = document.getElementById('majorsGrid');
 const prevPageButton = document.getElementById('prevPage');
 const nextPageButton = document.getElementById('nextPage');
