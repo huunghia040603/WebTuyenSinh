@@ -1,0 +1,1035 @@
+{% extends "base.html" %}
+
+{% block title %}Phân Tích Cung Hoàng Đạo - TimTruongHoc.vn{% endblock %}
+
+{% block stylesheets %}
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    /* Reset và base styles */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+
+    /* Hero Section */
+    .hero-section {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        padding: 120px 0 180px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(2px 2px at 20px 30px, #ffffff, transparent),
+            radial-gradient(2px 2px at 40px 70px, #ffffff, transparent),
+            radial-gradient(1px 1px at 90px 40px, #ffffff, transparent),
+            radial-gradient(1px 1px at 130px 80px, #ffffff, transparent),
+            radial-gradient(2px 2px at 160px 30px, #ffffff, transparent),
+            radial-gradient(1px 1px at 200px 60px, #ffffff, transparent),
+            radial-gradient(2px 2px at 240px 90px, #ffffff, transparent),
+            radial-gradient(1px 1px at 280px 20px, #ffffff, transparent),
+            radial-gradient(2px 2px at 320px 70px, #ffffff, transparent),
+            radial-gradient(1px 1px at 360px 40px, #ffffff, transparent),
+            radial-gradient(2px 2px at 400px 80px, #ffffff, transparent),
+            radial-gradient(1px 1px at 440px 30px, #ffffff, transparent),
+            radial-gradient(2px 2px at 480px 60px, #ffffff, transparent),
+            radial-gradient(1px 1px at 520px 90px, #ffffff, transparent),
+            radial-gradient(2px 2px at 560px 20px, #ffffff, transparent),
+            radial-gradient(1px 1px at 600px 70px, #ffffff, transparent),
+            radial-gradient(2px 2px at 640px 40px, #ffffff, transparent),
+            radial-gradient(1px 1px at 680px 80px, #ffffff, transparent),
+            radial-gradient(2px 2px at 720px 30px, #ffffff, transparent),
+            radial-gradient(1px 1px at 760px 60px, #ffffff, transparent);
+        background-size: 800px 100px;
+        opacity: 0.8;
+        animation: starMove 20s linear infinite, starGlow 3s ease-in-out infinite;
+        will-change: transform;
+        filter: drop-shadow(0 0 3px rgba(255,255,255,0.2));
+    }
+
+
+
+    @keyframes starMove {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-800px); }
+    }
+
+    /* Shooting Stars Effect - Based on the image */
+    .shooting-star {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: #00bfff;
+        border-radius: 50%;
+        box-shadow: 0 0 10px rgba(0, 191, 255, 1), 0 0 20px rgba(0, 191, 255, 0.8);
+        opacity: 0;
+        animation: shootingStar 6s linear infinite;
+        transform-origin: right center;
+    }
+
+    .shooting-star::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        right: 0;
+        width: 150px;
+        height: 3px;
+        background: linear-gradient(90deg, transparent 0%, rgba(0, 191, 255, 0.3) 20%, #00bfff 40%, #87ceeb 60%, rgba(135, 206, 235, 0.4) 80%, transparent 100%);
+        transform: translateY(-50%);
+        transform-origin: right center;
+        box-shadow: 0 0 6px rgba(0, 191, 255, 0.4);
+    }
+
+    .shooting-star-1 { top: 5%; left: 5%; animation-delay: 0s; }
+    .shooting-star-2 { top: 15%; left: 15%; animation-delay: 0.3s; }
+    .shooting-star-3 { top: 25%; left: 25%; animation-delay: 0.6s; }
+    .shooting-star-4 { top: 35%; left: 35%; animation-delay: 0.9s; }
+    .shooting-star-5 { top: 45%; left: 45%; animation-delay: 1.2s; }
+    .shooting-star-6 { top: 55%; left: 55%; animation-delay: 1.5s; }
+    .shooting-star-7 { top: 65%; left: 65%; animation-delay: 1.8s; }
+    .shooting-star-8 { top: 75%; left: 75%; animation-delay: 2.1s; }
+    .shooting-star-9 { top: 85%; left: 85%; animation-delay: 2.4s; }
+    .shooting-star-10 { top: 10%; left: 10%; animation-delay: 2.7s; }
+    .shooting-star-11 { top: 20%; left: 20%; animation-delay: 3s; }
+    .shooting-star-12 { top: 30%; left: 30%; animation-delay: 3.3s; }
+    .shooting-star-13 { top: 40%; left: 40%; animation-delay: 3.6s; }
+    .shooting-star-14 { top: 50%; left: 50%; animation-delay: 3.9s; }
+    .shooting-star-15 { top: 60%; left: 60%; animation-delay: 4.2s; }
+    .shooting-star-16 { top: 70%; left: 70%; animation-delay: 4.5s; }
+    .shooting-star-17 { top: 80%; left: 80%; animation-delay: 4.8s; }
+    .shooting-star-18 { top: 90%; left: 90%; animation-delay: 5.1s; }
+    .shooting-star-19 { top: 8%; left: 8%; animation-delay: 5.4s; }
+    .shooting-star-20 { top: 18%; left: 18%; animation-delay: 5.7s; }
+    .shooting-star-21 { top: 28%; left: 28%; animation-delay: 6s; }
+    .shooting-star-22 { top: 38%; left: 38%; animation-delay: 6.3s; }
+    .shooting-star-23 { top: 48%; left: 48%; animation-delay: 6.6s; }
+    .shooting-star-24 { top: 58%; left: 58%; animation-delay: 6.9s; }
+    .shooting-star-25 { top: 68%; left: 68%; animation-delay: 7.2s; }
+    .shooting-star-26 { top: 78%; left: 78%; animation-delay: 7.5s; }
+    .shooting-star-27 { top: 88%; left: 88%; animation-delay: 7.8s; }
+    .shooting-star-28 { top: 12%; left: 12%; animation-delay: 8.1s; }
+    .shooting-star-29 { top: 22%; left: 22%; animation-delay: 8.4s; }
+    .shooting-star-30 { top: 32%; left: 32%; animation-delay: 8.7s; }
+
+    @keyframes shootingStar {
+        0% {
+            opacity: 0;
+            transform: translateX(0) translateY(0) rotate(45deg) scale(0.3);
+        }
+        5% {
+            opacity: 1;
+            transform: translateX(10px) translateY(10px) rotate(45deg) scale(1.2);
+        }
+        85% {
+            opacity: 1;
+            transform: translateX(180px) translateY(180px) rotate(45deg) scale(0.8);
+        }
+        100% {
+            opacity: 0;
+            transform: translateX(250px) translateY(250px) rotate(45deg) scale(0.2);
+        }
+    }
+
+    @keyframes twinkle {
+        0%, 100% { opacity: 0.6; }
+        50% { opacity: 0.8; }
+    }
+
+    @keyframes starGlow {
+        0%, 100% { 
+            opacity: 0.6;
+            filter: brightness(1) drop-shadow(0 0 2px rgba(255,255,255,0.3));
+        }
+        50% { 
+            opacity: 1;
+            filter: brightness(1.5) drop-shadow(0 0 8px rgba(255,255,255,0.8));
+        }
+    }
+
+    @keyframes starPulse {
+        0%, 100% { 
+            transform: scale(1);
+            filter: brightness(1);
+        }
+        50% { 
+            transform: scale(1.2);
+            filter: brightness(1.8);
+        }
+    }
+
+    @keyframes titleGlow {
+        0%, 100% { 
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5), 0 0 20px rgba(255,255,255,0.3);
+        }
+        50% { 
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5), 0 0 30px rgba(255,255,255,0.6);
+        }
+    }
+
+    @keyframes gradientShift {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+
+    @keyframes subtitleFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+    }
+
+    @keyframes underlineExpand {
+        0% { width: 0; }
+        100% { width: 80%; }
+    }
+
+    @keyframes formPulse {
+        0%, 100% { 
+            box-shadow: 0 0 20px rgba(255,255,255,0.1);
+        }
+        50% { 
+            box-shadow: 0 0 40px rgba(255,255,255,0.2);
+        }
+    }
+
+    @keyframes buttonGlow {
+        0%, 100% { 
+            box-shadow: 0 8px 25px rgba(255,107,107,0.3);
+        }
+        50% { 
+            box-shadow: 0 8px 25px rgba(255,107,107,0.5), 0 0 20px rgba(255,107,107,0.3);
+        }
+    }
+
+
+
+
+
+    @keyframes inputFocus {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.02); }
+        100% { transform: scale(1); }
+    }
+
+    @keyframes placeholderGlow {
+        0%, 100% { opacity: 0.7; }
+        50% { opacity: 1; }
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 10;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        animation: fadeInUp 1s ease-out, titleGlow 2s ease-in-out infinite;
+        position: relative;
+    }
+
+
+
+    .hero-subtitle {
+        font-size: 1.3rem;
+        color: rgba(255,255,255,0.9);
+        margin-bottom: 40px;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+        animation: fadeInUp 1s ease-out 0.2s both, subtitleFloat 4s ease-in-out infinite;
+        position: relative;
+    }
+
+    .hero-subtitle::after {
+        content: '';
+        position: absolute;
+        bottom: -5px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #ff6b6b, transparent);
+        animation: underlineExpand 2s ease-out 1s forwards;
+    }
+
+    /* Input Form */
+    .zodiac-form {
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(15px);
+        border-radius: 25px;
+        padding: 40px;
+        max-width: 500px;
+        margin: 0 auto;
+        border: 1px solid rgba(255,255,255,0.2);
+        animation: fadeInUp 1s ease-out 0.4s both, formPulse 6s ease-in-out infinite;
+        position: relative;
+        overflow: visible;
+    }
+
+
+
+
+
+    .form-group {
+        margin-bottom: 25px;
+        text-align: left;
+        position: relative;
+        z-index: 10;
+    }
+
+    .form-label {
+        display: block;
+        color: white;
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+        position: relative;
+        z-index: 10;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 15px 20px;
+        border: 2px solid rgba(255,255,255,0.3);
+        border-radius: 15px;
+        background: rgba(255,255,255,0.1);
+        color: white;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 10;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #ff6b6b;
+        background: rgba(255,255,255,0.2);
+        box-shadow: 0 0 20px rgba(255,107,107,0.3);
+        animation: inputFocus 0.3s ease;
+    }
+
+    .form-input:focus::placeholder {
+        animation: placeholderGlow 1s ease-in-out infinite;
+    }
+
+    .form-input::placeholder {
+        color: rgba(255,255,255,0.7);
+    }
+
+    .btn-analyze {
+        background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+        color: white;
+        padding: 15px 40px;
+        border: none;
+        border-radius: 50px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        margin-top: 20px;
+        box-shadow: 0 8px 25px rgba(255,107,107,0.3);
+        position: relative;
+        overflow: hidden;
+        animation: buttonGlow 2s ease-in-out infinite;
+        z-index: 10;
+    }
+
+
+
+    .btn-analyze:hover {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 15px 40px rgba(255,107,107,0.5);
+        background: linear-gradient(45deg, #ff5252, #ff1744);
+    }
+
+    .btn-analyze:active {
+        transform: translateY(-1px) scale(0.98);
+    }
+
+    /* Results Section */
+    .results-section {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        padding: 100px 0;
+        display: none;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .results-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(2px 2px at 20px 30px, #ffffff, transparent),
+            radial-gradient(1px 1px at 90px 40px, #ffffff, transparent),
+            radial-gradient(2px 2px at 160px 30px, #ffffff, transparent),
+            radial-gradient(1px 1px at 240px 90px, #ffffff, transparent),
+            radial-gradient(2px 2px at 320px 70px, #ffffff, transparent),
+            radial-gradient(1px 1px at 400px 80px, #ffffff, transparent),
+            radial-gradient(2px 2px at 480px 60px, #ffffff, transparent),
+            radial-gradient(1px 1px at 560px 20px, #ffffff, transparent),
+            radial-gradient(2px 2px at 640px 40px, #ffffff, transparent),
+            radial-gradient(1px 1px at 720px 30px, #ffffff, transparent);
+        background-size: 800px 100px;
+        opacity: 0.4;
+        animation: starMove 30s linear infinite;
+    }
+
+    .results-section::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(1px 1px at 50px 20px, #ffffff, transparent),
+            radial-gradient(2px 2px at 150px 80px, #ffffff, transparent),
+            radial-gradient(1px 1px at 250px 60px, #ffffff, transparent),
+            radial-gradient(2px 2px at 350px 40px, #ffffff, transparent),
+            radial-gradient(1px 1px at 450px 20px, #ffffff, transparent),
+            radial-gradient(2px 2px at 550px 80px, #ffffff, transparent),
+            radial-gradient(1px 1px at 650px 60px, #ffffff, transparent),
+            radial-gradient(2px 2px at 750px 40px, #ffffff, transparent);
+        background-size: 800px 100px;
+        opacity: 0.15;
+        animation: starMove 35s linear infinite reverse;
+    }
+
+    .results-section.show {
+        display: block;
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 30px;
+        position: relative;
+        z-index: 2;
+    }
+
+    /* Zodiac Card */
+    .zodiac-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 30px;
+        padding: 60px 40px;
+        text-align: center;
+        color: white;
+        margin-bottom: 80px;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .zodiac-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%);
+        animation: rotate 40s linear infinite;
+    }
+
+
+
+
+
+    .zodiac-icon {
+        font-size: 5rem;
+        margin-bottom: 25px;
+        position: relative;
+        z-index: 2;
+        text-shadow: 0 0 20px rgba(255,255,255,0.3);
+    }
+
+    .zodiac-name {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+        position: relative;
+        z-index: 2;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .zodiac-dates {
+        font-size: 1.3rem;
+        opacity: 0.9;
+        position: relative;
+        z-index: 2;
+        font-weight: 500;
+        letter-spacing: 1px;
+    }
+
+    /* Analysis Sections */
+    .analysis-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+        margin-top: 50px;
+    }
+
+    .analysis-card {
+        background: rgba(255,255,255,0.08);
+        backdrop-filter: blur(8px);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.1);
+        display: flex;
+        align-items: center;
+        gap: 25px;
+    }
+
+    .analysis-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        transform: scaleX(0);
+        transition: transform 0.2s ease;
+    }
+
+    .analysis-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .analysis-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+        background: rgba(255,255,255,0.1);
+    }
+
+    .analysis-card:hover .analysis-icon {
+        transform: scale(1.05);
+    }
+
+    .analysis-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+        box-shadow: 0 3px 10px rgba(102, 126, 234, 0.15);
+        position: relative;
+        transition: transform 0.2s ease;
+        flex-shrink: 0;
+    }
+
+
+
+    .analysis-title {
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: white;
+        margin-bottom: 10px;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        letter-spacing: 0.5px;
+    }
+
+    .analysis-content-wrapper {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .analysis-content {
+        color: rgba(255,255,255,0.9);
+        line-height: 1.6;
+        flex-grow: 1;
+        font-size: 1rem;
+    }
+
+    .analysis-content ul {
+        margin: 15px 0;
+        padding-left: 20px;
+    }
+
+    .analysis-content li {
+        margin-bottom: 8px;
+        position: relative;
+        padding-left: 5px;
+    }
+
+    .analysis-content li::before {
+        content: '✨';
+        position: absolute;
+        left: -20px;
+        color: #ff6b6b;
+        font-size: 1rem;
+        top: 1px;
+    }
+
+    .analysis-content p {
+        margin-bottom: 10px;
+        font-weight: 500;
+    }
+
+    .analysis-content strong {
+        color: #ff6b6b;
+        font-weight: 600;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(0px);
+        }
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    .floating {
+        animation: float 3s ease-in-out infinite;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2.5rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+        }
+
+        .zodiac-form {
+            padding: 30px 20px;
+        }
+
+        .analysis-grid {
+            gap: 25px;
+        }
+
+        .zodiac-card {
+            padding: 40px 20px;
+            margin-bottom: 50px;
+        }
+
+        .zodiac-icon {
+            font-size: 4rem;
+        }
+
+        .zodiac-name {
+            font-size: 2.5rem;
+        }
+
+        .analysis-card {
+            padding: 25px 20px;
+            gap: 20px;
+        }
+
+        .container {
+            padding: 0 20px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <!-- Shooting Stars Background -->
+    <div class="shooting-star shooting-star-1"></div>
+    <div class="shooting-star shooting-star-2"></div>
+    <div class="shooting-star shooting-star-3"></div>
+    <div class="shooting-star shooting-star-4"></div>
+    <div class="shooting-star shooting-star-5"></div>
+    <div class="shooting-star shooting-star-6"></div>
+    <div class="shooting-star shooting-star-7"></div>
+    <div class="shooting-star shooting-star-8"></div>
+    <div class="shooting-star shooting-star-9"></div>
+    <div class="shooting-star shooting-star-10"></div>
+    <div class="shooting-star shooting-star-11"></div>
+    <div class="shooting-star shooting-star-12"></div>
+    <div class="shooting-star shooting-star-13"></div>
+    <div class="shooting-star shooting-star-14"></div>
+    <div class="shooting-star shooting-star-15"></div>
+    <div class="shooting-star shooting-star-16"></div>
+    <div class="shooting-star shooting-star-17"></div>
+    <div class="shooting-star shooting-star-18"></div>
+    <div class="shooting-star shooting-star-19"></div>
+    <div class="shooting-star shooting-star-20"></div>
+    <div class="shooting-star shooting-star-21"></div>
+    <div class="shooting-star shooting-star-22"></div>
+    <div class="shooting-star shooting-star-23"></div>
+    <div class="shooting-star shooting-star-24"></div>
+    <div class="shooting-star shooting-star-25"></div>
+    <div class="shooting-star shooting-star-26"></div>
+    <div class="shooting-star shooting-star-27"></div>
+    <div class="shooting-star shooting-star-28"></div>
+    <div class="shooting-star shooting-star-29"></div>
+    <div class="shooting-star shooting-star-30"></div>
+    
+    <div class="hero-content">
+        <h1 class="hero-title floating">
+            <i class="fas fa-star"></i> Phân Tích Cung Hoàng Đạo
+        </h1>
+        <p class="hero-subtitle">
+            Khám phá tính cách, ngành nghề phù hợp và tiềm năng của bạn thông qua cung hoàng đạo
+        </p>
+        
+        <!-- Input Form -->
+        <div class="zodiac-form">
+            <form id="zodiacForm">
+                <div class="form-group">
+                    <label class="form-label">Ngày sinh:</label>
+                    <input type="number" class="form-input" id="day" min="1" max="31" placeholder="Nhập ngày sinh (1-31)" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Tháng sinh:</label>
+                    <select class="form-input" id="month" required>
+                        <option value="">Chọn tháng sinh</option>
+                        <option value="1">Tháng 1</option>
+                        <option value="2">Tháng 2</option>
+                        <option value="3">Tháng 3</option>
+                        <option value="4">Tháng 4</option>
+                        <option value="5">Tháng 5</option>
+                        <option value="6">Tháng 6</option>
+                        <option value="7">Tháng 7</option>
+                        <option value="8">Tháng 8</option>
+                        <option value="9">Tháng 9</option>
+                        <option value="10">Tháng 10</option>
+                        <option value="11">Tháng 11</option>
+                        <option value="12">Tháng 12</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn-analyze">
+                    <i class="fas fa-magic"></i> Phân Tích Ngay
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- Results Section -->
+<section class="results-section" id="resultsSection">
+    <div class="container">
+        <!-- Zodiac Card -->
+        <div class="zodiac-card" id="zodiacCard">
+            <div class="zodiac-icon" id="zodiacIcon"></div>
+            <h2 class="zodiac-name" id="zodiacName"></h2>
+            <p class="zodiac-dates" id="zodiacDates"></p>
+        </div>
+        
+        <!-- Analysis Grid -->
+        <div class="analysis-grid">
+            <div class="analysis-card">
+                <div class="analysis-icon">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="analysis-content-wrapper">
+                    <h3 class="analysis-title">Tính Cách</h3>
+                    <div class="analysis-content" id="personalityContent">
+                        <!-- Content will be filled by JavaScript -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="analysis-card">
+                <div class="analysis-icon">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+                <div class="analysis-content-wrapper">
+                    <h3 class="analysis-title">Ngành Nghề Phù Hợp</h3>
+                    <div class="analysis-content" id="careerContent">
+                        <!-- Content will be filled by JavaScript -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="analysis-card">
+                <div class="analysis-icon">
+                    <i class="fas fa-lightbulb"></i>
+                </div>
+                <div class="analysis-content-wrapper">
+                    <h3 class="analysis-title">Lý Do Chọn Ngành</h3>
+                    <div class="analysis-content" id="reasonContent">
+                        <!-- Content will be filled by JavaScript -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="analysis-card">
+                <div class="analysis-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="analysis-content-wrapper">
+                    <h3 class="analysis-title">Tiềm Năng Phát Triển</h3>
+                    <div class="analysis-content" id="potentialContent">
+                        <!-- Content will be filled by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Zodiac data
+    const zodiacData = {
+        aries: {
+            name: "Bạch Dương",
+            icon: "♈",
+            dates: "21/3 - 20/4",
+            personality: "Bạch Dương là người tiên phong với tinh thần lãnh đạo bẩm sinh. Họ năng động, dũng cảm và luôn sẵn sàng đối mặt với thử thách. Với tính cách nhiệt tình, quyết đoán và thẳng thắn, Bạch Dương thường là người khởi xướng các ý tưởng mới và dẫn dắt người khác. Họ có khả năng ra quyết định nhanh chóng và không ngại rủi ro.",
+            career: "Quản lý cấp cao, CEO, doanh nhân, huấn luyện viên thể thao, sĩ quan quân đội, cảnh sát, chuyên gia marketing, nhân viên sales, founder startup, nhà thám hiểm, vận động viên chuyên nghiệp",
+            reason: "Tính cách lãnh đạo tự nhiên và khả năng ra quyết định nhanh chóng giúp Bạch Dương phù hợp với các vị trí quản lý. Sự dũng cảm và thích thử thách khiến họ thành công trong lĩnh vực kinh doanh và thể thao. Khả năng truyền cảm hứng và động lực cho người khác.",
+            potential: "Có tiềm năng trở thành lãnh đạo xuất sắc trong tổ chức lớn, doanh nhân thành công với khả năng xây dựng doanh nghiệp từ con số 0, chuyên gia trong lĩnh vực thể thao hoặc quân sự. Khả năng đổi mới và tiên phong trong các lĩnh vực mới."
+        },
+        taurus: {
+            name: "Kim Ngưu",
+            icon: "♉",
+            dates: "21/4 - 20/5",
+            personality: "Kim Ngưu là người đáng tin cậy với tính cách kiên nhẫn và ổn định. Họ có óc thẩm mỹ cao, thực tế và luôn coi trọng chất lượng. Với sự kiên trì và quyết tâm, Kim Ngưu thường đạt được mục tiêu thông qua sự chăm chỉ và phương pháp có hệ thống. Họ thích sự ổn định và có khả năng xây dựng nền tảng vững chắc.",
+            career: "Chuyên gia tài chính, quản lý ngân hàng, nhà đầu tư bất động sản, nông dân, đầu bếp, nhà thiết kế nội thất, kiến trúc sư, nhà sưu tầm nghệ thuật, chuyên gia phong thủy, nhà quản lý tài sản, chuyên gia ẩm thực",
+            reason: "Tính cách kiên nhẫn và thực tế giúp Kim Ngưu phù hợp với các ngành cần sự ổn định và chi tiết. Óc thẩm mỹ cao và khả năng đánh giá chất lượng khiến họ thành công trong lĩnh vực nghệ thuật và ẩm thực. Sự đáng tin cậy và phương pháp có hệ thống.",
+            potential: "Có thể trở thành chuyên gia tài chính hàng đầu, kiến trúc sư nổi tiếng với các công trình độc đáo, doanh nhân thành công trong lĩnh vực bất động sản hoặc ẩm thực. Khả năng xây dựng sự nghiệp bền vững và tích lũy tài sản."
+        },
+        gemini: {
+            name: "Song Tử",
+            icon: "♊",
+            dates: "21/5 - 21/6",
+            personality: "Song Tử là người thông minh với khả năng giao tiếp xuất sắc và trí tò mò vô tận. Họ linh hoạt, thích ứng nhanh và có khả năng học hỏi đa dạng. Với tính cách hài hước, thân thiện và khả năng kết nối với mọi người, Song Tử thường là người tạo ra không khí vui vẻ. Họ có khả năng xử lý nhiều việc cùng lúc và thích sự đa dạng.",
+            career: "Nhà báo, phóng viên, MC, giáo viên, hướng dẫn viên du lịch, chuyên viên PR, nhân viên dịch vụ khách hàng, lập trình viên, chuyên gia marketing, nhà văn, phiên dịch viên, nhà tư vấn",
+            reason: "Khả năng giao tiếp xuất sắc và trí tò mò giúp Song Tử phù hợp với các ngành cần sự tương tác và học hỏi. Tính linh hoạt và thích ứng nhanh khiến họ thành công trong môi trường thay đổi. Khả năng xử lý đa nhiệm và tạo kết nối.",
+            potential: "Có thể trở thành nhà báo nổi tiếng, MC chuyên nghiệp, giáo viên xuất sắc hoặc chuyên gia marketing sáng tạo. Khả năng phát triển trong nhiều lĩnh vực khác nhau và thích nghi với xu hướng mới."
+        },
+        cancer: {
+            name: "Cự Giải",
+            icon: "♋",
+            dates: "22/6 - 22/7",
+            personality: "Cự Giải là người nhạy cảm với trực giác mạnh mẽ và tình cảm sâu sắc. Họ có khả năng đồng cảm cao, quan tâm đến người khác và có trí tưởng tượng phong phú. Với tính cách bảo vệ, trung thành và coi trọng gia đình, Cự Giải thường là người tạo ra môi trường an toàn và ấm áp. Họ có khả năng ghi nhớ tốt và thích chăm sóc người khác.",
+            career: "Bác sĩ, y tá, nhà tâm lý học, giáo viên mầm non, nhà tư vấn, chuyên viên nhân sự, nhà hàng, khách sạn, chăm sóc người già, nhà văn, nghệ sĩ, nhà thiết kế nội thất",
+            reason: "Tính cách nhạy cảm và khả năng đồng cảm giúp Cự Giải phù hợp với các ngành cần sự quan tâm và chăm sóc. Trực giác mạnh mẽ và tình cảm sâu sắc khiến họ thành công trong lĩnh vực y tế và giáo dục. Khả năng tạo môi trường ấm áp và an toàn.",
+            potential: "Có thể trở thành bác sĩ tài ba với khả năng chẩn đoán chính xác, nhà tâm lý học xuất sắc, giáo viên mầm non được yêu mến hoặc chuyên gia trong lĩnh vực dịch vụ khách hàng. Khả năng xây dựng mối quan hệ bền vững và tạo ảnh hưởng tích cực."
+        },
+        leo: {
+            name: "Sư Tử",
+            icon: "♌",
+            dates: "23/7 - 22/8",
+            personality: "Sư Tử là người tự tin với khả năng lãnh đạo tự nhiên và sự hào phóng trong tâm hồn. Họ có tính cách sáng tạo, thích được chú ý và có khả năng truyền cảm hứng mạnh mẽ. Với sự kiêu hãnh, lòng dũng cảm và tinh thần bảo vệ người khác, Sư Tử thường là người tạo ra ảnh hưởng tích cực. Họ có khả năng tổ chức và dẫn dắt người khác.",
+            career: "Diễn viên, ca sĩ, MC, nhà thiết kế thời trang, doanh nhân, chính trị gia, giáo viên, nhà quản lý, nhà sáng tạo nội dung, nhà tổ chức sự kiện, chuyên gia PR, nhà lãnh đạo tổ chức",
+            reason: "Tính cách tự tin và khả năng lãnh đạo giúp Sư Tử phù hợp với các ngành cần sự thể hiện và dẫn dắt. Sự sáng tạo và khả năng truyền cảm hứng khiến họ thành công trong lĩnh vực giải trí và nghệ thuật. Khả năng tổ chức và tạo ảnh hưởng.",
+            potential: "Có thể trở thành ngôi sao giải trí nổi tiếng, doanh nhân thành công với khả năng xây dựng thương hiệu, chính trị gia có ảnh hưởng hoặc nhà lãnh đạo tổ chức xuất sắc. Khả năng tạo ra ảnh hưởng lớn và truyền cảm hứng cho nhiều người."
+        },
+        virgo: {
+            name: "Xử Nữ",
+            icon: "♍",
+            dates: "23/8 - 22/9",
+            personality: "Xử Nữ là người tỉ mỉ với óc phân tích sắc bén và khả năng quan sát chi tiết. Họ thông minh, thực tế và luôn hướng đến sự hoàn hảo trong mọi việc. Với tính cách khiêm tốn, chăm chỉ và có trách nhiệm cao, Xử Nữ thường là người đáng tin cậy trong công việc. Họ có khả năng tổ chức tốt và giải quyết vấn đề một cách có hệ thống.",
+            career: "Kế toán viên, kiểm toán viên, nhà nghiên cứu, nhà khoa học, bác sĩ, lập trình viên, biên tập viên, dịch thuật viên, nhà phân tích dữ liệu, chuyên gia QA, nhà văn kỹ thuật, chuyên gia tư vấn",
+            reason: "Tính cách tỉ mỉ và óc phân tích sắc bén giúp Xử Nữ phù hợp với các ngành cần sự chính xác và chi tiết. Khả năng quan sát và giải quyết vấn đề khiến họ thành công trong lĩnh vực nghiên cứu và phân tích. Sự chăm chỉ và trách nhiệm cao.",
+            potential: "Có thể trở thành nhà khoa học xuất sắc, bác sĩ chuyên khoa tài ba, chuyên gia phân tích dữ liệu hàng đầu hoặc nhà nghiên cứu có đóng góp quan trọng. Khả năng đạt được sự hoàn hảo trong chuyên môn và xây dựng uy tín cao."
+        },
+        libra: {
+            name: "Thiên Bình",
+            icon: "♎",
+            dates: "23/9 - 23/10",
+            personality: "Thiên Bình là người công bằng với óc thẩm mỹ cao và khả năng hòa giải xuất sắc. Họ thông minh, hòa nhã và luôn tìm kiếm sự cân bằng trong mọi tình huống. Với tính cách lịch thiệp, có trách nhiệm xã hội và khả năng nhìn nhận vấn đề từ nhiều góc độ, Thiên Bình thường là người tạo ra sự hài hòa. Họ có khả năng đưa ra quyết định công bằng và hợp lý.",
+            career: "Luật sư, thẩm phán, nhà ngoại giao, nhà thiết kế, nghệ sĩ, nhà tư vấn, chuyên viên nhân sự, chuyên gia quan hệ công chúng, nhà hòa giải, chuyên gia đàm phán, nhà báo, chuyên gia tư vấn hôn nhân",
+            reason: "Tính cách công bằng và khả năng hòa giải giúp Thiên Bình phù hợp với các ngành cần sự cân bằng và công lý. Óc thẩm mỹ cao và khả năng nhìn nhận đa chiều khiến họ thành công trong lĩnh vực nghệ thuật và tư vấn. Khả năng tạo ra sự hài hòa và đưa ra quyết định hợp lý.",
+            potential: "Có thể trở thành luật sư xuất sắc với khả năng bảo vệ công lý, nhà ngoại giao tài ba, nhà thiết kế nổi tiếng hoặc chuyên gia tư vấn được tin cậy. Khả năng tạo ra ảnh hưởng tích cực trong xã hội và xây dựng mối quan hệ bền vững."
+        },
+        scorpio: {
+            name: "Bọ Cạp",
+            icon: "♏",
+            dates: "24/10 - 22/11",
+            personality: "Bọ Cạp là người mạnh mẽ với trực giác siêu phàm và khả năng điều tra sâu sắc. Họ quyết đoán, bí ẩn và có khả năng nhìn thấu bản chất của mọi vấn đề. Với tính cách kiên trì, trung thành và có khả năng tập trung cao độ, Bọ Cạp thường là người giải quyết được những vấn đề phức tạp. Họ có khả năng bảo vệ người thân và giữ bí mật tốt.",
+            career: "Thám tử, cảnh sát, nhà tâm lý học, nhà nghiên cứu, chuyên gia tài chính, bác sĩ phẫu thuật, nhà khoa học, chuyên gia điều tra, nhà văn trinh thám, chuyên gia bảo mật, nhà phân tích tình báo, chuyên gia tư vấn",
+            reason: "Tính cách mạnh mẽ và trực giác siêu phàm giúp Bọ Cạp phù hợp với các ngành cần sự điều tra và phân tích sâu. Khả năng nhìn thấu bản chất và kiên trì khiến họ thành công trong lĩnh vực nghiên cứu và điều tra. Khả năng bảo vệ và giữ bí mật.",
+            potential: "Có thể trở thành thám tử xuất sắc với khả năng giải quyết các vụ án phức tạp, nhà tâm lý học tài ba, nhà nghiên cứu có đóng góp quan trọng hoặc chuyên gia tài chính thành công. Khả năng đạt được thành tựu cao trong lĩnh vực chuyên môn."
+        },
+        sagittarius: {
+            name: "Nhân Mã",
+            icon: "♐",
+            dates: "23/11 - 21/12",
+            personality: "Nhân Mã là người lạc quan với tinh thần phiêu lưu và khát khao khám phá vô tận. Họ thông minh, thẳng thắn và luôn tìm kiếm sự tự do trong cuộc sống. Với tính cách nhiệt tình, hài hước và có tầm nhìn xa, Nhân Mã thường là người truyền cảm hứng cho người khác. Họ có khả năng thích ứng với môi trường mới và học hỏi từ những trải nghiệm.",
+            career: "Hướng dẫn viên du lịch, giáo viên, nhà báo, nhà xuất bản, doanh nhân quốc tế, vận động viên, phiên dịch viên, nhà thám hiểm, chuyên gia marketing quốc tế, nhà văn, chuyên gia tư vấn du lịch, nhà nghiên cứu văn hóa",
+            reason: "Tính cách phiêu lưu và lạc quan giúp Nhân Mã phù hợp với các ngành cần sự khám phá và giao lưu. Khả năng thích ứng và học hỏi khiến họ thành công trong môi trường quốc tế. Tầm nhìn xa và khả năng truyền cảm hứng.",
+            potential: "Có thể trở thành hướng dẫn viên du lịch nổi tiếng, giáo viên xuất sắc, nhà báo quốc tế hoặc doanh nhân thành công trong lĩnh vực quốc tế. Khả năng mở rộng tầm nhìn và tạo ra ảnh hưởng tích cực trên toàn cầu."
+        },
+        capricorn: {
+            name: "Ma Kết",
+            icon: "♑",
+            dates: "22/12 - 19/1",
+            personality: "Ma Kết là người tham vọng với khả năng lãnh đạo bẩm sinh và sự kiên trì phi thường. Họ có trách nhiệm cao, thực tế và luôn hướng đến mục tiêu dài hạn. Với tính cách kỷ luật, có tổ chức và khả năng quản lý tài chính tốt, Ma Kết thường là người xây dựng nền tảng vững chắc. Họ có khả năng đạt được thành công thông qua sự chăm chỉ và phương pháp có hệ thống.",
+            career: "CEO, giám đốc điều hành, doanh nhân, chính trị gia, luật sư, chuyên gia tài chính, kiến trúc sư, nhà quản lý dự án, chuyên gia bất động sản, nhà đầu tư, chuyên gia tư vấn chiến lược, nhà lãnh đạo tổ chức",
+            reason: "Tính cách tham vọng và khả năng lãnh đạo giúp Ma Kết phù hợp với các ngành cần sự quản lý và phát triển. Sự kiên trì và kỷ luật khiến họ thành công trong việc xây dựng sự nghiệp. Khả năng quản lý tài chính và tổ chức.",
+            potential: "Có thể trở thành CEO xuất sắc của các tập đoàn lớn, chính trị gia có ảnh hưởng, doanh nhân thành công với khả năng xây dựng đế chế kinh doanh hoặc nhà lãnh đạo tổ chức tài ba. Khả năng đạt được thành tựu cao và xây dựng di sản bền vững."
+        },
+        aquarius: {
+            name: "Bảo Bình",
+            icon: "♒",
+            dates: "20/1 - 18/2",
+            personality: "Bảo Bình là người sáng tạo với tư duy độc lập và tinh thần nhân đạo sâu sắc. Họ thông minh, tiến bộ và luôn hướng đến tương lai. Với tính cách độc đáo, có tầm nhìn xa và khả năng tư duy đổi mới, Bảo Bình thường là người tiên phong trong các ý tưởng mới. Họ có khả năng kết nối với mọi người và tạo ra những thay đổi tích cực trong xã hội.",
+            career: "Nhà khoa học, lập trình viên, nhà thiết kế, nghệ sĩ, nhà hoạt động xã hội, chuyên gia môi trường, nhà nghiên cứu, chuyên gia công nghệ, nhà văn khoa học viễn tưởng, chuyên gia tư vấn đổi mới, nhà giáo dục, chuyên gia phát triển bền vững",
+            reason: "Tính cách sáng tạo và tư duy độc lập giúp Bảo Bình phù hợp với các ngành cần sự đổi mới và sáng tạo. Tinh thần nhân đạo và tầm nhìn xa khiến họ thành công trong lĩnh vực khoa học và xã hội. Khả năng tạo ra những thay đổi tích cực.",
+            potential: "Có thể trở thành nhà khoa học xuất sắc với những phát minh đột phá, nhà thiết kế sáng tạo, lập trình viên tài ba hoặc nhà hoạt động xã hội có ảnh hưởng. Khả năng tạo ra những đổi mới quan trọng và đóng góp cho sự phát triển của xã hội."
+        },
+        pisces: {
+            name: "Song Ngư",
+            icon: "♓",
+            dates: "19/2 - 20/3",
+            personality: "Song Ngư là người nhạy cảm với trực giác mạnh mẽ và trí tưởng tượng phong phú. Họ có tính cách tình cảm, sáng tạo và có khả năng đồng cảm sâu sắc với người khác. Với tính cách lãng mạn, có tâm hồn nghệ sĩ và khả năng kết nối với thế giới tâm linh, Song Ngư thường là người tạo ra những tác phẩm nghệ thuật đẹp. Họ có khả năng chữa lành và an ủi người khác.",
+            career: "Nghệ sĩ, nhạc sĩ, nhà văn, nhà thơ, nhà tâm lý học, bác sĩ, nhà tư vấn, nhà thiết kế, diễn viên, ca sĩ, nhà trị liệu nghệ thuật, chuyên gia tâm linh, nhà văn hóa, chuyên gia chăm sóc sức khỏe tinh thần",
+            reason: "Tính cách nhạy cảm và trực giác mạnh mẽ giúp Song Ngư phù hợp với các ngành cần sự sáng tạo và tình cảm. Khả năng đồng cảm và trí tưởng tượng phong phú khiến họ thành công trong lĩnh vực nghệ thuật và chữa lành. Khả năng kết nối với thế giới tâm linh.",
+            potential: "Có thể trở thành nghệ sĩ nổi tiếng với những tác phẩm nghệ thuật độc đáo, nhà văn tài ba, nhà tâm lý học xuất sắc hoặc chuyên gia chữa lành tâm hồn. Khả năng tạo ra những tác phẩm nghệ thuật có ý nghĩa sâu sắc và đóng góp cho sự phát triển tinh thần của con người."
+        }
+    };
+
+    // Function to determine zodiac sign
+    function getZodiacSign(day, month) {
+        if ((month === 3 && day >= 21) || (month === 4 && day <= 20)) return 'aries';
+        if ((month === 4 && day >= 21) || (month === 5 && day <= 20)) return 'taurus';
+        if ((month === 5 && day >= 21) || (month === 6 && day <= 21)) return 'gemini';
+        if ((month === 6 && day >= 22) || (month === 7 && day <= 22)) return 'cancer';
+        if ((month === 7 && day >= 23) || (month === 8 && day <= 22)) return 'leo';
+        if ((month === 8 && day >= 23) || (month === 9 && day <= 22)) return 'virgo';
+        if ((month === 9 && day >= 23) || (month === 10 && day <= 23)) return 'libra';
+        if ((month === 10 && day >= 24) || (month === 11 && day <= 22)) return 'scorpio';
+        if ((month === 11 && day >= 23) || (month === 12 && day <= 21)) return 'sagittarius';
+        if ((month === 12 && day >= 22) || (month === 1 && day <= 19)) return 'capricorn';
+        if ((month === 1 && day >= 20) || (month === 2 && day <= 18)) return 'aquarius';
+        if ((month === 2 && day >= 19) || (month === 3 && day <= 20)) return 'pisces';
+        return null;
+    }
+
+    // Function to display results
+    function displayResults(zodiacSign) {
+        const data = zodiacData[zodiacSign];
+        if (!data) return;
+
+        // Update zodiac card
+        document.getElementById('zodiacIcon').textContent = data.icon;
+        document.getElementById('zodiacName').textContent = data.name;
+        document.getElementById('zodiacDates').textContent = data.dates;
+
+        // Update analysis content
+        document.getElementById('personalityContent').innerHTML = `
+            <p>${data.personality}</p>
+            <ul>
+                <li>Điểm mạnh: Năng động, quyết đoán</li>
+                <li>Điểm yếu: Nóng vội, bốc đồng</li>
+                <li>Phong cách làm việc: Lãnh đạo, tiên phong</li>
+            </ul>
+        `;
+
+        document.getElementById('careerContent').innerHTML = `
+            <p><strong>Ngành nghề phù hợp:</strong></p>
+            <ul>
+                <li>${data.career.split(', ').join('</li><li>')}</li>
+            </ul>
+        `;
+
+        document.getElementById('reasonContent').innerHTML = `
+            <p>${data.reason}</p>
+            <ul>
+                <li>Tính cách phù hợp với ngành</li>
+                <li>Khả năng thích ứng tốt</li>
+                <li>Tiềm năng phát triển cao</li>
+            </ul>
+        `;
+
+        document.getElementById('potentialContent').innerHTML = `
+            <p>${data.potential}</p>
+            <ul>
+                <li>Khả năng lãnh đạo</li>
+                <li>Sáng tạo và đổi mới</li>
+                <li>Thành công trong sự nghiệp</li>
+            </ul>
+        `;
+
+        // Show results section
+        document.getElementById('resultsSection').classList.add('show');
+        
+        // Smooth scroll to results
+        document.getElementById('resultsSection').scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+    }
+
+    // Form submission
+    document.getElementById('zodiacForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const day = parseInt(document.getElementById('day').value);
+        const month = parseInt(document.getElementById('month').value);
+        
+        if (day && month) {
+            const zodiacSign = getZodiacSign(day, month);
+            if (zodiacSign) {
+                displayResults(zodiacSign);
+            } else {
+                alert('Vui lòng nhập ngày tháng sinh hợp lệ!');
+            }
+        } else {
+            alert('Vui lòng nhập đầy đủ ngày và tháng sinh!');
+        }
+    });
+
+    // Add floating animation to zodiac icon
+    document.addEventListener('DOMContentLoaded', function() {
+        const zodiacIcon = document.getElementById('zodiacIcon');
+        if (zodiacIcon) {
+            zodiacIcon.classList.add('floating');
+        }
+    });
+</script>
+{% endblock %}

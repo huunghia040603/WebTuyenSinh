@@ -20,6 +20,11 @@ document.addEventListener('DOMContentLoaded', function () {
     let currentLocationFilter = 'tphcm';
     let currentTypeFilter = '';
     let currentAdmissionScoreFilter = '';
+    let allUniversities = []; // Lưu trữ tất cả dữ liệu trường
+    let filteredUniversities = []; // Dữ liệu đã lọc
+    const ITEMS_PER_PAGE = 12;
+    const CACHE_KEY = 'universities_data';
+    const CACHE_EXPIRY = 24 * 60 * 60 * 1000; // 8 giờ
 
     // Tuition filter elements
     const tuitionMinInput = document.getElementById('tuitionMin');
@@ -33,6 +38,54 @@ document.addEventListener('DOMContentLoaded', function () {
     let currentTuitionMax = tuitionMaxInput ? parseInt(tuitionMaxInput.value, 10) : 100;
     const MIN_TUITION = tuitionMinInput ? parseInt(tuitionMinInput.min, 10) : 0;
     const MAX_TUITION = tuitionMaxInput ? parseInt(tuitionMaxInput.max, 10) : 100;
+
+    let tuitionFilterActive = false;
+
+    // Skeleton loading effect
+    function renderSkeletonCards(count = 12) {
+        if (!universitiesGrid) return;
+        let html = '';
+        for (let i = 0; i < count; i++) {
+            html += `
+            <div class="university-card skeleton-card">
+                <div class="card-content">
+                    <div class="card-image">
+                        <div class="skeleton-thumb"></div>
+                    </div>
+                    <div class="card-info">
+                        <div class="skeleton-line skeleton-title"></div>
+                        <div class="info-tags">
+                            <div class="skeleton-line skeleton-tag"></div>
+                            <div class="skeleton-line skeleton-tag"></div>
+                            <div class="skeleton-line skeleton-tag"></div>
+                        </div>
+                        <div class="info-tags">
+                            <div class="skeleton-line skeleton-tag short"></div>
+                            <div class="skeleton-line skeleton-tag short"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `;
+        }
+        universitiesGrid.innerHTML = html;
+    }
+
+    // Debug function để kiểm tra dữ liệu
+    function debugFilterData() {
+        console.log('=== DEBUG FILTER DATA ===');
+        console.log('Current filters:', {
+            search: currentSearchTerm,
+            location: currentLocationFilter,
+            type: currentTypeFilter,
+            admissionScore: currentAdmissionScoreFilter,
+            tuitionMin: currentTuitionMin,
+            tuitionMax: currentTuitionMax
+        });
+        console.log('Total universities:', allUniversities.length);
+        console.log('Filtered universities:', filteredUniversities.length);
+        console.log('Sample university data:', allUniversities[0]);
+    }
 
     function updateTuitionSliderUI() {
         if (!tuitionMinInput || !tuitionMaxInput) return;
@@ -68,18 +121,21 @@ document.addEventListener('DOMContentLoaded', function () {
     // Add event listeners for tuition filters if elements exist
     if (tuitionMinInput) {
         tuitionMinInput.addEventListener('input', function() {
+            tuitionFilterActive = true;
             updateTuitionSliderUI();
             applyFiltersAndFetch(1);
         });
     }
     if (tuitionMaxInput) {
         tuitionMaxInput.addEventListener('input', function() {
+            tuitionFilterActive = true;
             updateTuitionSliderUI();
             applyFiltersAndFetch(1);
         });
     }
     if (tuitionRangeInputMin) {
         tuitionRangeInputMin.addEventListener('change', function() {
+            tuitionFilterActive = true;
             let min = parseInt(tuitionRangeInputMin.value, 10);
             let max = tuitionRangeInputMax ? parseInt(tuitionRangeInputMax.value, 10) : MAX_TUITION;
             if (isNaN(min) || min < MIN_TUITION) min = MIN_TUITION;
@@ -91,6 +147,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     if (tuitionRangeInputMax) {
         tuitionRangeInputMax.addEventListener('change', function() {
+            tuitionFilterActive = true;
             let min = tuitionRangeInputMin ? parseInt(tuitionRangeInputMin.value, 10) : MIN_TUITION;
             let max = parseInt(tuitionRangeInputMax.value, 10);
             if (isNaN(max) || max > MAX_TUITION) max = MAX_TUITION;
@@ -104,38 +161,67 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initial UI update for tuition slider
     updateTuitionSliderUI();
 
-    // Function to fetch data from API with pagination and filters
-    async function fetchUniversities(page = 1) {
-        if (!universitiesGrid) return; // Prevent error if grid element is missing
-        universitiesGrid.innerHTML = `
-            <div class="modern-loader">
-                <div class="modern-loader-spinner"></div>
-                <div class="modern-loader-text">Tôi đang tải dữ liệu! <br/> Chờ tôi xíu nhé...</div>
-            </div>
-        `;
-        currentPage = page;
+    // Function to check if cached data is valid
+    function isCacheValid() {
+        try {
+            const cached = localStorage.getItem(CACHE_KEY);
+            if (!cached) return false;
+            
+            const { timestamp, data } = JSON.parse(cached);
+            const now = Date.now();
+            
+            return (now - timestamp) < CACHE_EXPIRY && data && data.length > 0;
+        } catch (error) {
+            console.error('Error checking cache:', error);
+            return false;
+        }
+    }
 
-        const baseUrl = 'https://timtruonghoc.pythonanywhere.com/schools/';
+    // Function to get cached data
+    function getCachedData() {
+        try {
+            const cached = localStorage.getItem(CACHE_KEY);
+            if (cached) {
+                const { data } = JSON.parse(cached);
+                return data;
+            }
+        } catch (error) {
+            console.error('Error getting cached data:', error);
+        }
+        return null;
+    }
+
+    // Function to save data to cache
+    function saveToCache(data) {
+        try {
+            const cacheData = {
+                timestamp: Date.now(),
+                data: data
+            };
+            localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
+        } catch (error) {
+            console.error('Error saving to cache:', error);
+        }
+    }
+
+    // Function to fetch all universities data once
+    async function fetchAllUniversities() {
+        if (!universitiesGrid) return;
+
+        // Kiểm tra cache trước
+        if (isCacheValid()) {
+            allUniversities = getCachedData();
+            applyFiltersAndRender(1);
+            return;
+        }
+
+        renderSkeletonCards(12);
+
+        // API endpoint thông thường (đã hoạt động)
+        const baseUrl = 'https://timtruonghoc.pythonanywhere.com/schools-optimized/';
+
         const params = new URLSearchParams();
-
-        if (currentSearchTerm) {
-            params.append('search', currentSearchTerm);
-        }
-        if (currentLocationFilter) {
-            params.append('country', currentLocationFilter);
-        }
-        if (currentTypeFilter) {
-            params.append('school_type', currentTypeFilter);
-        }
-        if (currentTuitionMin > MIN_TUITION) {
-            params.append('start', currentTuitionMin);
-        }
-        if (currentTuitionMax < MAX_TUITION) {
-            params.append('end', currentTuitionMax);
-        }
-
-        params.append('page', currentPage);
-        params.append('page_size', 12);
+        params.append('page_size', 1000); // Lấy tất cả dữ liệu
 
         const url = `${baseUrl}?${params.toString()}`;
         try {
@@ -144,7 +230,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const data = await response.json();
-            let universities = data.results.map(uni => ({
+            
+            // Tối ưu hóa: Sử dụng API schools-optimized không bao gồm majors_data
+            // Dữ liệu ngành sẽ được tải riêng khi vào trang chi tiết trường
+            allUniversities = data.results.map(uni => ({
                 id: uni.id,
                 name_en: uni.name_en,
                 name_vn: uni.name_vn,
@@ -160,7 +249,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 email: uni.email,
                 country: uni.country,
                 map_link: uni.map_link,
-                majors_data: uni.majors_data,
+                // Tối ưu hóa: Bỏ majors_data để giảm kích thước dữ liệu
+                // majors_data sẽ được tải riêng khi vào trang chi tiết trường
                 start: uni.start,
                 end: uni.end,
                 registration: uni.registration,
@@ -170,30 +260,100 @@ document.addEventListener('DOMContentLoaded', function () {
                 min_admission_score: uni.min_admission_score || null
             }));
 
-            totalPages = data.total_pages;
-
-            if (currentAdmissionScoreFilter) {
-                universities = universities.filter(uni => {
-                    const score = parseFloat(uni.min_admission_score);
-                    if (isNaN(score)) return false;
-                    if (currentAdmissionScoreFilter === 'low') return score >= 15 && score <= 18;
-                    if (currentAdmissionScoreFilter === 'medium') return score > 18 && score <= 20;
-                    if (currentAdmissionScoreFilter === 'high') return score > 20 && score <= 22;
-                    if (currentAdmissionScoreFilter === 'veryhigh') return score > 22;
-                    return true;
-                });
-            }
-
-            renderUniversities(universities);
-            updatePaginationControls();
+            // Lưu vào cache
+            saveToCache(allUniversities);
+            applyFiltersAndRender(1);
         } catch (error) {
             console.error('Error fetching universities:', error);
             if (universitiesGrid) {
                 universitiesGrid.innerHTML = '<p>Không thể tải dữ liệu trường học. Vui lòng thử lại sau.</p>';
             }
-            totalPages = 1;
-            updatePaginationControls();
         }
+    }
+
+    // Function to apply filters and render universities
+    function applyFiltersAndRender(page = 1) {
+        currentPage = page;
+        
+        // Lọc dữ liệu theo các tiêu chí
+        filteredUniversities = allUniversities.filter(uni => {
+            // Lọc theo tìm kiếm
+            if (currentSearchTerm) {
+                const searchLower = currentSearchTerm.toLowerCase();
+                const nameVn = uni.name_vn ? uni.name_vn.toLowerCase() : '';
+                const nameEn = uni.name_en ? uni.name_en.toLowerCase() : '';
+                const shortCode = uni.short_code ? uni.short_code.toLowerCase() : '';
+                
+                const nameMatch = nameVn.includes(searchLower) || 
+                                nameEn.includes(searchLower) ||
+                                shortCode.includes(searchLower);
+                if (!nameMatch) return false;
+            }
+
+            // Lọc theo địa điểm
+            if (currentLocationFilter) {
+                const country = uni.country ? uni.country.toLowerCase() : '';
+                const locationFilter = currentLocationFilter.toLowerCase();
+                
+                if (locationFilter === 'tphcm' && !country.includes('tphcm')) return false;
+                if (locationFilter === 'tp.hà nội' && !country.includes('tp.hà nội')) return false;
+                if (locationFilter === 'tp.đà nẵng' && !country.includes('tp.đà nẵng')) return false;
+                if (locationFilter === 'other' && 
+                    (country.includes('tphcm') || country.includes('tp.hà nội') || country.includes('tp.đà nẵng'))) return false;
+            }
+
+            // Lọc theo loại trường
+            if (currentTypeFilter) {
+                const schoolType = uni.school_type ? uni.school_type.toLowerCase() : '';
+                const typeFilter = currentTypeFilter.toLowerCase();
+                
+                if (typeFilter === 'public' && schoolType !== 'public') return false;
+                if (typeFilter === 'private' && schoolType !== 'private') return false;
+                if (typeFilter === 'international' && schoolType !== 'international') return false;
+            }
+
+            // Lọc theo học phí
+            if (tuitionFilterActive) {
+                const tuitionStart = typeof uni.start === 'number' ? uni.start : 0;
+                const tuitionEnd = typeof uni.end === 'number' ? uni.end : tuitionStart;
+                if (tuitionStart < currentTuitionMin || tuitionEnd > currentTuitionMax) return false;
+            }
+
+            // Lọc theo điểm sàn
+            if (currentAdmissionScoreFilter) {
+                const score = parseFloat(uni.min_admission_score);
+                if (isNaN(score)) return false;
+                
+                switch (currentAdmissionScoreFilter) {
+                    case 'low':
+                        if (score < 15 || score > 18) return false;
+                        break;
+                    case 'medium':
+                        if (score <= 18 || score > 20) return false;
+                        break;
+                    case 'high':
+                        if (score <= 20 || score > 22) return false;
+                        break;
+                    case 'veryhigh':
+                        if (score <= 22) return false;
+                        break;
+                }
+            }
+
+            return true;
+        });
+
+        // Tính toán phân trang
+        totalPages = Math.ceil(filteredUniversities.length / ITEMS_PER_PAGE);
+        const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+        const endIndex = startIndex + ITEMS_PER_PAGE;
+        const pageUniversities = filteredUniversities.slice(startIndex, endIndex);
+
+        renderUniversities(pageUniversities);
+        updatePaginationControls();
+        
+        // Debug khi cần thiết (có thể comment out sau khi test xong)
+        // debugFilterData();
     }
 
     function renderUniversities(universities) {
@@ -298,7 +458,7 @@ document.addEventListener('DOMContentLoaded', function () {
             firstPageButton.className = 'page-number-button';
             firstPageButton.textContent = '1';
             firstPageButton.addEventListener('click', () => {
-                fetchUniversities(1);
+                applyFiltersAndRender(1);
                 if (universitiesGrid) universitiesGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
             });
             pageNumbersContainer.appendChild(firstPageButton);
@@ -319,7 +479,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 pageButton.classList.add('active');
             }
             pageButton.addEventListener('click', () => {
-                fetchUniversities(i);
+                applyFiltersAndRender(i);
                 if (universitiesGrid) universitiesGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
             });
             pageNumbersContainer.appendChild(pageButton);
@@ -337,7 +497,7 @@ document.addEventListener('DOMContentLoaded', function () {
             lastPageButton.className = 'page-number-button';
             lastPageButton.textContent = totalPages;
             lastPageButton.addEventListener('click', () => {
-                fetchUniversities(totalPages);
+                applyFiltersAndRender(totalPages);
                 if (universitiesGrid) universitiesGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
             });
             pageNumbersContainer.appendChild(lastPageButton);
@@ -361,10 +521,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <div class="detailed-section">
                     <h4 class="section-heading">Ngành đào tạo chính</h4>
                     <ul class="description-list">
-                        ${university.majors_data && university.majors_data.length > 0 ?
-                            university.majors_data.map(major => `<li>${major.name}</li>`).join('') :
-                            '<li>Không có thông tin ngành đào tạo chính.</li>'
-                        }
+                        <li>Bấm xem chi tiết để xem</li>
                     </ul>
                 </div>
                 <div class="detailed-section">
@@ -472,11 +629,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Filter and Pagination logic
     function applyFiltersAndFetch(page = 1) {
-        currentSearchTerm = searchInput ? searchInput.value.trim().toLowerCase() : '';
-        currentLocationFilter = locationFilter ? locationFilter.value.toLowerCase() : '';
-        currentTypeFilter = typeFilter ? typeFilter.value.toLowerCase() : '';
+        currentSearchTerm = searchInput ? searchInput.value.trim() : '';
+        currentLocationFilter = locationFilter ? locationFilter.value : '';
+        currentTypeFilter = typeFilter ? typeFilter.value : '';
         currentAdmissionScoreFilter = admissionScoreFilter ? admissionScoreFilter.value : '';
-        fetchUniversities(page);
+        applyFiltersAndRender(page);
     }
 
     // Debounce helper
@@ -504,7 +661,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (prevPageButton) {
         prevPageButton.addEventListener('click', () => {
             if (currentPage > 1) {
-                fetchUniversities(currentPage - 1);
+                applyFiltersAndRender(currentPage - 1);
                 if (universitiesGrid) universitiesGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         });
@@ -512,12 +669,48 @@ document.addEventListener('DOMContentLoaded', function () {
     if (nextPageButton) {
         nextPageButton.addEventListener('click', () => {
             if (currentPage < totalPages) {
-                fetchUniversities(currentPage + 1);
+                applyFiltersAndRender(currentPage + 1);
                 if (universitiesGrid) universitiesGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         });
     }
 
     // Initial fetch and render
-    applyFiltersAndFetch();
+    fetchAllUniversities();
+
+    // Thêm nút refresh cache (cho admin/developer)
+    const refreshButton = document.createElement('button');
+    refreshButton.innerHTML = '<i class="fas fa-sync-alt"></i> Làm mới dữ liệu';
+    refreshButton.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #0a4191;
+        color: white;
+        border: none;
+        border-radius: 25px;
+        padding: 10px 15px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        z-index: 1000;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        transition: all 0.3s ease;
+    `;
+    refreshButton.addEventListener('mouseenter', () => {
+        refreshButton.style.background = '#065be2';
+        refreshButton.style.transform = 'scale(1.05)';
+    });
+    refreshButton.addEventListener('mouseleave', () => {
+        refreshButton.style.background = '#0a4191';
+        refreshButton.style.transform = 'scale(1)';
+    });
+    refreshButton.addEventListener('click', () => {
+        localStorage.removeItem(CACHE_KEY);
+        fetchAllUniversities();
+        refreshButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tải dữ liệu...';
+        setTimeout(() => {
+            refreshButton.innerHTML = '<i class="fas fa-sync-alt"></i> Làm mới dữ liệu';
+        }, 2000);
+    });
+    document.body.appendChild(refreshButton);
 });

@@ -61,7 +61,7 @@
         cursor: pointer;
         transition: color 0.2s;
         display: -webkit-box;
-        -webkit-line-clamp: 2;      /* Hiển thị tối đa 2 dòng */
+        -webkit-line-clamp: 1;      /* Hiển thị tối đa 2 dòng */
         -webkit-box-orient: vertical;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -73,7 +73,7 @@
         text-decoration: underline;
     }
     .major-school {
-        font-size: 0.98rem;
+        font-size: 0.9rem;
         color: #444;
         font-weight: 500;
         margin-bottom: 0;
@@ -108,25 +108,79 @@
     .major-label {
         background: #ffb703;
         color: #fff;
-        font-size: 0.78rem;
-        font-weight: 700;
-        border-radius: 6px;
-        padding: 0.15rem 0.7rem;
-        /* margin-right: 0.5rem; */
+        font-size: 0.6rem !important;
+        font-weight: 600;
+        border-radius: 13px;
+        padding: 4px 10px !important;
+        margin-right: 0.3rem;
         display: inline-block;
+        margin-bottom: 0.4rem;
+        text-transform: uppercase;
     }
     .major-label.conglap {
-        background: #1ecb8b;
+        background: #eaf6ff;
+        color: #0440af;
+        font-weight: 700;
     }
     .major-label.ngoaiconglap {
-        background: #e7d803;
+        background: #eaf6ff;
+        color: #c57a00;
+        font-weight: 700;
     }
     .major-label.noibat {
         background: #d01010;
     }
-    .major-label.top {
-        background: #1ecb8b;
+    .major-label.noibat {
+    /* Define a wider gradient initially */
+    background: linear-gradient(90deg, #eb5a3c, #ffb164, #bf2000); /* Added a third color stop for a repeating effect */
+    background-size: 200% 100%; /* Make the background twice as wide as the element */
+    color: #ffffff;
+    animation: gradient-shift 2s infinite alternate; /* Changed animation name and duration */
+}
+
+.major-label.noibat::before {
+    content: "✨"; /* Star icon */
+    font-size: 0.5rem !important;
+    color: #FFFFFF !important; /* Set star color to white */
+    /* margin-right: 1px; */
+    /* If you want the star itself to "sparkle" independently, you'd add its own animation here,
+       like the `sparkle-glow` one we discussed for opacity.
+       For now, let's keep it simple and focus on the background. */
+}
+/* New keyframes for smooth background-position animation */
+@keyframes gradient-shift {
+    0% {
+        background-position: 0% 50%; /* Start at the beginning of the gradient */
     }
+    100% {
+        background-position: 100% 50%; /* Move the gradient fully to the right */
+    }
+}
+    .major-label {
+    /* Define a wider gradient initially */
+    background: linear-gradient(90deg, #5ad345, #8dd663, #309501); /* Added a third color stop for a repeating effect */
+    background-size: 200% 100%; /* Make the background twice as wide as the element */
+    color: #ffffff;
+    animation: gradient-shift 2s infinite alternate; /* Changed animation name and duration */
+}
+
+.major-label:before {
+    font-size: 0.5rem !important;
+    color: #FFFFFF !important; /* Set star color to white */
+    /* margin-right: 1px; */
+    /* If you want the star itself to "sparkle" independently, you'd add its own animation here,
+       like the `sparkle-glow` one we discussed for opacity.
+       For now, let's keep it simple and focus on the background. */
+}
+/* New keyframes for smooth background-position animation */
+@keyframes gradient-shift {
+    0% {
+        background-position: 0% 50%; /* Start at the beginning of the gradient */
+    }
+    100% {
+        background-position: 100% 50%; /* Move the gradient fully to the right */
+    }
+}
     .major-fav-btn {
         position: absolute;
         top: 1.1rem;

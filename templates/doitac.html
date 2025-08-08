@@ -243,6 +243,7 @@ function createFloatLogo(item, idx) {
 
 // Fetch outstanding universities
 async function fetchOutstandingUniversities() {
+
     try {
         const res = await fetch('https://timtruonghoc.pythonanywhere.com/schools_outstanding/');
         if (!res.ok) { // Kiểm tra nếu phản hồi không thành công (ví dụ: 404, 500)
@@ -255,6 +256,7 @@ async function fetchOutstandingUniversities() {
         console.error("Lỗi khi fetch dữ liệu trường nổi bật:", error);
         return []; // Trả về mảng rỗng nếu có lỗi
     }
+
 }
 
 async function renderOutstandingLogos() {

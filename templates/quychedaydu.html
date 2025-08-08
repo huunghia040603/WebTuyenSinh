@@ -1,0 +1,1464 @@
+{% extends "base.html" %}
+
+{% block title %}Quy Chế Hoạt Động - TimTruongHoc.vn{% endblock %}
+
+{% block stylesheets %}
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    /* Reset và base styles */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background: linear-gradient(135deg, #667eea 0%, #beb649 100%);
+        min-height: 100vh;
+    }
+
+    /* Hero Section */
+    .hero-section {
+        background: linear-gradient(135deg, #041b80 60%, #ddb100  100%);
+        padding: 120px 0 80px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        opacity: 0.3;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        animation: fadeInUp 1s ease-out;
+    }
+
+    .hero-subtitle {
+        font-size: 1.3rem;
+        color: rgba(255,255,255,0.9);
+        margin-bottom: 40px;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+        animation: fadeInUp 1s ease-out 0.2s both;
+    }
+
+    .hero-buttons {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
+        animation: fadeInUp 1s ease-out 0.4s both;
+    }
+
+    .btn-primary {
+        background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+        color: white;
+        padding: 15px 30px;
+        border: none;
+        border-radius: 50px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        box-shadow: 0 8px 25px rgba(255,107,107,0.3);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 35px rgba(255,107,107,0.4);
+    }
+
+    .btn-secondary {
+        background: rgba(255,255,255,0.2);
+        color: white;
+        padding: 15px 30px;
+        border: 2px solid rgba(255,255,255,0.3);
+        border-radius: 50px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        backdrop-filter: blur(10px);
+    }
+
+    .btn-secondary:hover {
+        background: rgba(255,255,255,0.3);
+        transform: translateY(-3px);
+    }
+
+    /* Main Content */
+    .main-content {
+        background: white;
+        padding: 80px 0;
+        position: relative;
+    }
+
+    .container {
+        max-width: 1300px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    /* Section Styles */
+    .section {
+        margin-bottom: 80px;
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 0.8s ease;
+    }
+
+    .section.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .section-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 20px;
+        text-align: center;
+        position: relative;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 4px;
+        background: #041b80 ;
+        border-radius: 2px;
+    }
+
+    .section-subtitle {
+        font-size: 1.2rem;
+        color: #666;
+        text-align: center;
+        margin-bottom: 50px;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Card Grid */
+    .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 30px;
+        margin-top: 50px;
+    }
+
+    .card {
+        background: white;
+        border-radius: 20px;
+        padding: 40px 30px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,0.05);
+        will-change: transform;
+    }
+
+    .card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background:  #ddb100  100%;
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+    }
+
+    .card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+    }
+
+    .card-icon {
+        width: 80px;
+        height: 80px;
+        background:  #041b80 ;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 25px;
+        color: white;
+        transition: transform 0.3s ease;
+        will-change: transform;
+    }
+
+    .card-icon i {
+        font-size: 2rem;
+    }
+
+    .card:hover .card-icon {
+        transform: scale(1.05);
+    }
+
+    .card-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 15px;
+    }
+
+    .card-content {
+        color: #666;
+        line-height: 1.7;
+    }
+
+    /* Detailed Content Sections */
+    .content-section {
+        background:linear-gradient(135deg, #2c3e50, #000481);
+        padding: 50px 0;
+        margin: 0;
+        width: 100vw;
+        position: relative;
+        left: 50%;
+        right: 50%;
+        margin-left: -50vw;
+        margin-right: -50vw;
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+
+    .content-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 50px;
+        align-items: start;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .content-text {
+        font-size: 0.95rem;
+        line-height: 1.8;
+        color: #ffffff;
+    }
+
+    .content-text h3 {
+        color: #ffffff;
+        margin-bottom: 15px;
+        font-size: 1.5rem;
+    }
+
+    .content-text p {
+        margin-bottom: 20px;
+    }
+
+    .content-text ul {
+        margin: 20px 0;
+        padding-left: 20px;
+    }
+
+    .content-text li {
+        margin-bottom: 10px;
+        position: relative;
+    }
+
+    .content-text li::before {
+        /* content: '✓'; */
+        color: #667eea;
+        font-weight: bold;
+        position: absolute;
+        left: -20px;
+    }
+
+    .content-image {
+        background-image: url('/static/images/nenquyche.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        border-radius: 10px;
+        padding: 0 40px;
+        color: white;
+        text-align: center;
+        min-height: 370px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        align-self: center;
+    }
+
+    .content-image h3 {
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+    }
+
+    .content-image h3 i {
+        margin-right: 10px;
+    }
+
+    .content-image p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+
+    /* Timeline */
+    .timeline {
+        position: relative;
+        max-width: 800px;
+        margin: 60px auto 0;
+        
+    }
+
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        transform: translateX(-50%);
+    }
+
+    .timeline-item {
+        position: relative;
+        margin-bottom: 60px;
+        opacity: 0;
+        transform: translateX(-50px);
+        transition: all 0.6s ease;
+    }
+
+    .timeline-item:nth-child(even) {
+        transform: translateX(50px);
+    }
+
+    .timeline-item.visible {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .timeline-item:nth-child(odd) .timeline-content {
+        margin-left: 0;
+        margin-right: 60px;
+        text-align: right;
+                background:linear-gradient(135deg, #2c3e50, #000481);
+
+    }
+
+    .timeline-item:nth-child(even) .timeline-content {
+        margin-left: 60px;
+        margin-right: 0;
+        text-align: left;
+        background:linear-gradient(135deg, #2c3e50, #000481);
+
+    }
+
+    .timeline-dot {
+        position: absolute;
+        left: 50%;
+        top: 20px;
+        width: 20px;
+        height: 20px;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        border-radius: 50%;
+        transform: translateX(-50%);
+        box-shadow: 0 0 0 8px rgba(102,126,234,0.2);
+        transition: all 0.3s ease;
+    }
+
+    .timeline-item:hover .timeline-dot {
+        transform: translateX(-50%) scale(1.3);
+        box-shadow: 0 0 0 12px rgba(102,126,234,0.3);
+    }
+
+    .timeline-content {
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        position: relative;
+    }
+
+    .timeline-content::before {
+        content: '';
+        position: absolute;
+        top: 20px;
+        width: 0;
+        height: 0;
+        border: 10px solid transparent;
+    }
+
+    .timeline-item:nth-child(odd) .timeline-content::before {
+        right: -20px;
+        border-left-color:#000481;
+    }
+
+    .timeline-item:nth-child(even) .timeline-content::before {
+        left: -20px;
+        border-right-color: #000481;
+    }
+
+    .timeline-date {
+        font-size: 0.9rem;
+        color: #667eea;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+
+    .timeline-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 10px;
+    }
+
+    .timeline-description {
+        color: #ffffff;
+        line-height: 1.6;
+    }
+
+    /* FAQ Section */
+    .faq-section {
+        padding: 80px 0;
+    }
+
+    .faq-item {
+        background: white;
+        border-radius: 15px;
+        margin-bottom: 20px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .faq-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+    }
+
+    .faq-question {
+        padding: 18px 30px;
+        background: #00047ad1;
+        color: white;
+        font-size: 0.9rem;
+        font-weight: 400;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .faq-question::after {
+        content: '+';
+        position: absolute;
+        right: 30px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.5rem;
+        transition: transform 0.3s ease;
+    }
+
+    .faq-item.active .faq-question::after {
+        transform: translateY(-50%) rotate(45deg);
+    }
+
+    .faq-answer {
+        padding: 0 30px;
+        max-height: 0;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        color: #666;
+        line-height: 1.6;
+    }
+
+    .faq-item.active .faq-answer {
+        padding: 25px 30px;
+        max-height: 300px;
+    }
+
+   
+
+    .quyche-contact-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 30px;
+        margin-top: 50px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .quyche-contact-item {
+        padding: 20px 30px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 20px;
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255,255,255,0.2);
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .quyche-contact-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(45deg, #ddb100, #ff6b6b);
+        transform: scaleX(0);
+        transition: transform 0.4s ease;
+    }
+
+    .quyche-contact-item:hover::before {
+        transform: scaleX(1);
+    }
+
+    .quyche-contact-item:hover {
+        transform: translateY(-8px);
+        background: rgba(255,255,255,0.15);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+    }
+
+    .quyche-contact-icon {
+        margin-bottom: 25px;
+        color: #ddb100;
+        transition: all 0.3s ease;
+    }
+
+    .quyche-contact-item:hover .quyche-contact-icon {
+        color: #ffffff;
+        transform: scale(1.1);
+    }
+
+    .quyche-contact-icon i {
+        font-size: 2.5rem;
+    }
+
+    .quyche-contact-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: #ffffff;
+    }
+
+    .quyche-contact-info {
+        color: rgba(248, 187, 34, 0.808) !important ;
+        font-size: 1.1rem;
+        line-height: 1.6;
+    }
+
+    .quyche-contact-info.small {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.754)!important;
+        margin-top: 8px;
+    }
+    .quyche-contact-section {
+        background: linear-gradient(135deg, #2c3e50, #000481);
+        padding: 80px 0;
+        text-align: center;
+        position: relative;
+    }
+
+    .quyche-contact-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.05)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        opacity: 0.3;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(0px);
+        }
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+    }
+
+    @keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes rotate {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    @keyframes glow {
+        0%, 100% {
+            box-shadow: 0 0 5px rgba(221, 177, 0, 0.5);
+        }
+        50% {
+            box-shadow: 0 0 20px rgba(221, 177, 0, 0.8), 0 0 30px rgba(221, 177, 0, 0.6);
+        }
+    }
+
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {
+            transform: translateY(0);
+        }
+        40% {
+            transform: translateY(-10px);
+        }
+        60% {
+            transform: translateY(-5px);
+        }
+    }
+
+    .floating {
+        animation: float 3s ease-in-out infinite;
+    }
+
+    .pulse {
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    .slide-in-left {
+        animation: slideInLeft 0.8s ease-out;
+    }
+
+    .slide-in-right {
+        animation: slideInRight 0.8s ease-out;
+    }
+
+    .rotate {
+        animation: rotate 3s linear infinite;
+    }
+
+    .glow {
+        animation: glow 2s ease-in-out infinite;
+    }
+
+    .bounce {
+        animation: bounce 2s ease-in-out infinite;
+    }
+
+    /* Hover effects */
+    .card:hover .card-icon {
+        animation: bounce 0.6s ease-in-out;
+    }
+
+    .timeline-dot:hover {
+        animation: pulse 1s ease-in-out infinite;
+    }
+
+    .faq-question:hover {
+        animation: glow 1s ease-in-out infinite;
+    }
+
+    /* Parallax effect */
+    .parallax {
+        transform: translateZ(0);
+        will-change: transform;
+    }
+
+    /* Loading animation */
+    .loading {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.6s ease;
+    }
+
+    .loading.loaded {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Stagger animation for cards */
+    .card {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 0.6s ease;
+    }
+
+    .card.animate {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .card:nth-child(1) { transition-delay: 0.1s; }
+    .card:nth-child(2) { transition-delay: 0.2s; }
+    .card:nth-child(3) { transition-delay: 0.3s; }
+    .card:nth-child(4) { transition-delay: 0.4s; }
+    .card:nth-child(5) { transition-delay: 0.5s; }
+    .card:nth-child(6) { transition-delay: 0.6s; }
+
+    /* Ripple effect for buttons */
+    .btn-primary, .btn-secondary {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .ripple {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(0);
+        animation: ripple-animation 0.6s linear;
+        pointer-events: none;
+    }
+
+    @keyframes ripple-animation {
+        to {
+            transform: scale(4);
+            opacity: 0;
+        }
+    }
+
+    /* Enhanced scroll animations */
+    .section-title, .section-subtitle {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 0.8s ease;
+    }
+
+    .section-title.animate, .section-subtitle.animate {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2.5rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+        }
+
+        .hero-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .section-title {
+            font-size: 2rem;
+        }
+
+        .card-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .content-grid {
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+
+        .timeline::before {
+            left: 20px;
+        }
+
+        .timeline-item:nth-child(odd) .timeline-content,
+        .timeline-item:nth-child(even) .timeline-content {
+            margin-left: 60px;
+            margin-right: 0;
+            text-align: left;
+        }
+
+        .timeline-dot {
+            left: 20px;
+        }
+
+        .timeline-item:nth-child(odd) .timeline-content::before,
+        .timeline-item:nth-child(even) .timeline-content::before {
+            left: -20px;
+            border-right-color: white;
+        }
+    }
+</style>
+{%endblock%}
+{% block content %}
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-content">
+        <h1 class="hero-title floating pulse">Quy Chế Hoạt Động</h1>
+        <p class="hero-subtitle">
+            Khám phá các quy định và nguyên tắc hoạt động của nền tảng TimTruongHoc.vn - 
+            Nơi kết nối học sinh với cơ hội giáo dục tốt nhất
+        </p>
+        <div class="hero-buttons">
+            <a href="#overview" class="btn-primary">Tìm Hiểu Ngay</a>
+            <a href="#contact" class="btn-secondary">Liên Hệ Hỗ Trợ</a>
+        </div>
+    </div>
+</section>
+
+<!-- Main Content -->
+<main class="main-content">
+    <div class="container">
+        <!-- Overview Section -->
+        <section id="overview" class="section">
+            <h2 class="section-title">Tổng Quan Quy Chế</h2>
+            <p class="section-subtitle">
+                TimTruongHoc.vn hoạt động dựa trên các nguyên tắc minh bạch, công bằng và vì lợi ích của cộng đồng giáo dục
+            </p>
+            
+            <div class="card-grid">
+                <div class="card loading">
+                    <div class="card-icon"><i class="fas fa-bullseye"></i></div>
+                    <h3 class="card-title">Mục Tiêu Hoạt Động</h3>
+                    <p class="card-content">
+                        Cung cấp nền tảng kết nối học sinh với các cơ sở giáo dục chất lượng, 
+                        tạo cơ hội tiếp cận thông tin tuyển sinh một cách minh bạch và hiệu quả.
+                    </p>
+                </div>
+                
+                <div class="card loading">
+                    <div class="card-icon"><i class="fas fa-balance-scale"></i></div>
+                    <h3 class="card-title">Nguyên Tắc Cơ Bản</h3>
+                    <p class="card-content">
+                        Tuân thủ pháp luật, đảm bảo tính minh bạch, công bằng và bảo mật thông tin 
+                        của người dùng trong mọi hoạt động.
+                    </p>
+                </div>
+                
+                <div class="card loading">
+                    <div class="card-icon"><i class="fas fa-handshake"></i></div>
+                    <h3 class="card-title">Đối Tác Chiến Lược</h3>
+                    <p class="card-content">
+                        Hợp tác với các trường học, cơ sở giáo dục uy tín để cung cấp thông tin 
+                        chính xác và cập nhật nhất cho học sinh.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Detailed Mission Section -->
+        <section class="content-section">
+            <div class="container">
+                <div class="content-grid">
+                    <div class="content-text">
+                        <h3>Sứ Mệnh và Tầm Nhìn</h3>
+                        <p>
+                            TimTruongHoc.vn được thành lập với sứ mệnh trở thành cầu nối tin cậy giữa học sinh 
+                            và các cơ sở giáo dục chất lượng cao. Chúng tôi cam kết:
+                        </p>
+                        <ul>
+                            <li>Cung cấp thông tin tuyển sinh chính xác và cập nhật</li>
+                            <li>Tạo môi trường minh bạch cho việc lựa chọn giáo dục</li>
+                            <li>Hỗ trợ học sinh đưa ra quyết định sáng suốt</li>
+                            <li>Thúc đẩy sự phát triển của hệ thống giáo dục Việt Nam</li>
+                        </ul>
+                        <p>
+                            Tầm nhìn của chúng tôi là trở thành nền tảng hàng đầu trong lĩnh vực 
+                            tư vấn và kết nối giáo dục tại Việt Nam.
+                        </p>
+                    </div>
+                    <div class="content-image">
+                        <!-- <h3><i class="fas fa-graduation-cap"></i> Sứ Mệnh Giáo Dục</h3>
+                        <p>Kết nối tri thức, mở ra tương lai</p> -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Core Values Section -->
+        <section class="section">
+            <h2 class="section-title">Giá Trị Cốt Lõi</h2>
+            <p class="section-subtitle">
+                Những giá trị định hướng mọi hoạt động của TimTruongHoc.vn
+            </p>
+            
+            <div class="card-grid">
+                <div class="card loading">
+                    <div class="card-icon"><i class="fas fa-search"></i></div>
+                    <h3 class="card-title">Minh Bạch</h3>
+                    <p class="card-content">
+                        Tất cả thông tin được công khai rõ ràng, không giấu diếm hay thiên vị. 
+                        Học sinh có quyền biết đầy đủ thông tin để đưa ra quyết định.
+                    </p>
+                </div>
+                
+                <div class="card loading">
+                    <div class="card-icon"><i class="fas fa-balance-scale"></i></div>
+                    <h3 class="card-title">Công Bằng</h3>
+                    <p class="card-content">
+                        Mọi học sinh đều có cơ hội tiếp cận thông tin như nhau, không phân biệt 
+                        đối xử dựa trên bất kỳ tiêu chí nào.
+                    </p>
+                </div>
+                
+                <div class="card loading">
+                    <div class="card-icon"><i class="fas fa-shield-alt"></i></div>
+                    <h3 class="card-title">Bảo Mật</h3>
+                    <p class="card-content">
+                        Thông tin cá nhân của người dùng được bảo vệ tuyệt đối, tuân thủ 
+                        các quy định về bảo mật dữ liệu.
+                    </p>
+                </div>
+                
+                <div class="card loading">
+                    <div class="card-icon"><i class="fas fa-star"></i></div>
+                    <h3 class="card-title">Chất Lượng</h3>
+                    <p class="card-content">
+                        Chỉ hợp tác với các cơ sở giáo dục có chất lượng đào tạo tốt, 
+                        đảm bảo lợi ích tối đa cho học sinh.
+                    </p>
+                </div>
+                
+                <div class="card loading">
+                    <div class="card-icon"><i class="fas fa-rocket"></i></div>
+                    <h3 class="card-title">Đổi Mới</h3>
+                    <p class="card-content">
+                        Liên tục cải tiến công nghệ và dịch vụ để mang đến trải nghiệm 
+                        tốt nhất cho người dùng.
+                    </p>
+                </div>
+                
+                <div class="card loading">
+                    <div class="card-icon"><i class="fas fa-handshake"></i></div>
+                    <h3 class="card-title">Hợp Tác</h3>
+                    <p class="card-content">
+                        Xây dựng mối quan hệ đối tác bền vững với các trường học và 
+                        tổ chức giáo dục uy tín.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Detailed Process Section -->
+        <section class="content-section">
+            <div class="container">
+                <div class="content-grid">
+                    <div class="content-image">
+                        <!-- <h3><i class="fas fa-clipboard-list"></i> Quy Trình Chuyên Nghiệp</h3>
+                        <p>Đảm bảo chất lượng từng bước</p> -->
+                    </div>
+                    <div class="content-text">
+                        <h3>Quy Trình Kiểm Soát Chất Lượng</h3>
+                        <p>
+                            TimTruongHoc.vn áp dụng quy trình kiểm soát chất lượng nghiêm ngặt 
+                            để đảm bảo thông tin chính xác và dịch vụ tốt nhất:
+                        </p>
+                        <ul>
+                            <li><strong>Kiểm chứng thông tin:</strong> Tất cả thông tin trường học được xác minh trực tiếp</li>
+                            <li><strong>Cập nhật thường xuyên:</strong> Thông tin được cập nhật định kỳ hàng tháng</li>
+                            <li><strong>Phản hồi người dùng:</strong> Hệ thống đánh giá và phản hồi từ học sinh</li>
+                            <li><strong>Giám sát liên tục:</strong> Đội ngũ chuyên môn theo dõi chất lượng dịch vụ</li>
+                        </ul>
+                        <p>
+                            Chúng tôi cam kết cung cấp thông tin chính xác 100% và hỗ trợ 
+                            người dùng 24/7.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Process Section -->
+        <section class="section">
+            <h2 class="section-title">Quy Trình Hoạt Động</h2>
+            <p class="section-subtitle">
+                Quy trình hoạt động được thiết kế để đảm bảo chất lượng và hiệu quả trong việc kết nối học sinh với cơ hội giáo dục
+            </p>
+            
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-date">Bước 1</div>
+                        <h3 class="timeline-title">Đăng Ký Tài Khoản</h3>
+                        <p class="timeline-description">
+                            Học sinh đăng ký tài khoản với thông tin cá nhân chính xác để có thể 
+                            truy cập đầy đủ các tính năng của nền tảng. Quá trình đăng ký đơn giản, 
+                            nhanh chóng và bảo mật thông tin.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-date">Bước 2</div>
+                        <h3 class="timeline-title">Cập Nhật Thông Tin</h3>
+                        <p class="timeline-description">
+                            Cập nhật thông tin học tập, sở thích, mục tiêu nghề nghiệp và điều kiện 
+                            tài chính để hệ thống AI có thể đưa ra gợi ý phù hợp nhất với từng cá nhân.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-date">Bước 3</div>
+                        <h3 class="timeline-title">Tìm Kiếm & So Sánh</h3>
+                        <p class="timeline-description">
+                            Sử dụng các công cụ tìm kiếm thông minh và tính năng so sánh để khám phá 
+                            các cơ hội giáo dục phù hợp. Hệ thống sẽ gợi ý các trường học dựa trên 
+                            profile cá nhân.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-date">Bước 4</div>
+                        <h3 class="timeline-title">Tư Vấn Chuyên Sâu</h3>
+                        <p class="timeline-description">
+                            Nhận tư vấn từ đội ngũ chuyên gia giàu kinh nghiệm về ngành nghề, 
+                            trường học và cơ hội việc làm. Tư vấn miễn phí và tận tâm.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-date">Bước 5</div>
+                        <h3 class="timeline-title">Liên Hệ & Đăng Ký</h3>
+                        <p class="timeline-description">
+                            Liên hệ trực tiếp với trường học hoặc sử dụng tính năng đăng ký 
+                            trực tuyến để bắt đầu quá trình tuyển sinh. Hỗ trợ hoàn thiện hồ sơ 
+                            và theo dõi tiến trình.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-date">Bước 6</div>
+                        <h3 class="timeline-title">Theo Dõi & Hỗ Trợ</h3>
+                        <p class="timeline-description">
+                            Theo dõi quá trình tuyển sinh và hỗ trợ học sinh trong suốt hành trình 
+                            từ đăng ký đến nhập học. Đảm bảo mọi thắc mắc được giải đáp kịp thời.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services Section -->
+        <section class="content-section">
+            <div class="container">
+                <div class="content-grid">
+                    <div class="content-text">
+                        <h3>Dịch Vụ Hỗ Trợ Toàn Diện</h3>
+                        <p>
+                            TimTruongHoc.vn cung cấp đầy đủ các dịch vụ hỗ trợ để đảm bảo 
+                            học sinh có trải nghiệm tốt nhất:
+                        </p>
+                        <ul>
+                            <li><strong>Tư vấn chọn ngành nghề:</strong> Phân tích xu hướng thị trường và cơ hội việc làm</li>
+                            <li><strong>Tư vấn chọn trường:</strong> So sánh chất lượng đào tạo và điều kiện học tập</li>
+                            <li><strong>Hỗ trợ hồ sơ:</strong> Hướng dẫn chuẩn bị hồ sơ tuyển sinh hoàn chỉnh</li>
+                            <li><strong>Tư vấn tài chính:</strong> Thông tin về học phí, học bổng và các gói hỗ trợ</li>
+                            <li><strong>Theo dõi tiến trình:</strong> Cập nhật tình trạng hồ sơ và kết quả tuyển sinh</li>
+                        </ul>
+                        <p>
+                            Tất cả dịch vụ đều miễn phí cho học sinh, thể hiện cam kết 
+                            vì sự phát triển giáo dục của TimTruongHoc.vn.
+                        </p>
+                    </div>
+                    <div class="content-image">
+                        <!-- <h3><i class="fas fa-bullseye"></i> Dịch Vụ Chuyên Nghiệp</h3>
+                        <p>Hỗ trợ toàn diện cho tương lai</p> -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="faq-section">
+            <div class="container">
+                <h2 class="section-title">Câu Hỏi Thường Gặp</h2>
+                <p class="section-subtitle">
+                    Giải đáp những thắc mắc phổ biến về quy chế hoạt động của TimTruongHoc.vn
+                </p>
+                
+                <div class="faq-list">
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            TimTruongHoc.vn có phí sử dụng không?
+                        </div>
+                        <div class="faq-answer">
+                            <p><strong>TimTruongHoc.vn hoàn toàn miễn phí cho học sinh.</strong> Chúng tôi chỉ thu phí 
+                            từ các trường học và cơ sở giáo dục khi họ muốn quảng bá thông tin tuyển sinh 
+                            hoặc sử dụng các dịch vụ nâng cao. Điều này đảm bảo tính minh bạch và 
+                            không tạo gánh nặng tài chính cho học sinh.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            Thông tin trường học có đáng tin cậy không?
+                        </div>
+                        <div class="faq-answer">
+                            <p><strong>Tất cả thông tin cập nhật thường xuyên.</strong> 
+                            Chúng tôi luôn cố gắng cập nhật thông tin mới nhất và chính xác nhất. Để mang đến cho bạn thông tin chính xác nhất.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            Làm thế nào để báo cáo thông tin sai lệch?
+                        </div>
+                        <div class="faq-answer">
+                            <p>Bạn có thể báo cáo thông tin sai lệch bằng nhiều cách:</p>
+                            <ul>
+                                <li>Sử dụng tính năng "Báo cáo" trên mỗi trang thông tin</li>
+                                <li>Gửi email đến support@timtruonghoc.vn</li>
+                                <li>Liên hệ hotline 0987.789.274</li>
+                                <li>Sử dụng chat trực tuyến trên website</li>
+                            </ul>
+                            <p>Mọi báo cáo sẽ được xử lý trong vòng 24 giờ và cập nhật thông tin nếu cần thiết.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            TimTruongHoc.vn có hỗ trợ tư vấn tuyển sinh không?
+                        </div>
+                        <div class="faq-answer">
+                            <p><strong>Có, chúng tôi cung cấp dịch vụ tư vấn tuyển sinh miễn phí</strong> thông qua 
+                            đội ngũ chuyên gia giàu kinh nghiệm trong lĩnh vực giáo dục. Dịch vụ bao gồm:</p>
+                            <ul>
+                                <li>Tư vấn chọn ngành nghề phù hợp</li>
+                                <li>Hướng dẫn chọn trường học chất lượng</li>
+                                <li>Hỗ trợ chuẩn bị hồ sơ tuyển sinh</li>
+                                <li>Tư vấn về học bổng và tài chính</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            Thông tin cá nhân có được bảo mật không?
+                        </div>
+                        <div class="faq-answer">
+                            <p><strong>Hoàn toàn bảo mật!</strong> TimTruongHoc.vn tuân thủ nghiêm ngặt 
+                            Luật Bảo vệ dữ liệu cá nhân và các quy định về bảo mật thông tin:</p>
+                            <ul>
+                                <li>Mã hóa SSL/TLS cho mọi giao dịch</li>
+                                <li>Không chia sẻ thông tin với bên thứ ba</li>
+                                <li>Chỉ sử dụng thông tin cho mục đích tư vấn giáo dục</li>
+                                <li>Quyền xóa thông tin cá nhân bất cứ lúc nào</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            Có thể sử dụng TimTruongHoc.vn trên điện thoại không?
+                        </div>
+                        <div class="faq-answer">
+                            <p><strong>Có thể!</strong> TimTruongHoc.vn được thiết kế responsive hoàn toàn 
+                            và tối ưu cho mọi thiết bị:</p>
+                            <ul>
+                                <li>Website responsive cho smartphone và tablet</li>
+                                <li>Ứng dụng mobile (iOS/Android) sắp ra mắt</li>
+                                <li>Tối ưu tốc độ tải trang trên mobile</li>
+                                <li>Giao diện thân thiện với người dùng di động</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+
+<!-- Contact Section -->
+<section id="contact" class="quyche-contact-section">
+    <div class="container">
+        <h2 class="section-title" style="color: white;">Liên Hệ Hỗ Trợ</h2>
+        <p class="section-subtitle" style="color: rgba(255,255,255,0.8);">
+            Đội ngũ TimTruongHoc.vn luôn sẵn sàng hỗ trợ bạn trong mọi vấn đề
+        </p>
+        
+        <div class="quyche-contact-grid">
+            <div class="quyche-contact-item">
+                <div class="quyche-contact-icon"><i class="fas fa-envelope"></i></div>
+                <h3 class="quyche-contact-title">Email Hỗ Trợ</h3>
+                <p class="quyche-contact-info">support@timtruonghoc.vn</p>
+                <p class="quyche-contact-info small">Phản hồi trong 24h</p>
+            </div>
+            
+            <div class="quyche-contact-item">
+                <div class="quyche-contact-icon"><i class="fas fa-phone"></i></div>
+                <h3 class="quyche-contact-title">Hotline</h3>
+                <p class="quyche-contact-info">0987.789.274</p>
+                <p class="quyche-contact-info small">8:00 - 22:00 hàng ngày</p>
+            </div>
+            
+            <div class="quyche-contact-item">
+                <div class="quyche-contact-icon"><i class="fas fa-comments"></i></div>
+                <h3 class="quyche-contact-title">Chat Trực Tuyến</h3>
+                <p class="quyche-contact-info">24/7 Hỗ trợ</p>
+                <p class="quyche-contact-info small">Phản hồi tức thì</p>
+            </div>
+            
+            <div class="quyche-contact-item">
+                <div class="quyche-contact-icon"><i class="fas fa-building"></i></div>
+                <h3 class="quyche-contact-title">Văn Phòng</h3>
+                <p class="quyche-contact-info">123 Đường ABC, Quận 1, TP.HCM</p>
+                <p class="quyche-contact-info small">Thứ 2 - Thứ 6: 8:00-17:00</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Intersection Observer for animations
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                // Add loading animation for cards
+                if (entry.target.classList.contains('loading')) {
+                    entry.target.classList.add('loaded');
+                }
+            }
+        });
+    }, observerOptions);
+
+    // Observe all sections and cards
+    document.querySelectorAll('.section, .timeline-item, .card.loading').forEach(el => {
+        observer.observe(el);
+    });
+
+    // FAQ Toggle with enhanced effects
+    document.querySelectorAll('.faq-question').forEach(question => {
+        question.addEventListener('click', () => {
+            const faqItem = question.parentElement;
+            const isActive = faqItem.classList.contains('active');
+            
+            // Close all FAQ items
+            document.querySelectorAll('.faq-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Open clicked item if it wasn't active
+            if (!isActive) {
+                faqItem.classList.add('active');
+                // Add bounce effect
+                question.style.animation = 'bounce 0.6s ease-in-out';
+                setTimeout(() => {
+                    question.style.animation = '';
+                }, 600);
+            }
+        });
+    });
+
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+
+    // Enhanced card hover effects
+    document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            card.style.animation = 'float 2s ease-in-out infinite';
+            // Add glow effect
+            card.style.boxShadow = '0 15px 40px rgba(221, 177, 0, 0.3)';
+        });
+        
+        card.addEventListener('mouseleave', () => {
+            card.style.animation = 'none';
+            card.style.boxShadow = '';
+        });
+    });
+
+    // Timeline dot hover effects
+    document.querySelectorAll('.timeline-dot').forEach(dot => {
+        dot.addEventListener('mouseenter', () => {
+            dot.style.animation = 'pulse 1s ease-in-out infinite';
+        });
+        
+        dot.addEventListener('mouseleave', () => {
+            dot.style.animation = '';
+        });
+    });
+
+    // Contact item hover effects
+    document.querySelectorAll('.quyche-contact-item').forEach(item => {
+        item.addEventListener('mouseenter', () => {
+            const icon = item.querySelector('.quyche-contact-icon i');
+            icon.style.animation = 'bounce 0.6s ease-in-out';
+        });
+        
+        item.addEventListener('mouseleave', () => {
+            const icon = item.querySelector('.quyche-contact-icon i');
+            icon.style.animation = '';
+        });
+    });
+
+    // Parallax effect for hero section
+    window.addEventListener('scroll', () => {
+        const scrolled = window.pageYOffset;
+        const parallax = document.querySelector('.hero-section');
+        if (parallax) {
+            const speed = scrolled * 0.5;
+            parallax.style.transform = `translateY(${speed}px)`;
+        }
+    });
+
+    // Add typing effect to hero title
+    function typeWriter(element, text, speed = 100) {
+        let i = 0;
+        element.innerHTML = '';
+        
+        function type() {
+            if (i < text.length) {
+                element.innerHTML += text.charAt(i);
+                i++;
+                setTimeout(type, speed);
+            }
+        }
+        type();
+    }
+
+    // Initialize typing effect when page loads
+    window.addEventListener('load', () => {
+        const heroTitle = document.querySelector('.hero-title');
+        if (heroTitle) {
+            const originalText = heroTitle.textContent;
+            setTimeout(() => {
+                typeWriter(heroTitle, originalText, 80);
+            }, 1000);
+        }
+    });
+
+    // Add ripple effect to buttons
+    document.querySelectorAll('.btn-primary, .btn-secondary').forEach(button => {
+        button.addEventListener('click', function(e) {
+            const ripple = document.createElement('span');
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+            
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            ripple.classList.add('ripple');
+            
+            this.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+
+    // Add scroll-triggered animations
+    const scrollObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, { threshold: 0.1 });
+
+    // Observe elements for scroll animations
+    document.querySelectorAll('.section-title, .section-subtitle').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = 'all 0.8s ease';
+        scrollObserver.observe(el);
+    });
+</script>
+{% endblock %}

@@ -958,6 +958,61 @@ h3.range-title2 {
     opacity: 1;
 }
 
+    /* Skeleton loading effect bản mờ giống card thật */
+    .skeleton-card {
+        background: #e5e7eb !important;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        border-radius: 12px;
+        opacity: 0.7;
+        animation: skeletonPulse 1.2s infinite ease-in-out alternate;
+        border: 1px solid #e5e7eb;
+        min-height: 153px;
+        margin-bottom: 0;
+        pointer-events: none;
+        transition: none;
+    }
+    .skeleton-card .card-content {
+        display: flex;
+        height: 153px;
+    }
+    .skeleton-thumb {
+        width: 60px;
+        height: 60px;
+        background: #d1d5db;
+        border-radius: 8px;
+        margin: 0 auto;
+    }
+    .skeleton-card .card-image {
+        width: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: none;
+        border-right: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 10px;
+    }
+    .skeleton-card .card-info {
+        flex: 1;
+        padding: 15px 10px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    .skeleton-line {
+        height: 16px;
+        background: #d1d5db;
+        border-radius: 6px;
+        margin-bottom: 10px;
+        width: 80%;
+    }
+    .skeleton-title { width: 70%; height: 20px; margin-bottom: 16px; }
+    .skeleton-tag { width: 60px; height: 14px; margin-right: 8px; display: inline-block; margin-bottom: 0; }
+    .skeleton-tag.short { width: 40px; }
+    @keyframes skeletonPulse {
+        0% { opacity: 0.5; }
+        100% { opacity: 1; }
+    }
 </style>
 {% endblock %}
 
@@ -1003,14 +1058,6 @@ h3.range-title2 {
                 <option value="public">Công lập</option>
                 <option value="private">Ngoài công lập</option>
                 <option value="international">Trường quốc tế</option>
-            </select>
-            <select class="filter-select" id="admissionScoreFilter">
-                <option value="">Điểm sàn xét tuyển</option>
-                <option value="low">Từ 15-18 điểm</option>
-                <option value="medium">Từ 18-20 điểm</option>
-                <option value="high">Từ 20-22 điểm</option>
-                <option value="veryhigh">Trên 22 điểm</option>
-
             </select>
         </div>
     </div>

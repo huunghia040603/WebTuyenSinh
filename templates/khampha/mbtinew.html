@@ -589,9 +589,14 @@
                 </div>
             </div>
 
-            <button class="restart-btn" id="restartBtn">
-                <i class="fas fa-redo"></i> Làm lại bài test
-            </button>
+            <div style="display: flex; justify-content: center; gap: 18px; margin-top: 30px;">
+                <button class="restart-btn" id="restartBtn">
+                    <i class="fas fa-redo"></i> Làm lại bài test
+                </button>
+                <a href="/" class="home-btn" style="background: linear-gradient(135deg, #1fa36b, #0a4191); color: #fff; border: none; border-radius: 12px; padding: 15px 30px; font-size: 1rem; font-weight: 600; display: flex; align-items: center; gap: 8px; text-decoration: none; transition: all 0.3s; box-shadow: 0 8px 20px rgba(10,65,145,0.10);">
+                    <i class="fas fa-home"></i> Trở về trang chủ
+                </a>
+            </div>
         </div>
     </div>
 </div>
@@ -978,7 +983,7 @@ function showQuestion() {
     
     // Update navigation buttons
     prevBtn.disabled = currentQuestion === 0;
-    nextBtn.textContent = currentQuestion === mbtiQuestions.length - 1 ? 'Kết quả' : 'Tiếp theo';
+    nextBtn.textContent = currentQuestion === mbtiQuestions.length - 1 ? 'Xem kết quả' : 'Tiếp theo';
     
     // Render options
     renderOptions(question.options);
@@ -1033,7 +1038,19 @@ function selectOption(type, button) {
                 }, 350);
             }, 10);
         } else {
-            showResults();
+            // Hiện thông báo đã hoàn thành và trạng thái loading
+            questionSection.style.display = 'none';
+            loadingSection.style.display = 'block';
+            loadingSection.innerHTML = `
+                <div class="loading-spinner"></div>
+                <h3>Bạn đã hoàn thành bài test, vui lòng chờ kết quả...</h3>
+                <p>Đang phân tích tính cách của bạn...</p>
+            `;
+            setTimeout(() => {
+                // Sau khi loading xong, hiện kết quả
+                loadingSection.innerHTML = `<div class=\"loading-spinner\"></div><h3>Đang phân tích tính cách của bạn...</h3><p>Vui lòng chờ trong giây lát</p>`;
+                showResults();
+            }, 1200);
         }
     }, 350);
 }
@@ -1084,25 +1101,27 @@ function calculatePersonalityType() {
 
 // Show results
 function showResults() {
+    // Đảm bảo loadingSection có nội dung loading mặc định
+    loadingSection.innerHTML = `<div class=\"loading-spinner\"></div><h3>Đang phân tích tính cách của bạn...</h3><p>Vui lòng chờ trong giây lát</p>`;
     questionSection.style.display = 'none';
     loadingSection.style.display = 'block';
-    
+
     // Simulate loading
     setTimeout(() => {
         loadingSection.style.display = 'none';
         resultsSection.style.display = 'block';
-        
+
         const personalityType = calculatePersonalityType();
         const typeInfo = personalityTypes[personalityType];
-        
+
         if (typeInfo) {
             document.getElementById('personalityType').textContent = personalityType;
             document.getElementById('typeDescription').textContent = typeInfo.description;
-            
+
             // Render careers
             const careersGrid = document.getElementById('careersGrid');
             careersGrid.innerHTML = '';
-            
+
             typeInfo.careers.forEach(career => {
                 const careerCard = document.createElement('div');
                 careerCard.className = 'career-card';
