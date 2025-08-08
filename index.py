@@ -53,6 +53,10 @@ def demo():
 def major_detail(major_id):
     return render_template('chitiet-nganhchung.html')
 
+@app.route("/chitiet-nganh-rieng")
+def major_specific_detail():
+    return render_template('chitiet-nganh-rieng.html')
+
 @app.route("/mbtinew")
 def mbtinew():
     return render_template('khampha/mbtinew.html')

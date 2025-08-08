@@ -22,22 +22,46 @@ window.addEventListener('load', function () {
         try {
             console.log('Bắt đầu load dữ liệu cho mã trường:', universityCode);
             
+            // Kiểm tra cache localStorage trước
+            const cacheKey = `uni_${universityCode.toLowerCase()}`;
+            const cachedData = localStorage.getItem(cacheKey);
+            const cacheTime = localStorage.getItem(`${cacheKey}_time`);
+            const now = Date.now();
+            
+            // Cache hợp lệ trong 30 phút
+            if (cachedData && cacheTime && (now - parseInt(cacheTime)) < 30 * 60 * 1000) {
+                console.log('Sử dụng dữ liệu từ cache');
+                const university = JSON.parse(cachedData);
+                updatePageContent(university);
+                hideLoading();
+                return;
+            }
+            
             // Hiển thị loading
             showLoading();
             
-            // Fetch dữ liệu từ API - tải tất cả trường
-            const apiUrl = `${baseUrl}?short_code=${universityCode.toUpperCase()}&page_size=2000`;
-            console.log('API URL:', apiUrl);
+            // Thử API endpoint tối ưu trước
+            let apiUrl = `${baseUrl}by_short_code/${universityCode.toUpperCase()}/`;
+            console.log('Thử API tối ưu:', apiUrl);
             
-            const response = await fetch(apiUrl);
+            let response = await fetch(apiUrl);
             console.log('Response status:', response.status);
+            
+            // Nếu API tối ưu lỗi, fallback về API cũ
+            if (!response.ok) {
+                console.log('API tối ưu lỗi, thử API cũ...');
+                apiUrl = `${baseUrl}?short_code=${universityCode.toUpperCase()}&page_size=2000`;
+                console.log('API fallback:', apiUrl);
+                
+                response = await fetch(apiUrl);
+                console.log('Fallback response status:', response.status);
             
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             
             const data = await response.json();
-            console.log('API response:', data);
+                console.log('Fallback API response:', data);
             
             if (data.results && data.results.length > 0) {
                 // Lọc đúng short_code (không phân biệt hoa thường)
@@ -45,11 +69,34 @@ window.addEventListener('load', function () {
                     u => u.short_code && u.short_code.toLowerCase() === universityCode.toLowerCase()
                 );
                 if (university) {
+                        // Lưu vào cache
+                        localStorage.setItem(cacheKey, JSON.stringify(university));
+                        localStorage.setItem(`${cacheKey}_time`, now.toString());
+                        
                     updatePageContent(university);
-                    hideLoading(); // Ẩn loading khi thành công
+                        hideLoading();
+                        return;
                 } else {
                     showError('Không tìm thấy thông tin trường học');
+                        return;
+                    }
+                } else {
+                    showError('Không tìm thấy thông tin trường học');
+                    return;
                 }
+            }
+            
+            // API tối ưu thành công
+            const university = await response.json();
+            console.log('API tối ưu response:', university);
+            
+            if (university && university.short_code) {
+                // Lưu vào cache
+                localStorage.setItem(cacheKey, JSON.stringify(university));
+                localStorage.setItem(`${cacheKey}_time`, now.toString());
+                
+                updatePageContent(university);
+                hideLoading(); // Ẩn loading khi thành công
             } else {
                 showError('Không tìm thấy thông tin trường học');
             }
@@ -144,16 +191,45 @@ window.addEventListener('load', function () {
             // Cập nhật thông tin bên phải
             updateSidebar(university);
             
-            // Cập nhật ngành đào tạo
-            updateMajors(university);
-            
             // Cập nhật style cho trường nổi bật
             updateOutstandingStyle(university);
             
             // Khởi tạo các sự kiện
             initializeEvents();
             
-            console.log('Cập nhật nội dung hoàn tất');
+            console.log('Cập nhật thông tin trường hoàn tất');
+            
+            // Hiển thị thông báo nhỏ về việc đang tải ngành
+            const majorsSection = document.querySelector('.uni-majors-section');
+            if (majorsSection) {
+                const loadingNotice = document.createElement('div');
+                loadingNotice.id = 'majorsLoadingNotice';
+                loadingNotice.style.cssText = `
+                    text-align: center;
+                    padding: 10px;
+                    background: #f0f9ff;
+                    border: 1px solid #bae6fd;
+                    border-radius: 8px;
+                    margin-bottom: 15px;
+                    color: #0369a1;
+                    font-size: 14px;
+                    font-weight: 500;
+                `;
+                loadingNotice.innerHTML = '📚 Đang tải danh sách ngành đào tạo...';
+                
+                // Chèn vào đầu section ngành
+                const majorsTitle = majorsSection.querySelector('.uni-majors-title');
+                if (majorsTitle) {
+                    majorsTitle.parentNode.insertBefore(loadingNotice, majorsTitle.nextSibling);
+                }
+            }
+            
+            // Tải ngành sau khi thông tin trường đã hiển thị xong
+            setTimeout(() => {
+                console.log('Bắt đầu tải danh sách ngành...');
+                updateMajors(university);
+            }, 500); // Delay 500ms để người dùng thấy thông tin trường trước
+            
         } catch (error) {
             console.error('Lỗi khi cập nhật nội dung:', error);
         }
@@ -530,34 +606,81 @@ window.addEventListener('load', function () {
             const searchLower = majorsSearchTerm.toLowerCase().trim();
             filteredMajors = allMajors.filter(major => {
                 const name = major.name ? major.name.toLowerCase() : '';
-                const matches = name.includes(searchLower);
-                return matches;
+                return name.includes(searchLower);
             });
         }
-        
-        // Update search results display
-        const searchResults = document.getElementById('majorsSearchResults');
-        if (searchResults) {
-            if (majorsSearchTerm.trim()) {
-                searchResults.textContent = `Tìm thấy ${filteredMajors.length} ngành cho "${majorsSearchTerm}"`;
-            } else {
-                searchResults.textContent = `Hiển thị tất cả ${allMajors.length} ngành`;
-            }
-        }
-        
-        // Reset to first page and render
         majorsCurrentPage = 1;
         majorsTotalPages = Math.ceil(filteredMajors.length / MAJORS_PER_PAGE);
+        
+        // Cập nhật số lượng ngành trong search stats
+        updateMajorsSearchStats();
+        
         renderMajorsPageFromCache(1);
     }
+    
+    // Hàm cập nhật số lượng ngành trong search stats
+    function updateMajorsSearchStats() {
+        const searchStats = document.querySelector('.majors-search-stats span');
+        if (searchStats) {
+            if (majorsSearchTerm.trim()) {
+                // Nếu đang tìm kiếm, hiển thị số kết quả tìm được
+                searchStats.textContent = `Tìm thấy ${filteredMajors.length} ngành`;
+            } else {
+                // Nếu không tìm kiếm, hiển thị tổng số ngành
+                searchStats.textContent = `Tổng cộng ${allMajors.length} ngành`;
+            }
+        }
+    }
 
+    // Thay đổi: Tải toàn bộ ngành 1 lần khi vào trường
+    async function loadAllMajors() {
+        if (!currentUniversity) {
+            console.log('❌ No current university set');
+            return;
+        }
+        
+        console.log('🔄 Loading ALL majors for university:', currentUniversity.name_vn);
+        console.log('🏫 University ID:', currentUniversity.id);
+        
+        const apiUrl = `https://timtruonghoc.pythonanywhere.com/schools/${currentUniversity.id}/all_majors/`;
+        console.log('🔗 API URL:', apiUrl);
+        
+        try {
+            showMajorsSkeleton();
+            const response = await fetch(apiUrl);
+            console.log('📡 Response status:', response.status);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            allMajors = await response.json();
+            console.log('✅ All majors loaded:', allMajors.length, 'majors');
+            console.log('📊 Sample major:', allMajors[0]);
+            
+            filteredMajors = [...allMajors];
+            majorsCurrentPage = 1;
+            majorsTotalPages = Math.ceil(filteredMajors.length / MAJORS_PER_PAGE);
+            majorsLoaded = true;
+            
+            console.log('📊 Total pages:', majorsTotalPages);
+            console.log('📊 Majors per page:', MAJORS_PER_PAGE);
+            
+            // Cập nhật số lượng ngành trong search stats
+            updateMajorsSearchStats();
+            
+            renderMajorsPageFromCache(1);
+            
+        } catch (error) {
+            console.error('❌ Error loading all majors:', error);
+            showMajorsError();
+        }
+    }
+
+    // Sửa updateMajors để gọi loadAllMajors thay vì loadMajorsPage
     function updateMajors(university) {
         console.log('🔄 Updating majors for university:', university.name_vn);
-        
-        // Cập nhật currentUniversity
         currentUniversity = university;
-        
-        // Reset majors data
         allMajors = [];
         filteredMajors = [];
         majorsCurrentPage = 1;
@@ -565,11 +688,10 @@ window.addEventListener('load', function () {
         majorsLoaded = false;
         majorsLoading = false;
         majorsSearchTerm = '';
-        
-        // Load lần đầu: không hiển thị skeleton, load trực tiếp
-        loadMajorsPage(1);
-        
-        // Khởi tạo search sau khi tải xong
+        showMajorsSkeleton();
+        setTimeout(() => {
+            loadAllMajors();
+        }, 200);
         setTimeout(() => {
             initializeMajorsSearch();
         }, 1000);
@@ -581,31 +703,22 @@ window.addEventListener('load', function () {
         
         console.log('🔄 Showing majors skeleton loading...');
         
-        let skeletonHTML = '';
-        for (let i = 0; i < MAJORS_PER_PAGE; i++) {
-            skeletonHTML += `
-                <div class="major-card skeleton-major-card">
-                    <div class="major-card-header">
-                        <div class="skeleton-logo"></div>
-                        <div>
-                            <div class="skeleton-labels-row">
-                                <div class="skeleton-label"></div>
-                                <div class="skeleton-label"></div>
-                            </div>
-                            <div class="skeleton-title"></div>
-                            <div class="skeleton-code"></div>
-                        </div>
-                    </div>
-                    <div class="major-info-row">
-                        <div class="skeleton-fee"></div>
-                        <div class="skeleton-location"></div>
-                    </div>
-                    <div class="skeleton-fav-btn"></div>
+        // Hiển thị loading indicator với thông báo rõ ràng
+        majorsGrid.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px;">
+                <div style="display: inline-block; padding: 20px; background: #f8fafc; border-radius: 12px; border: 2px solid #e2e8f0;">
+                    <div style="width: 40px; height: 40px; border: 3px solid #e2e8f0; border-top: 3px solid #3b82f6; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px;"></div>
+                    <div style="color: #64748b; font-weight: 600; font-size: 14px;">Đang tải danh sách ngành...</div>
+                    <div style="color: #94a3b8; font-size: 12px; margin-top: 5px;">Vui lòng chờ trong giây lát</div>
                 </div>
-            `;
-        }
-        
-        majorsGrid.innerHTML = skeletonHTML;
+            </div>
+            <style>
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            </style>
+        `;
         
         // Ẩn pagination trong khi loading
         const majorsPagination = document.getElementById('majorsPagination');
@@ -664,6 +777,20 @@ window.addEventListener('load', function () {
         console.log(`📊 Loading majors page ${page} for university:`, currentUniversity.name_vn);
         console.log(`🏫 University ID:`, currentUniversity.id);
         
+        // Kiểm tra cache cho majors
+        const majorsCacheKey = `majors_${currentUniversity.id}_page_${page}`;
+        const cachedMajors = localStorage.getItem(majorsCacheKey);
+        const cacheTime = localStorage.getItem(`${majorsCacheKey}_time`);
+        const now = Date.now();
+        
+        // Cache hợp lệ trong 15 phút
+        if (cachedMajors && cacheTime && (now - parseInt(cacheTime)) < 15 * 60 * 1000) {
+            console.log(`📊 Sử dụng majors từ cache cho page ${page}`);
+            const data = JSON.parse(cachedMajors);
+            processMajorsData(data, page);
+            return;
+        }
+        
         // Hiển thị skeleton khi chuyển trang (không phải trang đầu tiên)
         if (page > 1) {
             showMajorsSkeleton();
@@ -683,126 +810,111 @@ window.addEventListener('load', function () {
             
             const data = await response.json();
             console.log(`✅ Majors page ${page} loaded:`, data);
-            console.log(`📊 Data type:`, typeof data);
-            console.log(`📊 Is Array:`, Array.isArray(data));
-            console.log(`📊 Data length:`, data.length || 'N/A');
             
-            // Xử lý dữ liệu - handle cả Array và Object có results
-            let majorsData = [];
-            let totalCount = 0;
+            // Lưu vào cache
+            localStorage.setItem(majorsCacheKey, JSON.stringify(data));
+            localStorage.setItem(`${majorsCacheKey}_time`, now.toString());
             
-            if (Array.isArray(data)) {
-                // API trả về Array trực tiếp
-                majorsData = data;
-                totalCount = data.length;
-                console.log(`📊 Processing Array data: ${majorsData.length} majors`);
-            } else if (data && data.results) {
-                // API trả về Object có results
-                majorsData = data.results;
-                totalCount = data.count || data.results.length;
-                console.log(`📊 Processing Object data: ${majorsData.length} majors, total: ${totalCount}`);
-            } else {
-                console.error(`❌ Unexpected data format:`, data);
-                throw new Error('Unexpected data format from API');
-            }
-            
-            // Cập nhật dữ liệu majors
-            if (page === 1) {
-                // Trang đầu tiên: thay thế toàn bộ dữ liệu
-                allMajors = majorsData;
-                console.log(`📊 Page 1: Set allMajors to ${allMajors.length} majors`);
-            } else {
-                // Các trang tiếp theo: thêm vào dữ liệu hiện có
-                const oldLength = allMajors.length;
-                allMajors = [...allMajors, ...majorsData];
-                console.log(`📊 Page ${page}: Added ${majorsData.length} majors to existing ${oldLength} -> ${allMajors.length}`);
-            }
-            
-            // Cập nhật filteredMajors
-            filteredMajors = [...allMajors];
-            console.log(`📊 Updated filteredMajors: ${filteredMajors.length} majors`);
-            
-            // Cập nhật thông tin phân trang
-            majorsTotalPages = Math.ceil(totalCount / MAJORS_PER_PAGE);
-            console.log(`📊 Total pages: ${majorsTotalPages} (total: ${totalCount}, per page: ${MAJORS_PER_PAGE})`);
-            
-            // Render trang hiện tại
-            console.log(`🎨 Calling renderMajorsPageFromCache with page ${page}`);
-            majorsCurrentPage = page; // Cập nhật trang hiện tại
-            renderMajorsPageFromCache(page);
+            processMajorsData(data, page);
             
         } catch (error) {
             console.error('❌ Error loading majors:', error);
-            console.error('❌ Error details:', error.message);
-            // Fallback: hiển thị thông báo lỗi
-            const majorsGrid = document.getElementById('majorsGrid');
-        if (majorsGrid) {
-                majorsGrid.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">Không thể tải dữ liệu ngành. Vui lòng thử lại sau.</p>';
-            }
+            showMajorsError();
+        }
+    }
+    
+    // Tách riêng logic xử lý dữ liệu majors
+    function processMajorsData(data, page) {
+        console.log(`📊 Data type:`, typeof data);
+        console.log(`📊 Is Array:`, Array.isArray(data));
+        console.log(`📊 Data length:`, data.length || 'N/A');
+        
+        // Xử lý dữ liệu - handle cả Array và Object có results
+        let majorsData = [];
+        let totalCount = 0;
+        
+        if (Array.isArray(data)) {
+            // API trả về Array trực tiếp
+            majorsData = data;
+            totalCount = data.length;
+            console.log(`📊 Processing Array data: ${majorsData.length} majors`);
+        } else if (data && data.results) {
+            // API trả về Object có results
+            majorsData = data.results;
+            totalCount = data.count || data.results.length;
+            console.log(`📊 Processing Object data: ${majorsData.length} majors, total: ${totalCount}`);
+        } else {
+            console.error(`❌ Unexpected data format:`, data);
+            throw new Error('Unexpected data format from API');
+        }
+        
+        // Cập nhật dữ liệu majors
+        if (page === 1) {
+            // Trang đầu tiên: thay thế toàn bộ dữ liệu
+            allMajors = majorsData;
+            console.log(`📊 Page 1: Set allMajors to ${allMajors.length} majors`);
+        } else {
+            // Các trang tiếp theo: thêm vào dữ liệu hiện có
+            const oldLength = allMajors.length;
+            allMajors = [...allMajors, ...majorsData];
+            console.log(`📊 Page ${page}: Added ${majorsData.length} majors to existing ${oldLength} -> ${allMajors.length}`);
+        }
+        
+        // Cập nhật filteredMajors
+        filteredMajors = [...allMajors];
+        console.log(`📊 Updated filteredMajors: ${filteredMajors.length} majors`);
+        
+        // Cập nhật thông tin phân trang
+        majorsTotalPages = Math.ceil(totalCount / MAJORS_PER_PAGE);
+        console.log(`📊 Total pages: ${majorsTotalPages} (total: ${totalCount}, per page: ${MAJORS_PER_PAGE})`);
+        
+        // Render trang hiện tại
+        console.log(`🎨 Calling renderMajorsPageFromCache with page ${page}`);
+        majorsCurrentPage = page; // Cập nhật trang hiện tại
+        renderMajorsPageFromCache(page);
+        
+        // Ẩn thông báo loading khi tải thành công
+        const loadingNotice = document.getElementById('majorsLoadingNotice');
+        if (loadingNotice) {
+            loadingNotice.style.display = 'none';
         }
     }
 
+    // Sửa renderMajorsPageFromCache để phân trang trên filteredMajors
     function renderMajorsPageFromCache(page) {
-        console.log(`🎨 Rendering majors page ${page} from cache (${allMajors.length} total majors)`);
-        console.log(`📊 Current state: majorsCurrentPage=${majorsCurrentPage}, majorsTotalPages=${majorsTotalPages}`);
+        console.log(`🎨 Rendering majors page ${page} from cache`);
+        console.log(`📊 Total filtered majors: ${filteredMajors.length}`);
+        console.log(`📊 Majors per page: ${MAJORS_PER_PAGE}`);
         
         const startIndex = (page - 1) * MAJORS_PER_PAGE;
         const endIndex = startIndex + MAJORS_PER_PAGE;
         const pageMajors = filteredMajors.slice(startIndex, endIndex);
         
-        console.log(`📄 Page ${page}: showing majors ${startIndex + 1}-${Math.min(endIndex, filteredMajors.length)} of ${filteredMajors.length}`);
-        console.log(`📄 Page majors data:`, pageMajors);
-        console.log(`📄 Page majors count:`, pageMajors.length);
+        console.log(`📊 Showing majors ${startIndex + 1} to ${endIndex} (${pageMajors.length} majors)`);
         
-        // Kiểm tra xem có đủ dữ liệu cho trang này không
-        if (pageMajors.length === 0 && page > 1) {
-            console.log(`⚠️ No data for page ${page}, loading from API...`);
-            // Hiển thị skeleton khi chuyển trang và cần load từ API
-            showMajorsSkeleton();
-            loadMajorsPage(page);
-            return;
-        }
-        
-        // Kiểm tra majorsGrid element
-        const majorsGrid = document.getElementById('majorsGrid');
-        console.log(`🎯 Majors grid element found:`, !!majorsGrid);
-        if (majorsGrid) {
-            console.log(`🎯 Majors grid current HTML length:`, majorsGrid.innerHTML.length);
-        }
+        // Cập nhật trang hiện tại
+        majorsCurrentPage = page;
         
         // Render majors cards
-        console.log(`🎨 Calling renderMajorsCards with ${pageMajors.length} majors`);
         renderMajorsCards(pageMajors);
         
         // Cập nhật pagination
         const majorsPagination = document.getElementById('majorsPagination');
-        if (majorsPagination) {
-            if (majorsTotalPages > 1) {
-                majorsPagination.style.display = 'flex';
-                console.log(`🎯 Showing pagination (${majorsTotalPages} pages)`);
-                renderMajorsPagination();
-            } else {
-                majorsPagination.style.display = 'none';
-                console.log(`🎯 Hiding pagination (only 1 page)`);
-            }
+        if (majorsTotalPages > 1) {
+            majorsPagination.style.display = 'flex';
+            renderMajorsPagination();
+        } else {
+            majorsPagination.style.display = 'none';
         }
         
-        // Cập nhật search results
-        const searchResults = document.getElementById('majorsSearchResults');
-        if (searchResults) {
-            if (majorsSearchTerm) {
-                searchResults.textContent = `Tìm thấy ${filteredMajors.length} ngành cho "${majorsSearchTerm}"`;
-            } else {
-                searchResults.textContent = `Hiển thị ${filteredMajors.length} ngành`;
-            }
+        // Cập nhật số lượng ngành trong search stats
+        updateMajorsSearchStats();
+        
+        // Ẩn thông báo loading khi tải thành công
+        const loadingNotice = document.getElementById('majorsLoadingNotice');
+        if (loadingNotice) {
+            loadingNotice.style.display = 'none';
         }
-        
-        // Cập nhật trạng thái
-        majorsLoaded = true;
-        majorsCurrentPage = page;
-        
-        console.log(`✅ Render completed for page ${page}`);
-        console.log(`✅ Final state: majorsCurrentPage=${majorsCurrentPage}, majorsLoaded=${majorsLoaded}`);
     }
 
     function renderMajorsPageFromAPI(page, pageMajors) {
@@ -873,24 +985,47 @@ window.addEventListener('load', function () {
                 const max = major.max_tuition_fee_per_year;
                 
                 if (min === "0" && max === "0") {
-                    feeText = 'Miễn phí';
+                    feeText = 'Thường miễn phí';
                 } else if (min === max) {
-                    feeText = `${formatCurrency(min)}`;
+                    const val = formatCurrency(min);
+                    feeText = val === 'Thường miễn phí' ? val : `Khoảng ${val}`;
                 } else {
-                    feeText = `${formatCurrency(min)} - ${formatCurrency(max)}`;
+                    const minVal = formatCurrency(min);
+                    const maxVal = formatCurrency(max);
+                    if (minVal === 'Thường miễn phí' && maxVal === 'Thường miễn phí') {
+                        feeText = 'Thường miễn phí';
+                    } else if (minVal === 'Thường miễn phí') {
+                        feeText = minVal;
+                    } else if (maxVal === 'Thường miễn phí') {
+                        feeText = maxVal;
+                    } else {
+                        feeText = `${minVal} - ${maxVal}`;
+                    }
                 }
             } else if (major.min_tuition_fee_per_year) {
-                feeText = `Từ ${formatCurrency(major.min_tuition_fee_per_year)}`;
+                const minVal = formatCurrency(major.min_tuition_fee_per_year);
+                feeText = minVal === 'Thường miễn phí' ? minVal : `Từ ${minVal}`;
             } else if (major.max_tuition_fee_per_year) {
-                feeText = `Đến ${formatCurrency(major.max_tuition_fee_per_year)}`;
+                const maxVal = formatCurrency(major.max_tuition_fee_per_year);
+                feeText = maxVal === 'Thường miễn phí' ? maxVal : `Đến ${maxVal}`;
             } else {
-                // Fallback về thông tin học phí của trường nếu ngành không có
                 if (currentUniversity.start === 0 && currentUniversity.end === 0) {
-                    feeText = 'Miễn phí';
+                    feeText = 'Thường miễn phí';
                 } else if (currentUniversity.start && currentUniversity.end && currentUniversity.start !== currentUniversity.end) {
-                    feeText = `${formatCurrency(currentUniversity.start)} - ${formatCurrency(currentUniversity.end)}`;
+                    const minVal = formatCurrency(currentUniversity.start);
+                    const maxVal = formatCurrency(currentUniversity.end);
+                    if (minVal === 'Thường miễn phí' && maxVal === 'Thường miễn phí') {
+                        feeText = 'Thường miễn phí';
+                    } else if (minVal === 'Thường miễn phí') {
+                        feeText = minVal;
+                    } else if (maxVal === 'Thường miễn phí') {
+                        feeText = maxVal;
+                    } else {
+                        feeText = `${minVal} - ${maxVal}`;
+                    }
                 } else if (currentUniversity.start) {
-                    feeText = formatCurrency(currentUniversity.start);
+                    const minVal = formatCurrency(currentUniversity.start);
+                    feeText = minVal === 'Thường miễn phí' ? minVal : `Khoảng ${minVal}`;
                 } else {
                     feeText = 'Đang cập nhật';
                 }
@@ -990,9 +1125,10 @@ window.addEventListener('load', function () {
                     return;
                 }
                 
-                // Navigate to major detail page
-                const majorId = getOriginalMajorId(major.major_id);
-                window.location.href = `/nganh/${majorId}`;
+                // Navigate to major detail page (specific to this school)
+                const majorId = major.id; // Use major ID from database
+                const schoolShortCode = currentUniversity.short_code;
+                window.location.href = `/chitiet-nganh-rieng?major_id=${majorId}&school_short_code=${schoolShortCode}`;
             });
             
             // Thêm click event cho favorite button
@@ -1105,7 +1241,7 @@ window.addEventListener('load', function () {
                     <div style="font-size: 3rem; color: #ef4444; margin-bottom: 16px;">⚠️</div>
                     <h3 style="color: #dc2626; margin-bottom: 8px;">Không thể tải dữ liệu</h3>
                     <p style="color: #9ca3af; margin-bottom: 16px;">Vui lòng thử lại sau</p>
-                    <button onclick="loadMajorsPage(1)" style="
+                    <button onclick="loadAllMajors()" style="
                         background: #0a4191; 
                         color: white; 
                         border: none; 
@@ -1242,7 +1378,7 @@ window.addEventListener('load', function () {
     function formatCurrency(amount) {
         const numAmount = parseFloat(amount);
         if (isNaN(numAmount) || numAmount === 0) {
-            return "Miễn phí";
+            return "Thường miễn phí";
         }
         const amountInMillions = numAmount / 1000000;
         if (amountInMillions % 1 === 0) {
@@ -1414,6 +1550,8 @@ window.addEventListener('load', function () {
                     searchClear.style.display = 'none';
                     if (majorsLoaded) {
                         filterMajors();
+                        // Cập nhật số lượng ngành sau khi clear
+                        updateMajorsSearchStats();
                     }
                 });
             }
@@ -1532,30 +1670,55 @@ window.addEventListener('load', function () {
             const max = major.max_tuition_fee_per_year;
             
             if (min === "0" && max === "0") {
-                tuitionDisplay = 'Miễn phí';
+                tuitionDisplay = 'Thường miễn phí';
             } else if (min === max) {
-                tuitionDisplay = `${min} triệu/năm`;
+                const val = formatCurrency(min);
+                tuitionDisplay = val === 'Thường miễn phí' ? val : `Khoảng ${val}`;
             } else {
-                tuitionDisplay = `${min} - ${max} triệu/năm`;
+                const minVal = formatCurrency(min);
+                const maxVal = formatCurrency(max);
+                if (minVal === 'Thường miễn phí' && maxVal === 'Thường miễn phí') {
+                    tuitionDisplay = 'Thường miễn phí';
+                } else if (minVal === 'Thường miễn phí') {
+                    tuitionDisplay = minVal;
+                } else if (maxVal === 'Thường miễn phí') {
+                    tuitionDisplay = maxVal;
+                } else {
+                    tuitionDisplay = `${minVal} - ${maxVal}`;
+                }
             }
         } else if (major.min_tuition_fee_per_year) {
-            tuitionDisplay = `Từ ${major.min_tuition_fee_per_year} triệu/năm`;
+            const minVal = formatCurrency(major.min_tuition_fee_per_year);
+            tuitionDisplay = minVal === 'Thường miễn phí' ? minVal : `Từ ${minVal}`;
         } else if (major.max_tuition_fee_per_year) {
-            tuitionDisplay = `Đến ${major.max_tuition_fee_per_year} triệu/năm`;
+            const maxVal = formatCurrency(major.max_tuition_fee_per_year);
+            tuitionDisplay = maxVal === 'Thường miễn phí' ? maxVal : `Đến ${maxVal}`;
         } else {
-            // Fallback về thông tin học phí của trường nếu ngành không có
             if (currentUniversity && typeof currentUniversity.start === 'number' && typeof currentUniversity.end === 'number') {
                 if (currentUniversity.start === 0 && currentUniversity.end === 0) {
-                    tuitionDisplay = 'Miễn phí';
+                    tuitionDisplay = 'Thường miễn phí';
                 } else if (currentUniversity.start === currentUniversity.end) {
-                    tuitionDisplay = `${currentUniversity.start} triệu/năm`;
+                    const val = formatCurrency(currentUniversity.start);
+                    tuitionDisplay = val === 'Thường miễn phí' ? val : `Khoảng ${val}`;
                 } else {
-                    tuitionDisplay = `${currentUniversity.start} - ${currentUniversity.end} triệu/năm`;
+                    const minVal = formatCurrency(currentUniversity.start);
+                    const maxVal = formatCurrency(currentUniversity.end);
+                    if (minVal === 'Thường miễn phí' && maxVal === 'Thường miễn phí') {
+                        tuitionDisplay = 'Thường miễn phí';
+                    } else if (minVal === 'Thường miễn phí') {
+                        tuitionDisplay = minVal;
+                    } else if (maxVal === 'Thường miễn phí') {
+                        tuitionDisplay = maxVal;
+                    } else {
+                        tuitionDisplay = `${minVal} - ${maxVal}`;
+                    }
                 }
             } else if (currentUniversity && typeof currentUniversity.start === 'number') {
-                tuitionDisplay = `Từ ${currentUniversity.start} triệu/năm`;
+                const minVal = formatCurrency(currentUniversity.start);
+                tuitionDisplay = minVal === 'Thường miễn phí' ? minVal : `Từ ${minVal}`;
             } else if (currentUniversity && typeof currentUniversity.end === 'number') {
-                tuitionDisplay = `Đến ${currentUniversity.end} triệu/năm`;
+                const maxVal = formatCurrency(currentUniversity.end);
+                tuitionDisplay = maxVal === 'Thường miễn phí' ? maxVal : `Đến ${maxVal}`;
             } else {
                 tuitionDisplay = 'Chưa có thông tin';
             }

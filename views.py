@@ -448,6 +448,50 @@ class SchoolViewSet(viewsets.ModelViewSet):
         
         return Response(serializer.data)
 
+    @action(detail=False, methods=['get'], url_path='by_short_code/(?P<short_code>[^/.]+)')
+    def by_short_code(self, request, short_code=None):
+        """
+        API tối ưu để lấy chi tiết 1 trường theo short_code.
+        Không bao gồm majors_data để tăng tốc độ.
+        """
+        try:
+            from django.shortcuts import get_object_or_404
+            
+            # Tối ưu query: chỉ lấy trường cần thiết
+            school = get_object_or_404(
+                School.objects.only(
+                    'id', 'name_vn', 'name_en', 'short_code', 'admission_code', 
+                    'logo', 'cover_photo', 'established_year', 'school_type',
+                    'website_url', 'quota_per_year', 'introduction', 'phone_number', 
+                    'email', 'map_link', 'start', 'end', 'scholarships', 
+                    'school_level', 'country', 'registration', 'benchmark_min', 
+                    'benchmark_max', 'tag', 'address', 'socialmedialink'
+                ),
+                short_code__iexact=short_code
+            )
+            
+            # Sử dụng serializer tối ưu (không có majors_data)
+            serializer = SchoolOptimizedSerializer(school)
+            return Response(serializer.data)
+            
+        except Exception as e:
+            print(f"Error in by_short_code: {str(e)}")
+            return Response({
+                'error': f'Không tìm thấy trường học với mã: {short_code}',
+                'detail': str(e)
+            }, status=404)
+
+    @action(detail=True, methods=['get'])
+    def all_majors(self, request, pk=None):
+        """
+        Trả về toàn bộ danh sách ngành của trường (không phân trang).
+        """
+        school = self.get_object()
+        majors = school.school_major.select_related('school').all()
+        from .serializers import MajorOptimizedSerializer
+        serializer = MajorOptimizedSerializer(majors, many=True)
+        return Response(serializer.data)
+
 # ---
 ## AdmissionScore ViewSet
 # ---
@@ -744,11 +788,14 @@ class AllMajorViewByFieldHasPagi(viewsets.ModelViewSet, generics.ListAPIView):
 
             return queryset
 
+        # --- Ưu tiên sắp xếp theo opportunities giảm dần nếu không có ordering ---
+        if not ordering_param:
+            return queryset.order_by('-opportunities', 'name')
+
         # --- Logic SẮP XẾP MẶC ĐỊNH (nếu không có sắp xếp tùy chỉnh) ---
         tag_order = ['hot', 'find', 'grown', 'push', 'normal']
         tag_ordering = Case(*[When(tag=tag_name, then=Value(i)) for i, tag_name in enumerate(tag_order)],
                             output_field=IntegerField())
-
         return queryset.order_by(tag_ordering)
 
 
@@ -908,6 +955,7 @@ class SchoolMajorsViewSet(viewsets.ReadOnlyModelViewSet):
         return queryset
 
     @action(detail=True, methods=['get'])
+    @method_decorator(cache_page(60*10))  # Cache 10 phút
     def majors(self, request, pk=None):
         """
         Lấy danh sách ngành của trường cụ thể với phân trang.

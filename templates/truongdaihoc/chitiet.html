@@ -1,6 +1,13 @@
 {% extends "base.html" %}
 
-{% block stylesheets %}
+<!-- Preload critical resources -->
+<link rel="preload" href="/static/css/styleindex.css" as="style">
+<link rel="preload" href="/static/font/SFCompactRounded-Bold.otf" as="font" type="font/otf" crossorigin>
+<link rel="preload" href="/static/font/SFCompactRounded-Ultralight.otf" as="font" type="font/otf" crossorigin>
+<link rel="dns-prefetch" href="https://timtruonghoc.pythonanywhere.com">
+<link rel="preconnect" href="https://timtruonghoc.pythonanywhere.com">
+
+{%block stylesheets%}
 <style>
     @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
 
