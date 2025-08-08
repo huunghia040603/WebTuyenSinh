@@ -197,7 +197,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
             localStorage.setItem('authToken', token);
             console.log('token',token)
             AuthManager.saveUserData(data); 
-            setTimeout(() => window.location.href = '/', 300);
+            setTimeout(() => window.location.href = '/', 100000);
         } else {
             let errorMessage = 'Đăng nhập thất bại.';
             if (data && typeof data === 'object') {
@@ -244,7 +244,7 @@ async function sendTokenToBackend(idToken) {
             localStorage.setItem('refresh_token', data.auth_token.tokens.refresh);
             AuthManager.saveUserData(data); 
             
-            setTimeout(() => window.location.href = '/', 300);
+            setTimeout(() => window.location.href = '/', 100000);
         } else {
             let errorMessage = 'Đăng nhập bằng Google thất bại.';
             if (data && typeof data === 'object') {
