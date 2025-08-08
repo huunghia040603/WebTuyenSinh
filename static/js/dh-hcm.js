@@ -219,6 +219,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // API endpoint thông thường (đã hoạt động)
         const baseUrl = 'https://timtruonghoc.pythonanywhere.com/schools-optimized/';
+
         const params = new URLSearchParams();
         params.append('page_size', 1000); // Lấy tất cả dữ liệu
 

@@ -17,6 +17,11 @@ def dai_hoc_hcm():
 def page_not_found(e):
     return render_template('404.html'), 404
 
+@app.route("/account")
+def account():
+    return render_template('account.html')
+
+
 @app.route("/dangnhap")
 def dangnhap():
     return render_template('dangnhap.html')
@@ -72,6 +77,7 @@ def moi():
 @app.route("/mbti-new")
 def mbti_new():
     return render_template('mbti/mbti_new.html')
+
 
 @app.route("/thansohoc")
 def thansohoc():
@@ -254,6 +260,7 @@ def dieukhoan():
 @app.route("/quyche")
 def quyche():
     return render_template('quychedaydu.html')
+
 
 if __name__ == "__main__":
     app.run(debug=True)
