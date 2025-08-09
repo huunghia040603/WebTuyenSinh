@@ -1126,7 +1126,7 @@ window.addEventListener('load', function () {
                 }
                 
                 // Navigate to major detail page (specific to this school)
-                const majorId = major.id; // Use major ID from database
+                const majorId = major.major_id; // Use major_id (real code) instead of major.id (database ID)
                 const schoolShortCode = currentUniversity.short_code;
                 window.location.href = `/chitiet-nganh-rieng?major_id=${majorId}&school_short_code=${schoolShortCode}`;
             });
@@ -1832,10 +1832,11 @@ window.addEventListener('load', function () {
             if (detailBtn && major.major_id) {
                 detailBtn.onclick = () => {
                     console.log('🖱️ Detail button clicked for major:', major.name);
-                    // Sử dụng mã ngành gốc nếu là ngành đặc biệt
-                    const majorId = isSpecialProgram(major.major_id) ? getOriginalMajorId(major.major_id) : major.major_id;
-                    console.log('🔄 Redirecting to major page with ID:', majorId);
-                    window.location.href = `/nganh/${majorId}`;
+                    // Sử dụng major_id thực tế để link đến trang chi tiết ngành riêng
+                    const majorId = major.major_id;
+                    const schoolShortCode = currentUniversity ? currentUniversity.short_code : '';
+                    console.log('🔄 Redirecting to major detail page with ID:', majorId);
+                    window.location.href = `/chitiet-nganh-rieng?major_id=${majorId}&school_short_code=${schoolShortCode}`;
                 };
             }
         }
@@ -1843,7 +1844,9 @@ window.addEventListener('load', function () {
         // Fetch và hiển thị dữ liệu so sánh điểm nếu có mã ngành
         if (major.major_id) {
             console.log('📊 Fetching comparison data for major:', major.major_id);
-            fetchMajorComparison(major.major_id).then(comparisonData => {
+            // Sử dụng major_id thực tế cho comparison
+            const comparisonMajorId = major.major_id;
+            fetchMajorComparison(comparisonMajorId).then(comparisonData => {
                 if (comparisonData) {
                     const comparisonHTML = createComparisonHTML(comparisonData, schoolName);
                     if (comparisonHTML) {

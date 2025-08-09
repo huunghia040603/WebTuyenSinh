@@ -83,6 +83,13 @@ def mbti_new():
 def thansohoc():
     return render_template('thansohoc/thansohoc.html')
 
+@app.route('/so-sanh-nganh')
+def so_sanh_nganh():
+    return render_template('so-sanh-nganh.html')
+
+@app.route('/so-sanh-truong')
+def so_sanh_truong():
+    return render_template('so-sanh-truong.html')
 
 
 zodiac_data = {
@@ -260,6 +267,8 @@ def dieukhoan():
 @app.route("/quyche")
 def quyche():
     return render_template('quychedaydu.html')
+
+
 
 
 if __name__ == "__main__":

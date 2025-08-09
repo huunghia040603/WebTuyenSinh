@@ -41,6 +41,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let tuitionFilterActive = false;
 
+    // Check for URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const schoolParam = urlParams.get('school');
+    
+    // If school parameter exists, set it as search term
+    if (schoolParam && searchInput) {
+        searchInput.value = schoolParam;
+        currentSearchTerm = schoolParam;
+        console.log('🔍 Auto-searching for school:', schoolParam);
+    }
+
     // Skeleton loading effect
     function renderSkeletonCards(count = 12) {
         if (!universitiesGrid) return;
@@ -347,13 +358,26 @@ document.addEventListener('DOMContentLoaded', function () {
         totalPages = Math.ceil(filteredUniversities.length / ITEMS_PER_PAGE);
         const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
         const endIndex = startIndex + ITEMS_PER_PAGE;
-        const pageUniversities = filteredUniversities.slice(startIndex, endIndex);
+        const universitiesToShow = filteredUniversities.slice(startIndex, endIndex);
 
-        renderUniversities(pageUniversities);
+        // Render universities
+        renderUniversities(universitiesToShow);
         updatePaginationControls();
         
-        // Debug khi cần thiết (có thể comment out sau khi test xong)
-        // debugFilterData();
+        // Nếu có parameter school và tìm thấy trường, scroll đến trường đó
+        if (schoolParam && filteredUniversities.length > 0) {
+            setTimeout(() => {
+                const schoolCard = document.querySelector(`[data-short-code="${schoolParam.toUpperCase()}"]`);
+                if (schoolCard) {
+                    schoolCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    // Highlight trường được tìm kiếm
+                    schoolCard.style.boxShadow = '0 0 20px rgba(59, 130, 246, 0.5)';
+                    setTimeout(() => {
+                        schoolCard.style.boxShadow = '';
+                    }, 3000);
+                }
+            }, 500);
+        }
     }
 
     function renderUniversities(universities) {
@@ -371,6 +395,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 card.classList.add('highlight');
             }
             card.style.animationDelay = `${index * 0.1}s`;
+            // Thêm data attribute để có thể tìm kiếm trường
+            card.setAttribute('data-short-code', university.short_code);
 
             let locationText = 'Khác';
             if (university.country && university.country.includes('TPHCM')) {

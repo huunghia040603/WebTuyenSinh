@@ -105,7 +105,7 @@
     .content-grid {
         display: grid;
         grid-template-columns: 2fr 1fr;
-        gap: 40px;
+        gap: 20px;
     }
 
     .content-main {
@@ -394,6 +394,7 @@
         display: flex;
         align-items: center;
         gap: 15px;
+        cursor: pointer;
     }
 
     .related-school-card.outstanding-border {
@@ -409,6 +410,16 @@
     .related-school-card:hover {
         transform: translateY(-2px);
         box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .related-school-card.outstanding-border:hover {
+        box-shadow: 0 8px 25px rgba(251, 191, 36, 0.3);
+        border-color: #f59e0b;
+    }
+
+    .related-school-card.normal-border:hover {
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+        border-color: #2563eb;
     }
 
     .school-logo {
@@ -699,10 +710,10 @@
 
 {% block content %}
 <!-- Back Button -->
-<button class="back-button" onclick="goBack()">
+<!-- <button class="back-button" onclick="goBack()">
     <i class="fas fa-arrow-left"></i>
     Quay lại
-</button>
+</button> -->
 
 <!-- Hero Section -->
 <section class="hero-section">

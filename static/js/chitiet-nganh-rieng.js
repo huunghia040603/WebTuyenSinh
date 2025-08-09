@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Get parameters from URL
     const urlParams = new URLSearchParams(window.location.search);
-    const majorId = urlParams.get('major_id');
+    const majorId = urlParams.get('major_id'); // Đây là major_id thực tế (ví dụ: 7460104)
     const schoolId = urlParams.get('school_id');
     const schoolShortCode = urlParams.get('school_short_code');
     
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
     
-    // Load data
+    // Load data - majorId bây giờ là mã ngành thực tế
     loadMajorData(majorId, schoolId, schoolShortCode);
 });
 
@@ -28,26 +28,19 @@ document.addEventListener('DOMContentLoaded', function() {
 async function loadMajorData(majorId, schoolId, schoolShortCode) {
     try {
         console.log('🔄 Loading major data...');
+        console.log('🔍 Major ID (real):', majorId);
         
         // Load school data first
         await loadSchoolData(schoolId, schoolShortCode);
         
-        // Load major data
+        // Load major data by major_id (real code)
         await loadMajorDetails(majorId);
         
-        // Load general major data - sử dụng major_id từ currentMajor
-        if (currentMajor && currentMajor.major_id) {
-            await loadGeneralMajorData(currentMajor.major_id);
-        } else {
-            await loadGeneralMajorData(majorId);
-        }
+        // Load general major data using the real major_id
+        await loadGeneralMajorData(majorId);
         
-        // Load related schools - sử dụng major_id từ currentMajor
-        if (currentMajor && currentMajor.major_id) {
-            await loadRelatedSchools(currentMajor.major_id);
-        } else {
-            await loadRelatedSchools(majorId);
-        }
+        // Load related schools using the real major_id
+        await loadRelatedSchools(majorId);
         
         console.log('✅ All data loaded successfully');
         
@@ -85,13 +78,30 @@ async function loadSchoolData(schoolId, schoolShortCode) {
 // Load major details
 async function loadMajorDetails(majorId) {
     console.log('📚 Loading major details...');
+    console.log('🔍 Searching for major with major_id:', majorId);
     
-    const response = await fetch(`https://timtruonghoc.pythonanywhere.com/majors/${majorId}/`);
+    // Tìm major theo major_id thực tế thay vì ID tự sinh
+    const response = await fetch(`https://timtruonghoc.pythonanywhere.com/majors/?major_id=${majorId}`);
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
     }
     
-    currentMajor = await response.json();
+    const data = await response.json();
+    console.log('🔍 Search response:', data);
+    
+    // Tìm major có major_id khớp
+    let foundMajor = null;
+    if (data.results && Array.isArray(data.results)) {
+        foundMajor = data.results.find(major => major.major_id === majorId);
+    } else if (Array.isArray(data)) {
+        foundMajor = data.find(major => major.major_id === majorId);
+    }
+    
+    if (!foundMajor) {
+        throw new Error(`Không tìm thấy ngành với mã: ${majorId}`);
+    }
+    
+    currentMajor = foundMajor;
     console.log('✅ Major data loaded:', currentMajor);
     console.log('🔍 Major ID (primary key):', currentMajor.id);
     console.log('🔍 Major ID (major_id field):', currentMajor.major_id);
@@ -105,9 +115,6 @@ async function loadMajorDetails(majorId) {
 async function loadGeneralMajorData(majorId) {
     console.log('📖 Loading general major data...');
     console.log('🔍 Major ID to search:', majorId);
-    console.log('🔍 Current major name:', currentMajor?.name);
-    
-    // Thử nhiều cách khác nhau để lấy dữ liệu ngành chung
     
     // Cách 1: Tìm theo mã ngành riêng chính xác
     let response = await fetch(`https://timtruonghoc.pythonanywhere.com/all_major/?all_major_id=${majorId}`);
@@ -116,14 +123,25 @@ async function loadGeneralMajorData(majorId) {
     if (response.ok) {
         const data = await response.json();
         console.log('🔍 Method 1 response:', data);
-        if (data.results && data.results.length > 0) {
-            const foundMajor = data.results[0];
+        
+        // Xử lý cả trường hợp array và object có results
+        let results = [];
+        if (Array.isArray(data)) {
+            results = data;
+        } else if (data.results && Array.isArray(data.results)) {
+            results = data.results;
+        }
+        
+        if (results.length > 0) {
+            const foundMajor = results[0];
             console.log('🔍 Found major in Method 1:', foundMajor.name, 'ID:', foundMajor.all_major_id);
-            // Kiểm tra xem có đúng ngành không
-            if (foundMajor.all_major_id === majorId || foundMajor.name === currentMajor?.name) {
+            // Chỉ cần kiểm tra all_major_id khớp chính xác
+            if (foundMajor.all_major_id === majorId) {
                 generalMajorData = foundMajor;
                 console.log('✅ General major data loaded (Method 1):', generalMajorData);
+                console.log('🔄 Calling updateGeneralInfo...');
                 updateGeneralInfo();
+                console.log('✅ updateGeneralInfo completed');
                 return;
             } else {
                 console.log('⚠️ Method 1 found wrong major, trying next method...');
@@ -131,112 +149,47 @@ async function loadGeneralMajorData(majorId) {
         }
     }
     
-    // Cách 2: Tìm theo tên ngành chính xác (ưu tiên cao hơn baseMajorId)
-    if (currentMajor && currentMajor.name) {
-        console.log('🔍 Trying to search by exact name:', currentMajor.name);
-        response = await fetch(`https://timtruonghoc.pythonanywhere.com/all_major/?name=${encodeURIComponent(currentMajor.name)}`);
-        console.log('🔍 Method 2 - By exact name status:', response.status);
-        
-        if (response.ok) {
-            const data = await response.json();
-            console.log('🔍 Method 2 response:', data);
-            if (data.results && data.results.length > 0) {
-                // Tìm ngành có tên khớp chính xác nhất
-                const exactMatch = data.results.find(major => 
-                    major.name.toLowerCase() === currentMajor.name.toLowerCase()
-                );
-                if (exactMatch) {
-                    generalMajorData = exactMatch;
-                    console.log('✅ General major data loaded (Method 2 - exact match):', generalMajorData);
-                    updateGeneralInfo();
-                    return;
-                } else {
-                    console.log('⚠️ No exact name match found in Method 2');
-                }
-            }
-        }
-    }
-    
-    // Cách 3: Tìm theo base major ID (chỉ khi majorId có vẻ là mã ngành chuẩn)
+    // Cách 2: Tìm theo base major ID (chỉ khi majorId có vẻ là mã ngành chuẩn)
     const baseMajorId = getBaseMajorId(majorId);
     console.log('🔍 Base major ID:', baseMajorId);
     
     // Chỉ thử baseMajorId nếu nó khác với majorId gốc hoặc có vẻ là mã ngành chuẩn
     if (baseMajorId !== majorId || /^\d{7}$/.test(majorId)) {
         response = await fetch(`https://timtruonghoc.pythonanywhere.com/all_major/?all_major_id=${baseMajorId}`);
-        console.log('🔍 Method 3 - Base major ID status:', response.status);
+        console.log('🔍 Method 2 - Base major ID status:', response.status);
         
         if (response.ok) {
             const data = await response.json();
-            console.log('🔍 Method 3 response:', data);
-            if (data.results && data.results.length > 0) {
-                const foundMajor = data.results[0];
-                console.log('🔍 Found major in Method 3:', foundMajor.name, 'ID:', foundMajor.all_major_id);
-                // Kiểm tra xem có đúng ngành không
-                if (foundMajor.all_major_id === baseMajorId || foundMajor.name === currentMajor?.name) {
+            console.log('🔍 Method 2 response:', data);
+            
+            // Xử lý cả trường hợp array và object có results
+            let results = [];
+            if (Array.isArray(data)) {
+                results = data;
+            } else if (data.results && Array.isArray(data.results)) {
+                results = data.results;
+            }
+            
+            if (results.length > 0) {
+                const foundMajor = results[0];
+                console.log('🔍 Found major in Method 2:', foundMajor.name, 'ID:', foundMajor.all_major_id);
+                // Chỉ cần kiểm tra all_major_id khớp chính xác
+                if (foundMajor.all_major_id === baseMajorId) {
                     generalMajorData = foundMajor;
-                    console.log('✅ General major data loaded (Method 3):', generalMajorData);
+                    console.log('✅ General major data loaded (Method 2):', generalMajorData);
+                    console.log('🔄 Calling updateGeneralInfo...');
                     updateGeneralInfo();
+                    console.log('✅ updateGeneralInfo completed');
                     return;
                 } else {
-                    console.log('⚠️ Method 3 found wrong major, trying next method...');
+                    console.log('⚠️ Method 2 found wrong major');
                 }
             }
         }
     }
     
-    // Cách 4: Thử endpoint khác - có thể là all_major_has_pagi
-    response = await fetch(`https://timtruonghoc.pythonanywhere.com/all_major_has_pagi/?all_major_id=${baseMajorId}`);
-    console.log('🔍 Method 4 - all_major_has_pagi status:', response.status);
-    
-    if (response.ok) {
-        const data = await response.json();
-        console.log('🔍 Method 4 response:', data);
-        if (data.results && data.results.length > 0) {
-            // Tìm ngành có tên khớp trong danh sách
-            const nameMatch = data.results.find(major => 
-                major.name.toLowerCase() === currentMajor?.name.toLowerCase()
-            );
-            if (nameMatch) {
-                generalMajorData = nameMatch;
-                console.log('✅ General major data loaded (Method 4 - name match):', generalMajorData);
-                updateGeneralInfo();
-                return;
-            } else {
-                console.log('⚠️ No name match found in Method 4 results');
-            }
-        }
-    }
-    
-    // Cách 5: Tìm kiếm theo từ khóa trong tên ngành
-    if (currentMajor && currentMajor.name) {
-        const keywords = currentMajor.name.split(' ').filter(word => word.length > 2);
-        console.log('🔍 Trying to search by keywords:', keywords);
-        
-        for (const keyword of keywords) {
-            response = await fetch(`https://timtruonghoc.pythonanywhere.com/all_major/?name=${encodeURIComponent(keyword)}`);
-            if (response.ok) {
-                const data = await response.json();
-                if (data.results && data.results.length > 0) {
-                    // Tìm ngành có tên chứa từ khóa
-                    const keywordMatch = data.results.find(major => 
-                        major.name.toLowerCase().includes(keyword.toLowerCase()) ||
-                        currentMajor.name.toLowerCase().includes(major.name.toLowerCase())
-                    );
-                    if (keywordMatch) {
-                        generalMajorData = keywordMatch;
-                        console.log('✅ General major data loaded (Method 5 - keyword match):', generalMajorData);
-                        updateGeneralInfo();
-                        return;
-                    }
-                }
-            }
-        }
-    }
-    
-    console.warn('⚠️ No general major data found with any method');
-    console.log('🔍 All methods failed. Major ID:', majorId, 'Base ID:', baseMajorId, 'Major name:', currentMajor?.name);
-    console.log('💡 Suggestion: Check if this major exists in AllMajorOfAllSchool table');
+    console.log('⚠️ No general major data found with Method 1 or 2');
+    console.log('🔍 Failed for major ID:', majorId);
 }
 
 // Load related schools (các trường có đào tạo ngành tương ứng)
@@ -618,7 +571,11 @@ function updateSchoolSpecificContent() {
 
 // Update general info
 function updateGeneralInfo() {
-    if (!generalMajorData) return;
+    console.log('🔄 updateGeneralInfo called with:', generalMajorData);
+    if (!generalMajorData) {
+        console.log('❌ No generalMajorData available');
+        return;
+    }
     
     // Update quick info with highlighted numbers
     const trainingDuration = document.getElementById('trainingDuration');
@@ -626,35 +583,46 @@ function updateGeneralInfo() {
     const averageSalary = document.getElementById('averageSalary');
     const fieldName = document.getElementById('fieldName');
     
+    console.log('🔍 Updating quick info sections...');
+    
     if (trainingDuration) {
         const duration = generalMajorData.training_duration || 'Chưa có thông tin';
         trainingDuration.innerHTML = `<span class="info-title">Thời gian đào tạo:</span> <span class="highlight-line">${highlightNumbers(duration)} năm</span>`;
+        console.log('✅ Updated trainingDuration:', duration);
     }
     
     if (opportunities) {
         const opp = generalMajorData.opportunities;
         if (opp) {
             opportunities.innerHTML = `<span class="info-title">Cơ hội việc làm:</span> <span class="highlight-line"><span class="highlight-number">${opp}/100</span><span class="highlight-text"></span></span>`;
+            console.log('✅ Updated opportunities:', opp);
         } else {
             opportunities.innerHTML = `<span class="info-title">Cơ hội việc làm:</span> <span class="highlight-line">Chưa có thông tin</span>`;
+            console.log('⚠️ No opportunities data');
         }
     }
     
     if (averageSalary) {
         const salary = generalMajorData.salary || 'Chưa có thông tin';
         averageSalary.innerHTML = `<span class="info-title">Mức lương trung bình:</span> <span class="highlight-line">${highlightNumbers(salary)}</span>`;
+        console.log('✅ Updated averageSalary:', salary);
     }
     
     if (fieldName) {
         const field = generalMajorData.field?.name || 'Chưa có thông tin';
         fieldName.innerHTML = `<span class="info-title">Lĩnh vực:</span> <span class="highlight-line">${field}</span>`;
+        console.log('✅ Updated fieldName:', field);
     }
+    
+    console.log('🔍 Updating content sections...');
     
     // Update content sections
     updateContentSection('generalInfo', generalMajorData.short_description);
     updateContentSection('trainingProgram', generalMajorData.program);
     updateContentSection('careerOpportunities', generalMajorData.job);
     updateContentSection('suitableQualities', generalMajorData.suitable);
+    
+    console.log('✅ updateGeneralInfo completed successfully');
 }
 
 // Helper function to highlight numbers in text
@@ -816,48 +784,28 @@ function updateAdmissionRequirements() {
 function formatAdmissionRequirements(content) {
     if (!content) return '';
     
+    console.log('🔍 Formatting admission requirements:', content);
+    
     // Chuyển đổi HTML entities nếu có
     let text = content;
     
-    // Tạo danh sách các phương thức xét tuyển theo thứ tự ưu tiên
-    const methods = [
-        {
-            keywords: ['thi tốt nghiệp', 'thpt', 'tốt nghiệp thpt', 'kết quả thi'],
-            title: '1. Xét kết quả thi tốt nghiệp THPT.'
-        },
-        {
-            keywords: ['học bạ', 'điểm học bạ', 'kết quả học bạ'],
-            title: '2. Xét kết quả học bạ THPT.'
-        },
-        {
-            keywords: ['tuyển thẳng', 'ưu tiên xét tuyển', 'ưu tiên'],
-            title: '3. Xét tuyển thẳng, ưu tiên xét tuyển.'
-        },
-        {
-            keywords: ['phương thức khác', 'quy định của trường', 'theo quy định'],
-            title: '4. Các phương thức khác theo quy định của trường.'
-        }
-    ];
-    
-    // Tìm và format các phương thức
+    // Format theo pattern "1. ", "2. ", "3. " và chỉ xuống dòng sau khi viết xong số thứ tự
     let formattedText = text;
-    let foundMethods = [];
     
-    methods.forEach(method => {
-        const hasKeyword = method.keywords.some(keyword => 
-            text.toLowerCase().includes(keyword.toLowerCase())
-        );
-        if (hasKeyword) {
-            foundMethods.push(method.title);
-        }
+    // Tìm và format các phương thức theo pattern "số. nội dung."
+    // Chỉ xuống dòng sau khi viết xong số thứ tự (có dấu chấm ở cuối)
+    formattedText = formattedText.replace(/(\d+\.\s*[^<]*?\.)(?=\s*\d+\.|$)/g, function(match, content) {
+        console.log('🔍 Found method:', match);
+        // Loại bỏ khoảng trắng thừa ở cuối
+        content = content.trim();
+        // Thêm <br> sau khi viết xong số thứ tự
+        return content + '<br>';
     });
     
-    // Nếu tìm thấy các phương thức cụ thể, format theo thứ tự
-    if (foundMethods.length > 0) {
-        formattedText = foundMethods.join('<br>');
-    } else {
-        // Nếu không tìm thấy, format theo dấu chấm hoặc dấu phẩy
-        formattedText = text
+    // Nếu không tìm thấy pattern "số. ", thử format theo dấu chấm
+    if (!formattedText.includes('<br>')) {
+        console.log('⚠️ No numbered methods found, using fallback formatting');
+        formattedText = formattedText
             .replace(/\.\s*/g, '.<br>')
             .replace(/,\s*/g, ',<br>')
             .replace(/<br><br>/g, '<br>'); // Loại bỏ <br> thừa
@@ -866,6 +814,11 @@ function formatAdmissionRequirements(content) {
     // Thêm style cho các dòng
     formattedText = formattedText.replace(/<br>/g, '</p><p>');
     formattedText = '<p>' + formattedText + '</p>';
+    
+    // Loại bỏ <p></p> thừa
+    formattedText = formattedText.replace(/<p>\s*<\/p>/g, '');
+    
+    console.log('✅ Formatted result:', formattedText);
     
     return formattedText;
 }
@@ -904,8 +857,11 @@ function updateRelatedSchoolsUI(schools) {
         const tuitionText = formatTuitionForSchools(school.tuition_min, school.tuition_max);
         const borderClass = school.tag === 'outstanding' ? 'outstanding-border' : 'normal-border';
         
+        // Tạo URL cho trường dựa trên short_code - link về trang chi tiết trường
+        const schoolUrl = `/${school.short_code.toLowerCase()}`;
+        
         schoolsHTML += `
-            <div class="related-school-card ${borderClass}">
+            <div class="related-school-card ${borderClass}" onclick="window.location.href='${schoolUrl}'" style="cursor: pointer;">
                 <div class="school-logo">
                     <img src="${school.logo || '/static/images/logo12.png'}" alt="${school.name}" onerror="this.src='/static/images/logo12.png'">
                 </div>
@@ -942,8 +898,11 @@ function showAllSchools(allSchools) {
         const tuitionText = formatTuitionForSchools(school.tuition_min, school.tuition_max);
         const borderClass = school.tag === 'outstanding' ? 'outstanding-border' : 'normal-border';
         
+        // Tạo URL cho trường dựa trên short_code - link về trang chi tiết trường
+        const schoolUrl = `/${school.short_code.toLowerCase()}`;
+        
         schoolsHTML += `
-            <div class="related-school-card ${borderClass}">
+            <div class="related-school-card ${borderClass}" onclick="window.location.href='${schoolUrl}'" style="cursor: pointer;">
                 <div class="school-logo">
                     <img src="${school.logo || '/static/images/logo12.png'}" alt="${school.name}" onerror="this.src='/static/images/logo12.png'">
                 </div>
@@ -994,8 +953,39 @@ function isSpecialProgram(majorId) {
 
 function getBaseMajorId(majorId) {
     if (!majorId) return '';
-    // Remove letters to get base major ID
-    return majorId.replace(/[a-zA-Z]/g, '');
+    
+    console.log('🔍 getBaseMajorId input:', majorId);
+    
+    // Lấy chỉ 7 số đầu tiên từ majorId
+    const match = majorId.match(/^\d{7}/);
+    if (match) {
+        const result = match[0];
+        console.log('✅ getBaseMajorId result (7 digits):', result);
+        return result;
+    }
+    
+    // Fallback: loại bỏ tất cả chữ cái và ký tự đặc biệt, chỉ giữ lại số
+    const fallbackResult = majorId.replace(/[^0-9]/g, '').substring(0, 7);
+    console.log('⚠️ getBaseMajorId fallback result:', fallbackResult);
+    return fallbackResult;
+}
+
+// Test cases for getBaseMajorId
+function testGetBaseMajorId() {
+    const testCases = [
+        '7340101_AU',
+        '7340101CLC',
+        '7340101',
+        '7340101_ABC_123',
+        '7340101-ABC',
+        '7340101.ABC'
+    ];
+    
+    console.log('🧪 Testing getBaseMajorId:');
+    testCases.forEach(testCase => {
+        const result = getBaseMajorId(testCase);
+        console.log(`Input: ${testCase} -> Output: ${result}`);
+    });
 }
 
 function showError(message) {
@@ -1010,4 +1000,4 @@ function goBack() {
     } else {
         window.location.href = '/';
     }
-} 
+}
