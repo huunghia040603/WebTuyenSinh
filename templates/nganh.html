@@ -33,6 +33,7 @@
         gap: 0.7rem;
         position: relative;
         transition: box-shadow 0.2s;
+        cursor: pointer;
     }
     .major-card:hover {
         box-shadow: 0 4px 16px rgba(10,65,145,0.10);
@@ -307,6 +308,76 @@
     text-align: center;
     text-shadow: 0 2px 12px #00e0ff22;
 }
+
+/* Favorite Heart Button Styles */
+.major-fav-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #e5e7eb;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.major-fav-btn:hover {
+    background: rgba(255, 255, 255, 1);
+    border-color: #ff4757;
+    transform: scale(1.1);
+    box-shadow: 0 4px 15px rgba(255, 71, 87, 0.2);
+}
+
+.major-fav-btn i {
+    font-size: 16px;
+    color: #9ca3af;
+    transition: all 0.3s ease;
+}
+
+.major-fav-btn:hover i {
+    color: #ff4757;
+}
+
+.major-fav-btn.active {
+    background: rgba(255, 71, 87, 0.1);
+    border-color: #ff4757;
+    animation: heartPulse 2s ease-in-out infinite;
+}
+
+.major-fav-btn.active i {
+    color: #ff4757;
+}
+
+.major-fav-btn.active:hover {
+    background: rgba(255, 71, 87, 0.2);
+    transform: scale(1.15);
+}
+
+@keyframes heartPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* Responsive adjustments for favorite button */
+@media (max-width: 768px) {
+    .major-fav-btn {
+        width: 32px;
+        height: 32px;
+        top: 8px;
+        right: 8px;
+    }
+    
+    .major-fav-btn i {
+        font-size: 14px;
+    }
+}
     </style>
 {% endblock %}
 {% block content %}
@@ -334,5 +405,17 @@
 {% endblock %}
 {% block scripts %}
 <script src="/static/js/nganh.js"></script>
+<script>
+// Update heart button counter on page load - automatically handled by footer system
+document.addEventListener('DOMContentLoaded', function() {
+    // The footer system will automatically update the counter
+    // Just ensure it runs after a small delay to let footer initialize
+    setTimeout(() => {
+        if (window.FooterFavoriteManager && window.FooterFavoriteManager.updateFavoritesCount) {
+            window.FooterFavoriteManager.updateFavoritesCount();
+        }
+    }, 100);
+});
+</script>
 
 {% endblock %}

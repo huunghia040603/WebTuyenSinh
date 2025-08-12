@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% block title %}Debug Authentication{% endblock %}
+
+{% block content %}
+<div style="padding: 20px; max-width: 800px; margin: 0 auto;">
+    <h1>🔧 Debug Authentication</h1>
+    
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+        <h3>📊 Trạng thái Authentication</h3>
+        <div id="authStatus">Đang kiểm tra...</div>
+    </div>
+    
+    <div style="background: #e9ecef; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+        <h3>🔑 Token Information</h3>
+        <div id="tokenInfo">Đang tải...</div>
+    </div>
+    
+    <div style="background: #fff3cd; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+        <h3>🧪 Test API</h3>
+        <button onclick="testAPI()" style="background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-right: 10px;">
+            Test Search API
+        </button>
+        <button onclick="refreshToken()" style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+            Refresh Token
+        </button>
+        <div id="testResult" style="margin-top: 15px;"></div>
+    </div>
+    
+    <div style="background: #d1ecf1; padding: 20px; border-radius: 10px;">
+        <h3>📝 Hướng dẫn</h3>
+        <ol>
+            <li>Kiểm tra trạng thái authentication</li>
+            <li>Xem thông tin token</li>
+            <li>Test API để xác nhận token hoạt động</li>
+            <li>Refresh token nếu cần</li>
+        </ol>
+    </div>
+</div>
+
+<script>
+// Đợi AuthHelper load
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+        checkAuthStatus();
+        displayTokenInfo();
+    }, 1000);
+});
+
+function checkAuthStatus() {
+    const statusDiv = document.getElementById('authStatus');
+    
+    if (!window.AuthHelper) {
+        statusDiv.innerHTML = `
+            <p style="color: red;">❌ AuthHelper chưa được load</p>
+        `;
+        return;
+    }
+    
+    const isLoggedIn = window.AuthHelper.isLoggedIn();
+    const userData = window.AuthHelper.getUserData();
+    
+    if (isLoggedIn) {
+        statusDiv.innerHTML = `
+            <p style="color: green;">✅ Đã đăng nhập</p>
+            <p><strong>User Data:</strong> ${userData ? JSON.stringify(userData, null, 2) : 'Không có'}</p>
+        `;
+    } else {
+        statusDiv.innerHTML = `
+            <p style="color: red;">❌ Chưa đăng nhập</p>
+            <p>Vui lòng đăng nhập tại <a href="/dangnhap">trang đăng nhập</a></p>
+        `;
+    }
+}
+
+function displayTokenInfo() {
+    const tokenDiv = document.getElementById('tokenInfo');
+    const accessToken = localStorage.getItem('access_token');
+    const refreshToken = localStorage.getItem('refresh_token');
+    
+    if (!accessToken) {
+        tokenDiv.innerHTML = '<p style="color: red;">❌ Không có access token</p>';
+        return;
+    }
+    
+    try {
+        const payload = JSON.parse(atob(accessToken.split('.')[1]));
+        const expiryTime = new Date(payload.exp * 1000);
+        const currentTime = new Date();
+        const timeUntilExpiry = expiryTime - currentTime;
+        const isExpired = timeUntilExpiry < 0;
+        
+        tokenDiv.innerHTML = `
+            <p><strong>Access Token:</strong> ${accessToken.substring(0, 50)}...</p>
+            <p><strong>Refresh Token:</strong> ${refreshToken ? refreshToken.substring(0, 50) + '...' : 'Không có'}</p>
+            <p><strong>User ID:</strong> ${payload.user_id}</p>
+            <p><strong>Expires:</strong> ${expiryTime.toLocaleString()}</p>
+            <p><strong>Time until expiry:</strong> ${Math.floor(timeUntilExpiry / 1000 / 60)} phút</p>
+            <p style="color: ${isExpired ? 'red' : 'green'};">${isExpired ? '❌ Token đã hết hạn' : '✅ Token còn hiệu lực'}</p>
+        `;
+    } catch (error) {
+        tokenDiv.innerHTML = `<p style="color: red;">❌ Lỗi parse token: ${error.message}</p>`;
+    }
+}
+
+async function testAPI() {
+    const resultDiv = document.getElementById('testResult');
+    resultDiv.innerHTML = '<p>Đang test API...</p>';
+    
+    try {
+        const response = await window.AuthHelper.makeAuthenticatedRequest(
+            'https://timtruonghoc.pythonanywhere.com/chat/search-users/?email=test'
+        );
+        
+        if (response.ok) {
+            const data = await response.json();
+            resultDiv.innerHTML = `
+                <p style="color: green;">✅ API hoạt động tốt!</p>
+                <p><strong>Response:</strong></p>
+                <pre style="background: #f8f9fa; padding: 10px; border-radius: 5px; overflow-x: auto;">${JSON.stringify(data, null, 2)}</pre>
+            `;
+        } else {
+            const errorData = await response.json();
+            resultDiv.innerHTML = `
+                <p style="color: red;">❌ API Error: ${response.status}</p>
+                <pre style="background: #f8f9fa; padding: 10px; border-radius: 5px; overflow-x: auto;">${JSON.stringify(errorData, null, 2)}</pre>
+            `;
+        }
+    } catch (error) {
+        resultDiv.innerHTML = `
+            <p style="color: red;">❌ Error: ${error.message}</p>
+        `;
+    }
+}
+
+async function refreshToken() {
+    const resultDiv = document.getElementById('testResult');
+    resultDiv.innerHTML = '<p>Đang refresh token...</p>';
+    
+    try {
+        const success = await window.AuthHelper.refreshToken();
+        if (success) {
+            resultDiv.innerHTML = '<p style="color: green;">✅ Token đã được refresh thành công!</p>';
+            displayTokenInfo(); // Cập nhật thông tin token
+        } else {
+            resultDiv.innerHTML = '<p style="color: red;">❌ Không thể refresh token</p>';
+        }
+    } catch (error) {
+        resultDiv.innerHTML = `<p style="color: red;">❌ Error: ${error.message}</p>`;
+    }
+}
+
+// Auto-refresh thông tin mỗi 30 giây
+setInterval(() => {
+    checkAuthStatus();
+    displayTokenInfo();
+}, 30000);
+</script>
+{% endblock %} 

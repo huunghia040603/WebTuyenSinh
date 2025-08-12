@@ -351,5 +351,196 @@ class Partner(models.Model):
         return f"Đối tác: {self.school.name_vn}"
 
 
+# ---
+## Models Chat System
+# ---
+class ChatRoom(models.Model):
+    """
+    Model cho phòng chat giữa hai người dùng
+    """
+    ROOM_TYPE_CHOICES = [
+        ('private', 'Riêng tư'),
+        ('group', 'Nhóm'),
+    ]
+    
+    name = models.CharField(max_length=255, blank=True, null=True, verbose_name="Tên phòng chat")
+    room_type = models.CharField(max_length=20, choices=ROOM_TYPE_CHOICES, default='private', verbose_name="Loại phòng")
+    participants = models.ManyToManyField(User, related_name='chat_rooms', verbose_name="Người tham gia")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Ngày tạo")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Ngày cập nhật")
+    is_active = models.BooleanField(default=True, verbose_name="Trạng thái hoạt động")
+    
+    class Meta:
+        verbose_name = "Phòng chat"
+        verbose_name_plural = "Các phòng chat"
+        ordering = ['-updated_at']
+    
+    def __str__(self):
+        if self.name:
+            return self.name
+        elif self.room_type == 'private':
+            participants = list(self.participants.all()[:2])
+            if len(participants) == 2:
+                return f"Chat giữa {participants[0].email} và {participants[1].email}"
+            elif len(participants) == 1:
+                return f"Chat của {participants[0].email}"
+        return f"Phòng chat #{self.id}"
+    
+    def get_other_participant(self, user):
+        """Lấy người tham gia khác trong chat riêng tư"""
+        if self.room_type == 'private':
+            return self.participants.exclude(id=user.id).first()
+        return None
+    
+    def get_latest_message(self):
+        """Lấy tin nhắn mới nhất"""
+        return self.messages.order_by('-created_at').first()
+
+
+class Message(models.Model):
+    """
+    Model cho tin nhắn trong phòng chat
+    """
+    MESSAGE_TYPE_CHOICES = [
+        ('text', 'Văn bản'),
+        ('image', 'Hình ảnh'),
+        ('file', 'Tệp tin'),
+        ('system', 'Hệ thống'),
+    ]
+    
+    room = models.ForeignKey(ChatRoom, on_delete=models.CASCADE, related_name='messages', verbose_name="Phòng chat")
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages', verbose_name="Người gửi")
+    message_type = models.CharField(max_length=20, choices=MESSAGE_TYPE_CHOICES, default='text', verbose_name="Loại tin nhắn")
+    content = models.TextField(verbose_name="Nội dung")
+    file_url = models.CharField(max_length=500, blank=True, null=True, verbose_name="Đường dẫn file")
+    is_read = models.BooleanField(default=False, verbose_name="Đã đọc")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Ngày gửi")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Ngày cập nhật")
+    is_deleted = models.BooleanField(default=False, verbose_name="Đã xóa")
+    deleted_for_users = models.ManyToManyField(User, related_name='deleted_messages', blank=True, verbose_name="Đã xóa cho người dùng")
+    # Tin nhắn được reply tới
+    reply_to = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='replies', verbose_name="Trả lời tin nhắn")
+    
+    class Meta:
+        verbose_name = "Tin nhắn"
+        verbose_name_plural = "Các tin nhắn"
+        ordering = ['created_at']
+    
+    def __str__(self):
+        content_preview = self.content[:50] + "..." if len(self.content) > 50 else self.content
+        return f"{self.sender.email}: {content_preview}"
+    
+    def mark_as_read(self):
+        """Đánh dấu tin nhắn đã đọc"""
+        if not self.is_read:
+            self.is_read = True
+            self.save(update_fields=['is_read'])
+    
+    def is_deleted_for_user(self, user):
+        """Kiểm tra tin nhắn có bị xóa cho user cụ thể không"""
+        return self.deleted_for_users.filter(id=user.id).exists()
+    
+    def delete_for_user(self, user):
+        """Xóa tin nhắn cho user cụ thể (delete for me)"""
+        if not self.is_deleted_for_user(user):
+            self.deleted_for_users.add(user)
+    
+    def restore_for_user(self, user):
+        """Khôi phục tin nhắn cho user cụ thể"""
+        if self.is_deleted_for_user(user):
+            self.deleted_for_users.remove(user)
+
+
+class MessageReaction(models.Model):
+    """Reaction cho tin nhắn"""
+    REACTION_CHOICES = [
+        ('like', 'Like'),
+        ('love', 'Love'),
+        ('haha', 'Haha'),
+    ]
+
+    message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name='reactions', verbose_name="Tin nhắn")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='message_reactions', verbose_name="Người dùng")
+    reaction = models.CharField(max_length=10, choices=REACTION_CHOICES, verbose_name="Loại reaction")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Thời gian tạo")
+
+    class Meta:
+        verbose_name = "Reaction tin nhắn"
+        verbose_name_plural = "Các reaction tin nhắn"
+        unique_together = ('message', 'user')
+
+    def __str__(self):
+        return f"{self.user.email} {self.reaction} {self.message.id}"
+
+
+class ChatUserStatus(models.Model):
+    """
+    Model cho trạng thái online/offline của user trong chat
+    """
+    STATUS_CHOICES = [
+        ('online', 'Trực tuyến'),
+        ('away', 'Vắng mặt'),
+        ('busy', 'Bận'),
+        ('offline', 'Ngoại tuyến'),
+    ]
+    
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='chat_status', verbose_name="Người dùng")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='offline', verbose_name="Trạng thái")
+    last_seen = models.DateTimeField(auto_now=True, verbose_name="Lần cuối trực tuyến")
+    is_typing_in_room = models.ForeignKey(ChatRoom, on_delete=models.SET_NULL, null=True, blank=True, related_name='typing_users', verbose_name="Đang nhập trong phòng")
+    
+    class Meta:
+        verbose_name = "Trạng thái chat"
+        verbose_name_plural = "Trạng thái chat của người dùng"
+    
+    def __str__(self):
+        return f"{self.user.email} - {self.get_status_display()}"
+
+
+# ---
+## Models Tracking lượt xem trường và ngành
+# ---
+class SchoolViewCount(models.Model):
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='view_counts', verbose_name="Trường")
+    view_count = models.IntegerField(default=0, verbose_name="Lượt xem")
+    last_viewed = models.DateTimeField(auto_now=True, verbose_name="Lần xem cuối")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Ngày tạo")
+    
+    class Meta:
+        verbose_name = "Lượt xem trường"
+        verbose_name_plural = "Lượt xem các trường"
+        unique_together = ('school',)
+    
+    def __str__(self):
+        return f"{self.school.name_vn} - {self.view_count} lượt xem"
+
+class MajorViewCount(models.Model):
+    major = models.ForeignKey(Major, on_delete=models.CASCADE, related_name='view_counts', verbose_name="Ngành")
+    view_count = models.IntegerField(default=0, verbose_name="Lượt xem")
+    last_viewed = models.DateTimeField(auto_now=True, verbose_name="Lần xem cuối")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Ngày tạo")
+    
+    class Meta:
+        verbose_name = "Lượt xem ngành"
+        verbose_name_plural = "Lượt xem các ngành"
+        unique_together = ('major',)
+    
+    def __str__(self):
+        return f"{self.major.name} - {self.view_count} lượt xem"
+
+class DailyViewStats(models.Model):
+    date = models.DateField(unique=True, verbose_name="Ngày")
+    total_school_views = models.IntegerField(default=0, verbose_name="Tổng lượt xem trường")
+    total_major_views = models.IntegerField(default=0, verbose_name="Tổng lượt xem ngành")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Ngày tạo")
+    
+    class Meta:
+        verbose_name = "Thống kê lượt xem theo ngày"
+        verbose_name_plural = "Thống kê lượt xem theo ngày"
+        ordering = ['-date']
+    
+    def __str__(self):
+        return f"Thống kê ngày {self.date} - Trường: {self.total_school_views}, Ngành: {self.total_major_views}"
+
 
 

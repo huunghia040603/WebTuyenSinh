@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Chat Flow</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            border-left: 4px solid #007bff;
+        }
+        .test-section.success {
+            border-left-color: #28a745;
+        }
+        .test-section.error {
+            border-left-color: #dc3545;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .log {
+            background: #f1f3f4;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Chat Flow</h1>
+    
+    <div class="test-section">
+        <h3>1. Authentication Test</h3>
+        <button class="test-button" onclick="testAuth()">Test Authentication</button>
+        <button class="test-button" onclick="autoLogin()">Auto Login</button>
+        <button class="test-button" onclick="logout()">Logout</button>
+        <div id="authStatus" class="status info">Chưa test</div>
+        <div id="authLog" class="log"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>2. Search Users Test</h3>
+        <input type="email" id="searchEmail" placeholder="Nhập email để tìm kiếm" style="padding: 8px; margin-right: 10px;">
+        <button class="test-button" onclick="testSearch()">Search Users</button>
+        <div id="searchStatus" class="status info">Chưa test</div>
+        <div id="searchLog" class="log"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>3. Create Chat Room Test</h3>
+        <input type="number" id="userId" placeholder="User ID" style="padding: 8px; margin-right: 10px;">
+        <button class="test-button" onclick="testCreateRoom()">Create Chat Room</button>
+        <div id="roomStatus" class="status info">Chưa test</div>
+        <div id="roomLog" class="log"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>4. Full Flow Test</h3>
+        <button class="test-button" onclick="testFullFlow()">Test Full Flow</button>
+        <div id="flowStatus" class="status info">Chưa test</div>
+        <div id="flowLog" class="log"></div>
+    </div>
+
+    <script src="/static/js/auth_helper.js"></script>
+    <script src="/static/js/auto_login.js"></script>
+    
+    <script>
+        function log(elementId, message) {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            element.textContent += `[${timestamp}] ${message}\n`;
+            element.scrollTop = element.scrollHeight;
+        }
+
+        function updateStatus(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `status ${type}`;
+        }
+
+        async function testAuth() {
+            updateStatus('authStatus', 'Đang test authentication...', 'info');
+            log('authLog', 'Bắt đầu test authentication');
+            
+            try {
+                if (!window.AuthHelper) {
+                    throw new Error('AuthHelper chưa được load');
+                }
+                
+                const isLoggedIn = window.AuthHelper.isLoggedIn();
+                log('authLog', `AuthHelper.isLoggedIn(): ${isLoggedIn}`);
+                
+                if (isLoggedIn) {
+                    const token = await window.AuthHelper.getValidToken();
+                    log('authLog', `Token có sẵn: ${!!token}`);
+                    
+                    if (token) {
+                        // Test API call
+                        const response = await window.AuthHelper.makeAuthenticatedRequest(
+                            'https://timtruonghoc.pythonanywhere.com/auth/me/'
+                        );
+                        
+                        if (response.ok) {
+                            const userData = await response.json();
+                            log('authLog', `API call thành công: ${JSON.stringify(userData, null, 2)}`);
+                            updateStatus('authStatus', '✅ Authentication thành công!', 'success');
+                        } else {
+                            throw new Error(`API call failed: ${response.status}`);
+                        }
+                    } else {
+                        throw new Error('Không có token hợp lệ');
+                    }
+                } else {
+                    throw new Error('Chưa đăng nhập');
+                }
+            } catch (error) {
+                log('authLog', `Lỗi: ${error.message}`);
+                updateStatus('authStatus', `❌ Authentication thất bại: ${error.message}`, 'error');
+            }
+        }
+
+        async function autoLogin() {
+            updateStatus('authStatus', 'Đang đăng nhập tự động...', 'info');
+            log('authLog', 'Bắt đầu auto login');
+            
+            try {
+                if (!window.AutoLogin) {
+                    throw new Error('AutoLogin chưa được load');
+                }
+                
+                const success = await window.AutoLogin.login();
+                if (success) {
+                    log('authLog', 'Auto login thành công');
+                    updateStatus('authStatus', '✅ Auto login thành công!', 'success');
+                } else {
+                    throw new Error('Auto login thất bại');
+                }
+            } catch (error) {
+                log('authLog', `Lỗi: ${error.message}`);
+                updateStatus('authStatus', `❌ Auto login thất bại: ${error.message}`, 'error');
+            }
+        }
+
+        async function logout() {
+            updateStatus('authStatus', 'Đang đăng xuất...', 'info');
+            log('authLog', 'Bắt đầu logout');
+            
+            try {
+                if (!window.AutoLogin) {
+                    throw new Error('AutoLogin chưa được load');
+                }
+                
+                window.AutoLogin.logout();
+                log('authLog', 'Logout thành công');
+                updateStatus('authStatus', '✅ Logout thành công!', 'success');
+            } catch (error) {
+                log('authLog', `Lỗi: ${error.message}`);
+                updateStatus('authStatus', `❌ Logout thất bại: ${error.message}`, 'error');
+            }
+        }
+
+        async function testSearch() {
+            const email = document.getElementById('searchEmail').value.trim();
+            if (!email) {
+                updateStatus('searchStatus', '❌ Vui lòng nhập email', 'error');
+                return;
+            }
+            
+            updateStatus('searchStatus', 'Đang tìm kiếm...', 'info');
+            log('searchLog', `Bắt đầu tìm kiếm: ${email}`);
+            
+            try {
+                const response = await window.AuthHelper.makeAuthenticatedRequest(
+                    `https://timtruonghoc.pythonanywhere.com/chat/search-users/?email=${encodeURIComponent(email)}`
+                );
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log('searchLog', `Tìm kiếm thành công: ${JSON.stringify(data, null, 2)}`);
+                    updateStatus('searchStatus', `✅ Tìm thấy ${data.count} người dùng`, 'success');
+                } else {
+                    const errorData = await response.json();
+                    throw new Error(`API Error: ${response.status} - ${JSON.stringify(errorData)}`);
+                }
+            } catch (error) {
+                log('searchLog', `Lỗi: ${error.message}`);
+                updateStatus('searchStatus', `❌ Tìm kiếm thất bại: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCreateRoom() {
+            const userId = document.getElementById('userId').value.trim();
+            if (!userId) {
+                updateStatus('roomStatus', '❌ Vui lòng nhập User ID', 'error');
+                return;
+            }
+            
+            updateStatus('roomStatus', 'Đang tạo phòng chat...', 'info');
+            log('roomLog', `Bắt đầu tạo phòng chat với user ID: ${userId}`);
+            
+            try {
+                const response = await window.AuthHelper.makeAuthenticatedRequest(
+                    'https://timtruonghoc.pythonanywhere.com/chat-rooms/create_or_get_private_room/',
+                    {
+                        method: 'POST',
+                        body: JSON.stringify({ user_id: parseInt(userId) })
+                    }
+                );
+                
+                if (response.ok) {
+                    const room = await response.json();
+                    log('roomLog', `Tạo phòng thành công: ${JSON.stringify(room, null, 2)}`);
+                    updateStatus('roomStatus', `✅ Tạo phòng chat thành công! Room ID: ${room.id}`, 'success');
+                } else {
+                    const errorData = await response.json();
+                    throw new Error(`API Error: ${response.status} - ${JSON.stringify(errorData)}`);
+                }
+            } catch (error) {
+                log('roomLog', `Lỗi: ${error.message}`);
+                updateStatus('roomStatus', `❌ Tạo phòng thất bại: ${error.message}`, 'error');
+            }
+        }
+
+        async function testFullFlow() {
+            updateStatus('flowStatus', 'Đang test full flow...', 'info');
+            log('flowLog', 'Bắt đầu test full flow');
+            
+            try {
+                // Step 1: Check authentication
+                log('flowLog', 'Step 1: Kiểm tra authentication');
+                if (!window.AuthHelper.isLoggedIn()) {
+                    log('flowLog', 'Chưa đăng nhập, thực hiện auto login');
+                    await window.AutoLogin.login();
+                }
+                
+                // Step 2: Search users
+                log('flowLog', 'Step 2: Tìm kiếm người dùng');
+                const searchResponse = await window.AuthHelper.makeAuthenticatedRequest(
+                    'https://timtruonghoc.pythonanywhere.com/chat/search-users/?email=test'
+                );
+                
+                if (!searchResponse.ok) {
+                    throw new Error('Tìm kiếm thất bại');
+                }
+                
+                const searchData = await searchResponse.json();
+                log('flowLog', `Tìm thấy ${searchData.count} người dùng`);
+                
+                if (searchData.users && searchData.users.length > 0) {
+                    // Step 3: Create chat room
+                    log('flowLog', 'Step 3: Tạo phòng chat');
+                    const userId = searchData.users[0].id;
+                    const roomResponse = await window.AuthHelper.makeAuthenticatedRequest(
+                        'https://timtruonghoc.pythonanywhere.com/chat-rooms/create_or_get_private_room/',
+                        {
+                            method: 'POST',
+                            body: JSON.stringify({ user_id: userId })
+                        }
+                    );
+                    
+                    if (roomResponse.ok) {
+                        const room = await roomResponse.json();
+                        log('flowLog', `Tạo phòng thành công: Room ID ${room.id}`);
+                        updateStatus('flowStatus', '✅ Full flow test thành công!', 'success');
+                    } else {
+                        throw new Error('Tạo phòng thất bại');
+                    }
+                } else {
+                    throw new Error('Không tìm thấy người dùng để test');
+                }
+            } catch (error) {
+                log('flowLog', `Lỗi: ${error.message}`);
+                updateStatus('flowStatus', `❌ Full flow test thất bại: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-fill test data
+        document.getElementById('searchEmail').value = 'test2@example.com';
+        document.getElementById('userId').value = '7';
+    </script>
+</body>
+</html> 

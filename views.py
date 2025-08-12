@@ -22,9 +22,16 @@ from .filter import SchoolMajorsFilter
 from django.db.models import Q # Import Q for OR queries
 from django.core.cache import cache
 from django.db.models import Q, Prefetch
+from rest_framework.decorators import action
+from rest_framework import status
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.views.decorators.vary import vary_on_cookie
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+from django.utils import timezone
+from datetime import timedelta
+from django.db.models import Sum
 
 
 
@@ -52,10 +59,53 @@ class GoogleSocialAuthView(GenericAPIView):
         # Lấy toàn bộ dictionary đã được validate, chứa token.
         data = serializer.validated_data
 
-        # In ra log để kiểm tra cấu trúc dữ liệu trước khi trả về
-        print(f"Data to be returned: {data}")
+        # Debug: In ra log để kiểm tra cấu trúc dữ liệu trước khi trả về
+        print(f"🔍 [DEBUG] serializer.validated_data: {data}")
+        print(f"🔍 [DEBUG] Type of data: {type(data)}")
+        print(f"🔍 [DEBUG] Keys in data: {list(data.keys()) if isinstance(data, dict) else 'Not a dict'}")
 
         return Response(data, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def registration_view(request):
+    """
+    Registration endpoint cho phép tạo user mới mà không cần authentication.
+    """
+    try:
+        # Debug logging
+        print(f"Registration request data: {request.data}")
+        
+        # Thêm default date_of_birth nếu không có
+        data = request.data.copy()
+        if 'date_of_birth' not in data or not data['date_of_birth']:
+            data['date_of_birth'] = '2000-01-01'
+        
+        print(f"Data after processing: {data}")
+        
+        serializer = UserSerializer(data=data)
+        if serializer.is_valid():
+            print("Serializer is valid, creating user...")
+            user = serializer.save()
+            print(f"User created successfully: {user.email}")
+            return Response({
+                'id': user.id,
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'message': 'User created successfully'
+            }, status=status.HTTP_201_CREATED)
+        else:
+            print(f"Serializer errors: {serializer.errors}")
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        print(f"Exception in registration_view: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return Response({
+            'error': 'Internal server error',
+            'detail': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # ---
 ## User ViewSet
@@ -115,6 +165,14 @@ class UserViewSet(viewsets.ModelViewSet):
 
         # Đối với các action khác, bạn có thể thiết lập quyền khác
         return [AllowAny()]
+
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def me(self, request):
+        """
+        Get current user profile
+        """
+        serializer = self.get_serializer(request.user)
+        return Response(serializer.data)
 
 
 # ---
@@ -972,5 +1030,644 @@ class SchoolMajorsViewSet(viewsets.ReadOnlyModelViewSet):
         serializer = MajorSerializer(majors, many=True)
         return Response(serializer.data)
 
+
+# ---
+## Chat ViewSets
+# ---
+class ChatRoomViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for ChatRoom model
+    """
+    serializer_class = ChatRoomSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = StandardResultsSetPagination
+    
+    def get_queryset(self):
+        """
+        Return chat rooms where current user is a participant
+        """
+        return ChatRoom.objects.filter(
+            participants=self.request.user,
+            is_active=True
+        ).prefetch_related('participants', 'messages').distinct()
+    
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return ChatRoomCreateSerializer
+        return ChatRoomSerializer
+    
+    def perform_create(self, serializer):
+        """
+        Create a new chat room and add current user as participant
+        """
+        room = serializer.save()
+        room.participants.add(self.request.user)
+        return room
+    
+    @action(detail=False, methods=['post'])
+    def create_or_get_private_room(self, request):
+        """
+        Create or get existing private chat room with another user
+        """
+        other_user_id = request.data.get('user_id')
+        if not other_user_id:
+            return Response({'error': 'user_id is required'}, status=400)
+        
+        try:
+            other_user = User.objects.get(id=other_user_id)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=404)
+        
+        if other_user == request.user:
+            return Response({'error': 'Cannot create room with yourself'}, status=400)
+        
+        # Check if private room already exists
+        existing_room = ChatRoom.objects.filter(
+            room_type='private',
+            participants=request.user
+        ).filter(
+            participants=other_user
+        ).first()
+        
+        if existing_room:
+            serializer = ChatRoomSerializer(existing_room, context={'request': request})
+            return Response(serializer.data)
+        
+        # Create new private room
+        room = ChatRoom.objects.create(room_type='private')
+        room.participants.add(request.user, other_user)
+        
+        serializer = ChatRoomSerializer(room, context={'request': request})
+        return Response(serializer.data, status=201)
+    
+    @action(detail=True, methods=['post'])
+    def mark_messages_read(self, request, pk=None):
+        """
+        Mark all messages in room as read for current user
+        """
+        room = self.get_object()
+        updated_count = room.messages.filter(
+            is_read=False
+        ).exclude(sender=request.user).update(is_read=True)
+        
+        return Response({'marked_read': updated_count})
+    
+    def destroy(self, request, *args, **kwargs):
+        """
+        Delete chat room - only participants can delete
+        """
+        room = self.get_object()
+        
+        # Check if user is a participant
+        if request.user not in room.participants.all():
+            return Response({'error': 'Bạn không có quyền xóa cuộc trò chuyện này'}, status=403)
+        
+        # Soft delete - mark as inactive instead of hard delete
+        room.is_active = False
+        room.save()
+        
+        return Response({'message': 'Cuộc trò chuyện đã được xóa thành công'}, status=200)
+
+
+class MessageViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for Message model
+    """
+    serializer_class = MessageSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = StandardResultsSetPagination
+    
+    def get_queryset(self):
+        """
+        Return messages from rooms where current user is a participant
+        Exclude messages that are deleted for the current user
+        """
+        room_id = self.request.query_params.get('room_id')
+        queryset = Message.objects.filter(
+            room__participants=self.request.user,
+            is_deleted=False
+        ).exclude(
+            deleted_for_users=self.request.user
+        ).select_related('sender', 'room').prefetch_related('reactions')
+        
+        if room_id:
+            queryset = queryset.filter(room_id=room_id)
+        
+        return queryset.order_by('-created_at')
+    
+    def perform_create(self, serializer):
+        """
+        Create a new message and set sender to current user
+        """
+        room = serializer.validated_data['room']
+        reply_to_id = self.request.data.get('reply_to')
+        reply_to = None
+        if reply_to_id:
+            try:
+                reply_to = Message.objects.filter(room=room).get(id=reply_to_id)
+            except Message.DoesNotExist:
+                reply_to = None
+        
+        # Check if user is participant of the room
+        if not room.participants.filter(id=self.request.user.id).exists():
+            raise PermissionDenied("You are not a participant of this room")
+        
+        serializer.save(sender=self.request.user, reply_to=reply_to)
+        
+        # Update room's updated_at timestamp
+        room.save(update_fields=['updated_at'])
+    
+    @action(detail=True, methods=['post'])
+    def mark_read(self, request, pk=None):
+        """
+        Mark a specific message as read
+        """
+        message = self.get_object()
+        if message.sender != request.user:
+            message.mark_as_read()
+        return Response({'status': 'marked_read'})
+
+    @action(detail=True, methods=['post'])
+    def react(self, request, pk=None):
+        """Add or toggle a reaction for a message"""
+        message = self.get_object()
+        reaction = request.data.get('reaction')
+        if reaction not in ['like', 'love', 'haha']:
+            return Response({'detail': 'Invalid reaction'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Toggle: if same reaction exists, remove; else set/update
+        existing = MessageReaction.objects.filter(message=message, user=request.user).first()
+        if existing and existing.reaction == reaction:
+            existing.delete()
+            action_status = 'removed'
+        else:
+            MessageReaction.objects.update_or_create(
+                message=message, user=request.user,
+                defaults={'reaction': reaction}
+            )
+            action_status = 'set'
+
+        # Return updated counts
+        counts = {}
+        for r in message.reactions.all():
+            counts[r.reaction] = counts.get(r.reaction, 0) + 1
+
+        return Response({'status': action_status, 'reactions': counts})
+    
+    @action(detail=True, methods=['post'])
+    def delete_for_me(self, request, pk=None):
+        """
+        Delete message for current user only (delete for me)
+        """
+        message = self.get_object()
+        
+        # Check if user is participant of the room
+        if not message.room.participants.filter(id=request.user.id).exists():
+            raise PermissionDenied("You are not a participant of this room")
+        
+        # Delete message for current user
+        message.delete_for_user(request.user)
+        
+        return Response({
+            'status': 'deleted_for_me',
+            'message': 'Message deleted for you only'
+        })
+    
+    @action(detail=True, methods=['post'])
+    def restore_for_me(self, request, pk=None):
+        """
+        Restore message for current user (undo delete for me)
+        """
+        message = self.get_object()
+        
+        # Check if user is participant of the room
+        if not message.room.participants.filter(id=request.user.id).exists():
+            raise PermissionDenied("You are not a participant of this room")
+        
+        # Restore message for current user
+        message.restore_for_user(request.user)
+        
+        return Response({
+            'status': 'restored_for_me',
+            'message': 'Message restored for you'
+        })
+
+
+class ChatUserStatusViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for ChatUserStatus model
+    """
+    serializer_class = ChatUserStatusSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        """
+        Return status of users that have chatted with current user
+        """
+        # Get users who are in same chat rooms as current user
+        room_participants = User.objects.filter(
+            chat_rooms__participants=self.request.user
+        ).exclude(id=self.request.user.id).distinct()
+        
+        return ChatUserStatus.objects.filter(user__in=room_participants)
+    
+    @action(detail=False, methods=['post'])
+    def update_status(self, request):
+        """
+        Update current user's chat status
+        """
+        status = request.data.get('status', 'online')
+        user_status, created = ChatUserStatus.objects.get_or_create(
+            user=request.user,
+            defaults={'status': status}
+        )
+        
+        if not created:
+            user_status.status = status
+            user_status.save()
+        
+        serializer = ChatUserStatusSerializer(user_status)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['post'])
+    def set_typing(self, request):
+        """
+        Set user as typing in a specific room
+        """
+        room_id = request.data.get('room_id')
+        is_typing = request.data.get('is_typing', True)
+        
+        if not room_id:
+            return Response({'error': 'room_id is required'}, status=400)
+        
+        try:
+            room = ChatRoom.objects.get(id=room_id, participants=request.user)
+        except ChatRoom.DoesNotExist:
+            return Response({'error': 'Room not found'}, status=404)
+        
+        user_status, created = ChatUserStatus.objects.get_or_create(
+            user=request.user,
+            defaults={'status': 'online'}
+        )
+        
+        if is_typing:
+            user_status.is_typing_in_room = room
+        else:
+            user_status.is_typing_in_room = None
+        
+        user_status.save()
+        
+        return Response({'status': 'updated'})
+
+
+class OnlineUsersViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    ViewSet to get list of online users for chat
+    """
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = StandardResultsSetPagination
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['email', 'first_name', 'last_name']
+    
+    def get_queryset(self):
+        """
+        Return active users excluding current user
+        """
+        return User.objects.filter(
+            is_active_user=True
+        ).exclude(id=self.request.user.id).select_related('chat_status')
+
+
+# --- Views cho đăng ký/đăng nhập đơn giản ---
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def simple_registration_view(request):
+    """
+    Đăng ký tài khoản đơn giản với email, họ tên, password
+    """
+    serializer = SimpleRegistrationSerializer(data=request.data)
+    if serializer.is_valid():
+        try:
+            user = serializer.save()
+            # Tạo token cho user mới
+            tokens = get_tokens_for_user(user)
+            
+            return Response({
+                'message': 'Đăng ký thành công!',
+                'user': {
+                    'id': user.id,
+                    'email': user.email,
+                    'first_name': user.first_name,
+                    'last_name': user.last_name,
+                },
+                'tokens': tokens
+            }, status=201)
+        except Exception as e:
+            return Response({
+                'error': 'Có lỗi xảy ra khi tạo tài khoản',
+                'detail': str(e)
+            }, status=400)
+    else:
+        return Response({
+            'error': 'Dữ liệu không hợp lệ',
+            'details': serializer.errors
+        }, status=400)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def simple_login_view(request):
+    """
+    Đăng nhập đơn giản với email và password
+    """
+    serializer = SimpleLoginSerializer(data=request.data)
+    if serializer.is_valid():
+        user = serializer.validated_data['user']
+        tokens = get_tokens_for_user(user)
+        
+        return Response({
+            'message': 'Đăng nhập thành công!',
+            'user': {
+                'id': user.id,
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'role': user.role,
+            },
+            'tokens': tokens
+        })
+    else:
+        return Response({
+            'error': 'Thông tin đăng nhập không đúng',
+            'details': serializer.errors
+        }, status=400)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def search_users_by_email(request):
+    """
+    Tìm kiếm người dùng theo email để chat
+    """
+    email = request.GET.get('email', '').strip()
+    
+    if not email:
+        return Response({
+            'error': 'Email không được để trống'
+        }, status=400)
+    
+    try:
+        # Tìm kiếm người dùng theo email (không phân biệt hoa thường)
+        users = User.objects.filter(
+            email__icontains=email,
+            is_active_user=True
+        ).exclude(id=request.user.id)  # Loại trừ chính mình
+        
+        # Giới hạn kết quả tìm kiếm
+        users = users[:10]
+        
+        # Serialize kết quả
+        user_data = []
+        for user in users:
+            user_data.append({
+                'id': user.id,
+                'email': user.email,
+                'first_name': user.first_name or '',
+                'last_name': user.last_name or '',
+                'full_name': f"{user.first_name or ''} {user.last_name or ''}".strip() or user.email,
+                'user_photo': user.user_photo or '',
+                'is_online': hasattr(user, 'chat_status') and user.chat_status.status == 'online'
+            })
+        
+        return Response({
+            'users': user_data,
+            'count': len(user_data)
+        })
+        
+    except Exception as e:
+        return Response({
+            'error': 'Có lỗi xảy ra khi tìm kiếm',
+            'detail': str(e)
+        }, status=500)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def me_view(request):
+    """
+    Lấy thông tin user hiện tại
+    """
+    try:
+        user = request.user
+        return Response({
+            'id': user.id,
+            'email': user.email,
+            'first_name': user.first_name or '',
+            'last_name': user.last_name or '',
+            'full_name': f"{user.first_name or ''} {user.last_name or ''}".strip() or user.email,
+            'role': user.role,
+            'user_photo': user.user_photo or '',
+            'is_active': user.is_active_user,
+            'date_of_birth': str(user.date_of_birth) if user.date_of_birth else None,
+            'living_place': user.living_place or '',
+            'sex': user.sex or ''
+        })
+    except Exception as e:
+        return Response({
+            'error': 'Có lỗi xảy ra khi lấy thông tin user',
+            'detail': str(e)
+        }, status=500)
+
+
+# --- ViewSets cho tracking lượt xem ---
+class SchoolViewCountViewSet(viewsets.ModelViewSet):
+    queryset = SchoolViewCount.objects.all().order_by('-view_count')
+    serializer_class = SchoolViewCountSerializer
+    permission_classes = [AllowAny]
+
+class MajorViewCountViewSet(viewsets.ModelViewSet):
+    queryset = MajorViewCount.objects.all().order_by('-view_count')
+    serializer_class = MajorViewCountSerializer
+    permission_classes = [AllowAny]
+
+class DailyViewStatsViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = DailyViewStats.objects.all().order_by('-date')
+    serializer_class = DailyViewStatsSerializer
+    permission_classes = [AllowAny]
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def increment_school_view(request):
+    """
+    Tăng lượt xem cho trường
+    """
+    school_id = request.data.get('school_id')
+    if not school_id:
+        return Response({'error': 'school_id là bắt buộc'}, status=400)
+    
+    try:
+        school = School.objects.get(id=school_id)
+        view_count, created = SchoolViewCount.objects.get_or_create(
+            school=school,
+            defaults={'view_count': 1}
+        )
+        
+        if not created:
+            view_count.view_count += 1
+            view_count.save()
+        
+        # Cập nhật thống kê theo ngày
+        today = timezone.now().date()
+        daily_stats, created = DailyViewStats.objects.get_or_create(
+            date=today,
+            defaults={'total_school_views': 1}
+        )
+        
+        if not created:
+            daily_stats.total_school_views += 1
+            daily_stats.save()
+        
+        return Response({
+            'success': True,
+            'view_count': view_count.view_count,
+            'message': f'Đã tăng lượt xem cho trường {school.name_vn}'
+        })
+        
+    except School.DoesNotExist:
+        return Response({'error': 'Không tìm thấy trường'}, status=404)
+    except Exception as e:
+        return Response({'error': f'Có lỗi xảy ra: {str(e)}'}, status=500)
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def increment_major_view(request):
+    """
+    Tăng lượt xem cho ngành
+    """
+    major_id = request.data.get('major_id')
+    if not major_id:
+        return Response({'error': 'major_id là bắt buộc'}, status=400)
+    
+    try:
+        major = Major.objects.get(id=major_id)
+        view_count, created = MajorViewCount.objects.get_or_create(
+            major=major,
+            defaults={'view_count': 1}
+        )
+        
+        if not created:
+            view_count.view_count += 1
+            view_count.save()
+        
+        # Cập nhật thống kê theo ngày
+        today = timezone.now().date()
+        daily_stats, created = DailyViewStats.objects.get_or_create(
+            date=today,
+            defaults={'total_major_views': 1}
+        )
+        
+        if not created:
+            daily_stats.total_major_views += 1
+            daily_stats.save()
+        
+        return Response({
+            'success': True,
+            'view_count': view_count.view_count,
+            'message': f'Đã tăng lượt xem cho ngành {major.name}'
+        })
+        
+    except Major.DoesNotExist:
+        return Response({'error': 'Không tìm thấy ngành'}, status=404)
+    except Exception as e:
+        return Response({'error': f'Có lỗi xảy ra: {str(e)}'}, status=500)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def top_schools(request):
+    """
+    Lấy danh sách top trường được xem nhiều nhất
+    """
+    limit = int(request.GET.get('limit', 10))
+    
+    # Lấy top trường theo lượt xem
+    top_schools = SchoolViewCount.objects.select_related('school').order_by('-view_count')[:limit]
+    
+    # Thêm rank cho mỗi trường
+    result = []
+    for i, school_view in enumerate(top_schools, 1):
+        school_data = TopSchoolsSerializer(school_view.school).data
+        school_data['view_count'] = school_view.view_count
+        school_data['rank'] = i
+        result.append(school_data)
+    
+    return Response({
+        'top_schools': result,
+        'total': len(result)
+    })
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def top_majors(request):
+    """
+    Lấy danh sách top ngành được xem nhiều nhất
+    """
+    limit = int(request.GET.get('limit', 10))
+    
+    # Lấy top ngành theo lượt xem
+    top_majors = MajorViewCount.objects.select_related('major', 'major__school').order_by('-view_count')[:limit]
+    
+    # Thêm rank cho mỗi ngành
+    result = []
+    for i, major_view in enumerate(top_majors, 1):
+        major_data = TopMajorsSerializer(major_view.major).data
+        major_data['view_count'] = major_view.view_count
+        major_data['rank'] = i
+        result.append(major_data)
+    
+    return Response({
+        'top_majors': result,
+        'total': len(result)
+    })
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def view_statistics(request):
+    """
+    Lấy thống kê tổng quan về lượt xem
+    """
+    # Tổng lượt xem trường
+    total_school_views = SchoolViewCount.objects.aggregate(
+        total=Sum('view_count')
+    )['total'] or 0
+    
+    # Tổng lượt xem ngành
+    total_major_views = MajorViewCount.objects.aggregate(
+        total=Sum('view_count')
+    )['total'] or 0
+    
+    # Thống kê 7 ngày gần nhất
+    seven_days_ago = timezone.now().date() - timedelta(days=7)
+    recent_stats = DailyViewStats.objects.filter(
+        date__gte=seven_days_ago
+    ).order_by('date')
+    
+    # Thống kê theo ngày
+    daily_data = []
+    for stat in recent_stats:
+        daily_data.append({
+            'date': stat.date.strftime('%Y-%m-%d'),
+            'school_views': stat.total_school_views,
+            'major_views': stat.total_major_views,
+            'total_views': stat.total_school_views + stat.total_major_views
+        })
+    
+    return Response({
+        'total_school_views': total_school_views,
+        'total_major_views': total_major_views,
+        'total_views': total_school_views + total_major_views,
+        'daily_stats': daily_data,
+        'last_7_days': len(daily_data)
+    })
 
 

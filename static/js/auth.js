@@ -109,16 +109,24 @@ const AuthManager = {
      */
     getUserData() {
         try {
-            const userDataString = localStorage.getItem(this.STORAGE_KEY);
+            // Thử đọc từ key chính
+            let userDataString = localStorage.getItem(this.STORAGE_KEY);
+            
+            // Nếu không có, thử key backup từ Google Auth
+            if (!userDataString) {
+                userDataString = localStorage.getItem('user_data');
+            }
+            
             if (userDataString) {
                 // Parse chuỗi JSON thành đối tượng và trả về
                 const userData = JSON.parse(userDataString);
-                console.log('Dữ liệu người dùng đã được tải từ localStorage.');
+                console.log('Dữ liệu người dùng đã được tải từ localStorage:', userData);
                 return userData;
             }
         } catch (e) {
             console.error('Lỗi khi tải dữ liệu từ localStorage:', e);
         }
+        console.log('Không tìm thấy dữ liệu người dùng trong localStorage');
         return null;
     },
 

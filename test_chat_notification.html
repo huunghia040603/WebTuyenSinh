@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Notification Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .chat-button {
+            position: relative;
+            display: inline-block;
+            padding: 10px 20px;
+            background: #1e40af;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        
+        .chat-notification-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 11px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+        }
+        
+        .chat-notification-badge:empty {
+            width: 8px;
+            height: 8px;
+        }
+        
+        .test-buttons {
+            margin: 20px 0;
+        }
+        
+        .test-button {
+            padding: 8px 16px;
+            margin: 5px;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .test-button:hover {
+            background: #059669;
+        }
+        
+        .debug-info {
+            background: #f3f4f6;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Chat Notification Test</h1>
+        
+        <div class="debug-info" id="debugInfo">
+            <strong>Debug Info:</strong><br>
+            Badge element: <span id="badgeStatus">Checking...</span><br>
+            Badge display: <span id="badgeDisplay">-</span><br>
+            Badge text: <span id="badgeText">-</span><br>
+            Badge opacity: <span id="badgeOpacity">-</span>
+        </div>
+        
+        <div>
+            <button class="chat-button" id="chatBtn">
+                <i class="fas fa-comments" id="chatIcon"></i>
+                Chat
+                <span class="chat-notification-badge" id="chatNotificationBadge" style="display: none;">0</span>
+            </button>
+        </div>
+        
+        <div class="test-buttons">
+            <button class="test-button" onclick="showBadge(1)">Show Badge (1)</button>
+            <button class="test-button" onclick="showBadge(5)">Show Badge (5)</button>
+            <button class="test-button" onclick="showBadge(99)">Show Badge (99)</button>
+            <button class="test-button" onclick="hideBadge()">Hide Badge</button>
+            <button class="test-button" onclick="testWithFakeData()">Test with Fake Data</button>
+            <button class="test-button" onclick="updateDebugInfo()">Update Debug Info</button>
+        </div>
+        
+        <div>
+            <h3>Instructions:</h3>
+            <ol>
+                <li>Click "Show Badge" buttons to test badge visibility</li>
+                <li>Click "Test with Fake Data" to simulate chat rooms with unread messages</li>
+                <li>Check the debug info to see badge status</li>
+                <li>Open browser console to see detailed logs</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        console.log('🧪 Chat notification test page loaded');
+        
+        const badge = document.getElementById('chatNotificationBadge');
+        const chatIcon = document.getElementById('chatIcon');
+        const chatBtn = document.getElementById('chatBtn');
+        
+        function showBadge(count) {
+            console.log(`🧪 Showing badge with count: ${count}`);
+            
+            if (badge) {
+                badge.textContent = count > 99 ? '99+' : count.toString();
+                badge.style.display = 'flex';
+                badge.style.opacity = '1';
+                
+                console.log('✅ Badge should be visible now');
+                updateDebugInfo();
+            } else {
+                console.log('❌ Badge element not found');
+            }
+        }
+        
+        function hideBadge() {
+            console.log('🧪 Hiding badge');
+            
+            if (badge) {
+                badge.style.display = 'none';
+                badge.style.opacity = '0';
+                
+                console.log('✅ Badge should be hidden now');
+                updateDebugInfo();
+            } else {
+                console.log('❌ Badge element not found');
+            }
+        }
+        
+        function updateDebugInfo() {
+            const badgeStatus = document.getElementById('badgeStatus');
+            const badgeDisplay = document.getElementById('badgeDisplay');
+            const badgeText = document.getElementById('badgeText');
+            const badgeOpacity = document.getElementById('badgeOpacity');
+            
+            if (badge) {
+                badgeStatus.textContent = 'Found';
+                badgeDisplay.textContent = badge.style.display;
+                badgeText.textContent = badge.textContent;
+                badgeOpacity.textContent = badge.style.opacity;
+            } else {
+                badgeStatus.textContent = 'Not found';
+                badgeDisplay.textContent = 'N/A';
+                badgeText.textContent = 'N/A';
+                badgeOpacity.textContent = 'N/A';
+            }
+        }
+        
+        function testWithFakeData() {
+            console.log('🧪 Testing with fake data...');
+            
+            // Create fake chat rooms with unread messages
+            const fakeRooms = [
+                { id: 1, name: 'Test Room 1', unread_count: 3 },
+                { id: 2, name: 'Test Room 2', unread_count: 1 },
+                { id: 3, name: 'Test Room 3', unread_count: 0 }
+            ];
+            
+            console.log('🧪 Fake data created:', fakeRooms);
+            
+            // Calculate total unread
+            const totalUnread = fakeRooms.reduce((sum, room) => sum + (room.unread_count || 0), 0);
+            console.log('🧪 Total unread:', totalUnread);
+            
+            // Show badge
+            showBadge(totalUnread);
+            
+            // Clear after 5 seconds
+            setTimeout(() => {
+                hideBadge();
+                console.log('🧹 Fake data test cleared');
+            }, 5000);
+        }
+        
+        // Initialize debug info
+        updateDebugInfo();
+        
+        console.log('🧪 Test functions ready. Use showBadge(), hideBadge(), testWithFakeData() in console');
+    </script>
+</body>
+</html> 

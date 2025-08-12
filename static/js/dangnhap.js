@@ -1,3 +1,7 @@
+// Configuration
+const BASE_API_URL = 'https://timtruonghoc.pythonanywhere.com/';
+const GOOGLE_CLIENT_ID = '875195545395-kh54279ju4pea3h5n1b85uj3hohn0aih.apps.googleusercontent.com';
+
 const container = document.getElementById('container');
 const registerBtn = document.getElementById('register');
 const loginBtn = document.getElementById('login');
@@ -115,8 +119,6 @@ window.addEventListener('resize', () => { });
 // --- Kết thúc Logic Mưa Logo ---
 
 // --- Logic Đăng nhập/Đăng ký API ---
-// Đặt BASE_API_URL là URL gốc của API auth
-const BASE_API_URL = 'https://timtruonghoc.pythonanywhere.com/';
 
 // Hàm helper để parse full name
 function parseFullName(fullName) {
@@ -142,9 +144,21 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
     const fullName = document.getElementById('signupFullName').value;
     const { firstName, lastName } = parseFullName(fullName);
     console.log('Dữ liệu đăng ký:', { email, password, firstName, lastName });
+    
+    // Validate dữ liệu
+    if (!email || !password || !fullName) {
+        alert('Vui lòng nhập đầy đủ thông tin!');
+        return;
+    }
+    
+    if (password.length < 6) {
+        alert('Mật khẩu phải có ít nhất 6 ký tự!');
+        return;
+    }
+    
     try {
-        // Gọi đến endpoint registration
-        const response = await fetch(`${BASE_API_URL}auth/registration/`, {
+        // Gọi đến endpoint simple registration mới
+        const response = await fetch(`${BASE_API_URL}auth/simple-register/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -152,6 +166,7 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
             body: JSON.stringify({
                 email: email,
                 password: password,
+                confirm_password: password, // Đơn giản hóa, không cần confirm
                 first_name: firstName,
                 last_name: lastName
             })
@@ -163,8 +178,10 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
             console.log('Đăng ký thành công. Chuyển sang form đăng nhập.');
         } else {
             let errorMessage = 'Đăng ký thất bại.';
-            if (data && typeof data === 'object') {
-                errorMessage += '\n' + Object.values(data).flat().join('\n');
+            if (data && data.details) {
+                errorMessage += '\n' + Object.values(data.details).flat().join('\n');
+            } else if (data && data.error) {
+                errorMessage = data.error;
             }
             alert(errorMessage);
             console.error('Đăng ký thất bại:', data);
@@ -183,8 +200,15 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
     console.log('Dữ liệu đăng nhập:', { email, password });
+    
+    // Validate dữ liệu
+    if (!email || !password) {
+        alert('Vui lòng nhập đầy đủ thông tin!');
+        return;
+    }
+    
     try {
-        const response = await fetch(`${BASE_API_URL}auth/login/`, {
+        const response = await fetch(`${BASE_API_URL}auth/simple-login/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -193,19 +217,33 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         });
         const data = await response.json();
         if (response.ok) {
-            const token = data.key || data.access;
-            localStorage.setItem('authToken', token);
-            console.log('token',token)
-            AuthManager.saveUserData(data); 
-            setTimeout(() => window.location.href = '/', 100000);
+            // Lưu token
+            if (data.tokens && data.tokens.access) {
+                localStorage.setItem('authToken', data.tokens.access);
+                localStorage.setItem('access_token', data.tokens.access);
+                if (data.tokens.refresh) {
+                    localStorage.setItem('refresh_token', data.tokens.refresh);
+                }
+            }
+            
+            // Lưu thông tin user
+            if (data.user) {
+                localStorage.setItem('user_data', JSON.stringify(data.user));
+                AuthManager.saveUserData(data.user);
+            }
+            
+            console.log('Đăng nhập thành công:', data);
+            alert('Đăng nhập thành công!');
+            setTimeout(() => window.location.href = '/', 300);
         } else {
             let errorMessage = 'Đăng nhập thất bại.';
-            if (data && typeof data === 'object') {
-                errorMessage += '\n' + Object.values(data).flat().join('\n');
-            } else if (typeof data === 'string') {
-                errorMessage = 'Đăng nhập thất bại: ' + data;
+            if (data && data.details) {
+                errorMessage += '\n' + Object.values(data.details).flat().join('\n');
+            } else if (data && data.error) {
+                errorMessage = data.error;
             }
             alert(errorMessage);
+            console.error('Đăng nhập thất bại:', data);
         }
     } catch (error) {
         console.error('Lỗi khi gửi yêu cầu đăng nhập:', error);
@@ -215,12 +253,13 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
 });
 
 // 3. Xử lý Google Sign-In (Đã cập nhật)
-const GOOGLE_CLIENT_ID = '875195545395-kh54279ju4pea3h5n1b85uj3hohn0aih.apps.googleusercontent.com';
 
 function handleCredentialResponse(response) {
     console.log("--- Phản hồi từ Google đã nhận được ---");
     const idToken = response.credential;
     console.log("ID Token:", idToken);
+    console.log("🔍 Token length:", idToken.length);
+    console.log("🔍 Token starts with:", idToken.substring(0, 50) + "...");
     sendTokenToBackend(idToken);
 }
 
@@ -228,23 +267,92 @@ async function sendTokenToBackend(idToken) {
     // Gọi đến endpoint google-social-auth
     const backendUrl = `${BASE_API_URL}auth/google-social-auth/`;
     console.log('Gửi ID Token đến backend:', backendUrl);
+    
+    const payload = {
+        auth_token: idToken
+    };
+    console.log('📤 Payload being sent:', payload);
+    console.log('📤 Payload JSON:', JSON.stringify(payload));
+    
     try {
         const response = await fetch(backendUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                auth_token: idToken
-            })
+            body: JSON.stringify(payload)
         });
+        console.log('📡 Response status:', response.status);
+        console.log('📡 Response OK:', response.ok);
+        
         const data = await response.json();
+        console.log('📋 Full response data:', data);
+        
         if (response.ok) {
-            localStorage.setItem('access_token', data.auth_token.tokens.access);
-            localStorage.setItem('refresh_token', data.auth_token.tokens.refresh);
-            AuthManager.saveUserData(data); 
+            console.log('✅ Google login successful:', data);
             
-            setTimeout(() => window.location.href = '/', 100000);
+            // Handle new token structure
+            let accessToken, refreshToken, userData;
+            
+            if (data.tokens) {
+                // New structure from PythonAnywhere
+                accessToken = data.tokens.access;
+                refreshToken = data.tokens.refresh;
+                userData = {
+                    id: data.id,
+                    email: data.email,
+                    first_name: data.first_name,
+                    last_name: data.last_name,
+                    user_photo: data.user_photo,
+                    date_of_birth: data.date_of_birth,
+                    living_place: data.living_place,
+                    role: data.role,
+                    sex: data.sex
+                };
+                console.log('📱 Using NEW token structure');
+            } else {
+                // Old structure (fallback)
+                accessToken = data.access_token;
+                refreshToken = data.refresh_token;
+                userData = data.user;
+                console.log('📱 Using OLD token structure');
+            }
+            
+            // Debug tokens
+            console.log('🔑 Access token:', accessToken);
+            console.log('🔑 Refresh token:', refreshToken);
+            console.log('👤 User data:', userData);
+            
+            // Lưu tokens
+            if (accessToken) {
+                localStorage.setItem('access_token', accessToken);
+                console.log('💾 Saved access_token');
+            } else {
+                console.error('❌ No access_token in response!');
+            }
+            
+            if (refreshToken) {
+                localStorage.setItem('refresh_token', refreshToken);
+                console.log('💾 Saved refresh_token');
+            }
+            
+            // Lưu user data
+            if (userData) {
+                // Lưu vào cả hai key để tương thích
+                localStorage.setItem('user_data', JSON.stringify(userData));
+                AuthManager.saveUserData(userData);
+                
+                // Verify data was saved
+                console.log('💾 Verification - user_data exists:', !!localStorage.getItem('user_data'));
+                console.log('💾 Verification - userData exists:', !!localStorage.getItem('userData'));
+                console.log('💾 AuthManager test:', AuthManager.getUserData());
+            } else {
+                console.error('❌ No user data in response!');
+            }
+            
+            // Chuyển hướng về trang chủ
+            alert('Đăng nhập Google thành công!');
+            setTimeout(() => window.location.href = '/', 300);
         } else {
             let errorMessage = 'Đăng nhập bằng Google thất bại.';
             if (data && typeof data === 'object') {

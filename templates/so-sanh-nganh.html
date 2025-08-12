@@ -1026,11 +1026,25 @@
     transition: all 0.3s ease;
 }
 
+/* Trường nổi bật - viền vàng */
+.school-item.outstanding {
+    border: 2px solid #ffc107;
+    background: linear-gradient(135deg, #fff9e6 0%, #f8f9fa 100%);
+    box-shadow: 0 4px 15px rgba(255, 193, 7, 0.2);
+}
+
 .school-item:hover {
     background: #e9ecef;
     border-color: #667eea;
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+}
+
+/* Hover cho trường outstanding */
+.school-item.outstanding:hover {
+    background: linear-gradient(135deg, #fff3cd 0%, #e9ecef 100%);
+    border-color: #f0ad4e;
+    box-shadow: 0 8px 25px rgba(255, 193, 7, 0.3);
 }
 
 .school-logo {

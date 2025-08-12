@@ -44,6 +44,11 @@ async function loadMajorData(majorId, schoolId, schoolShortCode) {
         
         console.log('✅ All data loaded successfully');
         
+        // Track major view
+        if (currentMajor && currentMajor.id) {
+            trackMajorView(currentMajor.id);
+        }
+        
     } catch (error) {
         console.error('❌ Error loading major data:', error);
         showError('Không thể tải dữ liệu ngành');
@@ -999,5 +1004,28 @@ function goBack() {
         window.history.back();
     } else {
         window.location.href = '/';
+    }
+}
+
+// Function to track major view
+async function trackMajorView(majorId) {
+    try {
+        const response = await fetch('https://timtruonghoc.pythonanywhere.com/tracking/increment-major-view/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                major_id: majorId
+            })
+        });
+        
+        if (response.ok) {
+            console.log('✅ Major view tracked successfully');
+        } else {
+            console.log('⚠️ Failed to track major view');
+        }
+    } catch (error) {
+        console.log('⚠️ Error tracking major view:', error);
     }
 }

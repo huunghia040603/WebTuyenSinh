@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}Test Chat{% endblock %}
+
+{% block content %}
+<div style="padding: 20px; max-width: 800px; margin: 0 auto;">
+    <h1>Test Chat Functionality</h1>
+    
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+        <h3>🔍 Tìm kiếm người dùng qua email</h3>
+        <input type="email" id="searchEmail" placeholder="Nhập email để tìm kiếm..." 
+               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 10px;">
+        <button onclick="searchUsers()" style="background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+            Tìm kiếm
+        </button>
+    </div>
+    
+    <div id="searchResults" style="margin-top: 20px;"></div>
+    
+    <div style="background: #e9ecef; padding: 20px; border-radius: 10px; margin-top: 20px;">
+        <h3>📝 Hướng dẫn test:</h3>
+        <ol>
+            <li>Đăng nhập vào tài khoản</li>
+            <li>Nhập email của người dùng khác đã đăng ký</li>
+            <li>Nhấn "Tìm kiếm" để tìm người dùng</li>
+            <li>Nhấn vào người dùng để bắt đầu chat</li>
+        </ol>
+    </div>
+</div>
+
+<script>
+async function searchUsers() {
+    const email = document.getElementById('searchEmail').value.trim();
+    const resultsDiv = document.getElementById('searchResults');
+    
+    if (!email) {
+        resultsDiv.innerHTML = '<p style="color: red;">Vui lòng nhập email</p>';
+        return;
+    }
+    
+    if (!window.AuthHelper || !window.AuthHelper.isLoggedIn()) {
+        resultsDiv.innerHTML = '<p style="color: red;">Vui lòng đăng nhập trước</p>';
+        return;
+    }
+    
+    resultsDiv.innerHTML = '<p>Đang tìm kiếm...</p>';
+    
+    try {
+        const response = await window.AuthHelper.makeAuthenticatedRequest(
+            `https://timtruonghoc.pythonanywhere.com/chat/search-users/?email=${encodeURIComponent(email)}`
+        );
+        
+        if (response.ok) {
+            const data = await response.json();
+            displayResults(data.users || []);
+        } else if (response.status === 401) {
+            resultsDiv.innerHTML = '<p style="color: red;">Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại</p>';
+        } else {
+            const errorData = await response.json();
+            resultsDiv.innerHTML = `<p style="color: red;">Lỗi: ${errorData.error || 'Không thể tìm kiếm'}</p>`;
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        resultsDiv.innerHTML = `<p style="color: red;">Lỗi kết nối: ${error.message}</p>`;
+    }
+}
+
+function displayResults(users) {
+    const resultsDiv = document.getElementById('searchResults');
+    
+    if (!users || users.length === 0) {
+        resultsDiv.innerHTML = '<p>Không tìm thấy người dùng nào</p>';
+        return;
+    }
+    
+    const usersHtml = users.map(user => `
+        <div style="border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px; background: white;">
+            <h4>${user.full_name || user.email}</h4>
+            <p><strong>Email:</strong> ${user.email}</p>
+            <p><strong>Trạng thái:</strong> ${user.is_online ? '🟢 Trực tuyến' : '🔴 Ngoại tuyến'}</p>
+            <button onclick="startChat(${user.id})" style="background: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 3px; cursor: pointer;">
+                Bắt đầu chat
+            </button>
+        </div>
+    `).join('');
+    
+    resultsDiv.innerHTML = `
+        <h3>Kết quả tìm kiếm (${users.length} người dùng):</h3>
+        ${usersHtml}
+    `;
+}
+
+async function startChat(userId) {
+    if (!window.AuthHelper || !window.AuthHelper.isLoggedIn()) {
+        alert('Vui lòng đăng nhập để sử dụng chat');
+        return;
+    }
+    
+    try {
+        const response = await window.AuthHelper.makeAuthenticatedRequest(
+            'https://timtruonghoc.pythonanywhere.com/chat-rooms/create_or_get_private_room/',
+            {
+                method: 'POST',
+                body: JSON.stringify({ user_id: userId })
+            }
+        );
+        
+        if (response.ok) {
+            const room = await response.json();
+            alert(`Đã tạo phòng chat thành công! Room ID: ${room.id}`);
+            // Có thể chuyển hướng đến trang chat hoặc mở modal chat
+        } else if (response.status === 401) {
+            alert('Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại');
+        } else {
+            const errorData = await response.json();
+            alert(`Không thể tạo phòng chat: ${errorData.error || 'Lỗi không xác định'}`);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert(`Lỗi khi tạo phòng chat: ${error.message}`);
+    }
+}
+
+// Auto-search khi nhập Enter
+document.getElementById('searchEmail').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        searchUsers();
+    }
+});
+</script>
+{% endblock %} 

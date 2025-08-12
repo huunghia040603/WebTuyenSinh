@@ -79,18 +79,40 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Kiểm tra xem người dùng đã đăng nhập chưa
-    if (userData && userData.auth_token) {
-        const { id, first_name, last_name, email, date, live, user_photo, sex, tokens } = userData.auth_token;
-        const accessToken = tokens.access;
+    if (userData) {
+        // Xử lý cả cấu trúc cũ và mới
+        let userInfo;
+        if (userData.auth_token) {
+            // Cấu trúc cũ
+            userInfo = userData.auth_token;
+        } else {
+            // Cấu trúc mới (từ Google Auth hoặc regular login)
+            userInfo = userData;
+        }
+        
+        // Đảm bảo các field có giá trị mặc định nếu không tồn tại
+        userInfo = {
+            id: userInfo.id || '',
+            first_name: userInfo.first_name || '',
+            last_name: userInfo.last_name || '',
+            email: userInfo.email || '',
+            date_of_birth: userInfo.date_of_birth || userInfo.date || '',
+            living_place: userInfo.living_place || userInfo.live || '',
+            user_photo: userInfo.user_photo || '',
+            sex: userInfo.sex || ''
+        };
+        
+        const { id, first_name, last_name, email, date_of_birth, living_place, user_photo, sex } = userInfo;
+        const accessToken = localStorage.getItem('access_token');
 
         const fullName = `${last_name} ${first_name}`;
         document.getElementById('profile-title-display').textContent = fullName.trim() || 'Chưa cập nhật';
         
         document.getElementById('email-value').textContent = email;
-        document.getElementById('date-value').textContent = formatDate(date);
+        document.getElementById('date-value').textContent = formatDate(date_of_birth);
         document.getElementById('sex-value').textContent = formatSex(sex);
-        document.getElementById('live-value').textContent = live || 'Chưa cập nhật';
-        userPhotoElement.src = user_photo || 'placeholder.jpg';
+        document.getElementById('live-value').textContent = living_place || 'Chưa cập nhật';
+        userPhotoElement.src = user_photo || '/static/images/avatar.jpg';
 
         // Ẩn chức năng thay đổi ảnh khi chưa ở chế độ chỉnh sửa
         userPhotoContainer.style.cursor = 'default';
@@ -107,8 +129,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             document.getElementById('profile-title-edit').textContent = fullName.trim() || 'Chưa cập nhật';
             document.getElementById('edit-email').textContent = email;
-            document.getElementById('edit-date').value = date;
-            document.getElementById('edit-live').value = live || '';
+            document.getElementById('edit-date').value = date_of_birth;
+            document.getElementById('edit-live').value = living_place || '';
             document.getElementById('edit-sex').value = sex || '';
             document.getElementById('edit-first-name').value = first_name;
             document.getElementById('edit-last-name').value = last_name;
@@ -202,27 +224,55 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log("Cập nhật thành công:", response.data);
                
                 
+                // Cập nhật dữ liệu người dùng với cấu trúc mới
                 const updatedUserData = {
                     ...userData,
                     auth_token: {
                         ...userData.auth_token,
                         first_name: response.data.first_name,
                         last_name: response.data.last_name,
-                        date: response.data.date_of_birth,
-                        live: response.data.living_place,
+                        date_of_birth: response.data.date_of_birth,
+                        living_place: response.data.living_place,
                         sex: response.data.sex,
                         user_photo: response.data.user_photo
                     }
                 };
+                
+                // Cũng cập nhật cấu trúc trực tiếp nếu không có auth_token
+                if (!userData.auth_token) {
+                    updatedUserData.first_name = response.data.first_name;
+                    updatedUserData.last_name = response.data.last_name;
+                    updatedUserData.date_of_birth = response.data.date_of_birth;
+                    updatedUserData.living_place = response.data.living_place;
+                    updatedUserData.sex = response.data.sex;
+                    updatedUserData.user_photo = response.data.user_photo;
+                }
+                
+                // Lưu dữ liệu đã cập nhật
                 AuthManager.setUserData(updatedUserData);
                 
                 hideLoading(); // Ẩn loading sau khi cập nhật thành công
+                
+                // Hiển thị thông báo thành công
+                alert('Cập nhật thông tin thành công!');
+                
+                // Reload trang để hiển thị thông tin mới
                 window.location.reload();
 
             } catch (error) {
                 hideLoading(); // Ẩn loading nếu có lỗi cập nhật
                 console.error("Lỗi khi cập nhật thông tin:", error.response ? error.response.data : error.message);
-                alert("Có lỗi xảy ra khi cập nhật. Vui lòng thử lại.");
+                
+                // Hiển thị thông báo lỗi chi tiết hơn
+                let errorMessage = "Có lỗi xảy ra khi cập nhật. Vui lòng thử lại.";
+                if (error.response && error.response.data) {
+                    if (typeof error.response.data === 'object') {
+                        errorMessage = Object.values(error.response.data).flat().join('\n');
+                    } else {
+                        errorMessage = error.response.data;
+                    }
+                }
+                alert(errorMessage);
             }
         });
     } else {

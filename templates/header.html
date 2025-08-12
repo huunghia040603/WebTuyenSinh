@@ -589,7 +589,7 @@
                         <a href="#" id="logout-btn" class="auth-btn auth-btn-logout">Đăng xuất</a>
                     </div>
                 </div>
-                <a href="#" class="auth-btn auth-btn-post">Đăng tin tuyển sinh</a>
+                <a href="/hop-tac" class="auth-btn auth-btn-post">Đăng tin tuyển sinh</a>
 
             </div>
         </div>
@@ -634,6 +634,7 @@
                         <li><a href="#">Miền Bắc</a></li>
                         <li><a href="#">Miền Trung</a></li>
                         <li><a href="#">Miền Nam</a></li>
+                        <li><a href="/thongke">Thống kê tìm trường</a></li>
                     </ul>
                 </li>
                 <li><a href="#">Cao đẳng</a>
@@ -664,16 +665,11 @@
                         <li><a href="#">Tin học</a></li>
                     </ul>
                 </li>
-                <li><a href="#">So sánh</a>
-                    <ul class="submenu">
-                        <li><a href="/so-sanh-nganh">So sánh ngành học</a></li>
-                        <li><a href="/so-sanh-truong">So sánh trường học</a></li>
-                    </ul>
-                </li>
                 <li><a href="#">Liên hệ</a>
                     <ul class="submenu">
                         <li><a href="#">Quảng Cáo</a></li>
                         <li><a href="#">Chúng tôi</a></li>
+                        <li><a href="/thongke">📊 Thống kê</a></li>
                     </ul>
                 </li>
             </ul>
@@ -731,15 +727,11 @@
                 <a href="#">Tiếng Anh</a>
                 <a href="#">Tin học</a>
             </div>
-            <button class="mobile-menu-item" data-menu="sosanh">So sánh <span>&#9654;</span></button>
-            <div class="mobile-submenu" id="submenu-sosanh">
-                <a href="/so-sanh-nganh">So sánh ngành học</a>
-                <a href="/so-sanh-truong">So sánh trường học</a>
-            </div>
             <button class="mobile-menu-item" data-menu="lienhe">Liên hệ <span>&#9654;</span></button>
             <div class="mobile-submenu" id="submenu-lienhe">
                 <a href="#">Quảng Cáo</a>
                 <a href="#">Chúng tôi</a>
+                <a href="/thongke">📊 Thống kê</a>
             </div>
         </div>
         <div class="mobile-menu-overlay" id="mobile-menu-overlay"></div>
@@ -783,6 +775,14 @@
 
             logoutBtn.addEventListener('click', () => {
                 AuthManager.clearUserData();
+                
+                // Reset chat state before reload
+                if (window.AutoLogin && typeof window.AutoLogin.resetChatState === 'function') {
+                    window.AutoLogin.resetChatState();
+                } else if (typeof resetChatState === 'function') {
+                    resetChatState();
+                }
+                
                 window.location.reload(); // Hoặc chuyển hướng đến trang chủ
             });
 

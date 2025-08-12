@@ -711,11 +711,21 @@ async function generateSchoolsComparison() {
         try {
             const schools = await loadSchoolsForMajor(major.all_major_id);
             
+            // Sắp xếp: trường outstanding trước, sau đó theo tên
+            const sortedSchools = schools.sort((a, b) => {
+                // Ưu tiên trường outstanding
+                if (a.tag === 'outstanding' && b.tag !== 'outstanding') return -1;
+                if (a.tag !== 'outstanding' && b.tag === 'outstanding') return 1;
+                
+                // Sau đó theo tên trường
+                return a.name.localeCompare(b.name);
+            });
+            
             schoolsHTML += `
                 <div class="schools-card">
                     <h3>${major.name}</h3>
                     <div class="schools-list" id="schools-list-${major.all_major_id}">
-                        ${schools.slice(0, 5).map(school => {
+                        ${sortedSchools.slice(0, 5).map(school => {
                             // Format học phí
                             const formatTuition = (min, max) => {
                                 if (!min && !max) return 'N/A';
@@ -730,7 +740,7 @@ async function generateSchoolsComparison() {
                             };
                             
                             return `
-                                <div class="school-item" onclick="goToSchoolMajor('${school.short_code}', '${major.all_major_id}')" style="cursor: pointer;">
+                                <div class="school-item ${school.tag === 'outstanding' ? 'outstanding' : ''}" onclick="goToSchoolMajor('${school.short_code}', '${major.all_major_id}')" style="cursor: pointer;">
                                     <div class="school-logo">
                                         ${school.logo ? 
                                             `<img src="${school.logo}" alt="${school.name}" onerror="this.parentElement.innerHTML='${school.short_code ? school.short_code.substring(0, 2).toUpperCase() : 'TR'}'">` :
@@ -748,10 +758,10 @@ async function generateSchoolsComparison() {
                         }).join('')}
                     </div>
                     
-                    ${schools.length > 5 ? `
+                    ${sortedSchools.length > 5 ? `
                         <div class="schools-controls">
-                            <div class="more-schools" onclick="toggleAllSchools('${major.all_major_id}', ${JSON.stringify(schools).replace(/"/g, '&quot;')})">
-                                Và ${schools.length - 5} trường khác...
+                            <div class="more-schools" onclick="toggleAllSchools('${major.all_major_id}', ${JSON.stringify(sortedSchools).replace(/"/g, '&quot;')})">
+                                Và ${sortedSchools.length - 5} trường khác...
                             </div>
                             <div class="less-schools" onclick="toggleLessSchools('${major.all_major_id}')" style="display: none;">
                                 Thu gọn danh sách
@@ -800,7 +810,7 @@ function toggleAllSchools(majorId, allSchools) {
     
     // Hiển thị tất cả trường
     const allSchoolsHTML = allSchools.map(school => `
-        <div class="school-item" onclick="goToSchoolMajor('${school.short_code}', '${majorId}')" style="cursor: pointer;">
+        <div class="school-item ${school.tag === 'outstanding' ? 'outstanding' : ''}" onclick="goToSchoolMajor('${school.short_code}', '${majorId}')" style="cursor: pointer;">
             <div class="school-logo">
                 ${school.logo ? 
                     `<img src="${school.logo}" alt="${school.name}" onerror="this.parentElement.innerHTML='${school.short_code ? school.short_code.substring(0, 2).toUpperCase() : 'TR'}'">` :

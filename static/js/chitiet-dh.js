@@ -32,6 +32,10 @@ window.addEventListener('load', function () {
             if (cachedData && cacheTime && (now - parseInt(cacheTime)) < 30 * 60 * 1000) {
                 console.log('Sử dụng dữ liệu từ cache');
                 const university = JSON.parse(cachedData);
+                
+                // Track lượt xem trường (ngay cả khi dùng cache)
+                trackSchoolView(university.id);
+                
                 updatePageContent(university);
                 hideLoading();
                 return;
@@ -73,6 +77,9 @@ window.addEventListener('load', function () {
                         localStorage.setItem(cacheKey, JSON.stringify(university));
                         localStorage.setItem(`${cacheKey}_time`, now.toString());
                         
+                        // Track lượt xem trường (API fallback)
+                        trackSchoolView(university.id);
+                        
                     updatePageContent(university);
                         hideLoading();
                         return;
@@ -94,6 +101,9 @@ window.addEventListener('load', function () {
                 // Lưu vào cache
                 localStorage.setItem(cacheKey, JSON.stringify(university));
                 localStorage.setItem(`${cacheKey}_time`, now.toString());
+                
+                // Track lượt xem trường
+                trackSchoolView(university.id);
                 
                 updatePageContent(university);
                 hideLoading(); // Ẩn loading khi thành công
@@ -642,11 +652,36 @@ window.addEventListener('load', function () {
         console.log('🔄 Loading ALL majors for university:', currentUniversity.name_vn);
         console.log('🏫 University ID:', currentUniversity.id);
         
-        const apiUrl = `https://timtruonghoc.pythonanywhere.com/schools/${currentUniversity.id}/all_majors/`;
-        console.log('🔗 API URL:', apiUrl);
-        
         try {
+            // Use majors_data from currentUniversity (already loaded)
+            if (currentUniversity.majors_data && currentUniversity.majors_data.length > 0) {
+                console.log('✅ Using majors_data from currentUniversity');
+                allMajors = currentUniversity.majors_data;
+                console.log('✅ All majors loaded from cache:', allMajors.length, 'majors');
+                console.log('📊 Sample major:', allMajors[0]);
+                
+                filteredMajors = [...allMajors];
+                majorsCurrentPage = 1;
+                majorsTotalPages = Math.ceil(filteredMajors.length / MAJORS_PER_PAGE);
+                majorsLoaded = true;
+                
+                console.log('📊 Total pages:', majorsTotalPages);
+                console.log('📊 Majors per page:', MAJORS_PER_PAGE);
+                
+                // Cập nhật số lượng ngành trong search stats
+                updateMajorsSearchStats();
+                
+                renderMajorsPageFromCache(1);
+                return;
+            }
+            
+            // Fallback: Fetch school data if majors_data not available
+            console.log('🔄 Fallback: Fetching school data with majors...');
             showMajorsSkeleton();
+            
+            const apiUrl = `https://timtruonghoc.pythonanywhere.com/schools/${currentUniversity.id}/`;
+            console.log('🔗 API URL:', apiUrl);
+            
             const response = await fetch(apiUrl);
             console.log('📡 Response status:', response.status);
             
@@ -654,22 +689,32 @@ window.addEventListener('load', function () {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             
-            allMajors = await response.json();
-            console.log('✅ All majors loaded:', allMajors.length, 'majors');
-            console.log('📊 Sample major:', allMajors[0]);
+            const schoolData = await response.json();
+            console.log('📦 Loaded school data with majors');
             
-            filteredMajors = [...allMajors];
-            majorsCurrentPage = 1;
-            majorsTotalPages = Math.ceil(filteredMajors.length / MAJORS_PER_PAGE);
-            majorsLoaded = true;
+            // Extract majors_data from school response
+            allMajors = schoolData.majors_data || [];
+            console.log('✅ All majors loaded from API:', allMajors.length, 'majors');
             
-            console.log('📊 Total pages:', majorsTotalPages);
-            console.log('📊 Majors per page:', MAJORS_PER_PAGE);
-            
-            // Cập nhật số lượng ngành trong search stats
-            updateMajorsSearchStats();
-            
-            renderMajorsPageFromCache(1);
+            if (allMajors.length > 0) {
+                console.log('📊 Sample major:', allMajors[0]);
+                
+                filteredMajors = [...allMajors];
+                majorsCurrentPage = 1;
+                majorsTotalPages = Math.ceil(filteredMajors.length / MAJORS_PER_PAGE);
+                majorsLoaded = true;
+                
+                console.log('📊 Total pages:', majorsTotalPages);
+                console.log('📊 Majors per page:', MAJORS_PER_PAGE);
+                
+                // Cập nhật số lượng ngành trong search stats
+                updateMajorsSearchStats();
+                
+                renderMajorsPageFromCache(1);
+            } else {
+                console.log('⚠️ No majors found for this university');
+                showMajorsError('Không tìm thấy ngành học cho trường này');
+            }
             
         } catch (error) {
             console.error('❌ Error loading all majors:', error);
@@ -1134,15 +1179,19 @@ window.addEventListener('load', function () {
             // Thêm click event cho favorite button
             const favBtn = majorCard.querySelector('.major-fav-btn');
             if (favBtn) {
+                // Kiểm tra trạng thái yêu thích từ localStorage
+                const favoriteKey = `favorite_${currentUniversity.short_code}_${major.major_id}`;
+                const isFavorite = localStorage.getItem(favoriteKey) === 'true';
+                
+                if (isFavorite) {
+                    favBtn.classList.add('active');
+                    const icon = favBtn.querySelector('i');
+                    icon.style.color = '#ff4757';
+                }
+                
                 favBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    favBtn.classList.toggle('active');
-                    const icon = favBtn.querySelector('i');
-                    if (favBtn.classList.contains('active')) {
-                        icon.style.color = '#ff4757';
-                    } else {
-                        icon.style.color = '#cbd5e0';
-                    }
+                    toggleMajorFavorite(major, currentUniversity, favBtn);
                 });
             }
             
@@ -1967,4 +2016,522 @@ window.addEventListener('load', function () {
         // Loại bỏ tất cả chữ cái, chỉ giữ lại số
         return majorId.replace(/[A-Za-z]/g, '');
     }
+
+    // ===== FAVORITE MANAGEMENT FUNCTIONS =====
+
+    /**
+     * Toggle favorite status for a major
+     */
+    function toggleMajorFavorite(major, university, favBtn) {
+        const favoriteKey = `favorite_${university.short_code}_${major.major_id}`;
+        const isFavorite = localStorage.getItem(favoriteKey) === 'true';
+        const icon = favBtn.querySelector('i');
+        
+        if (isFavorite) {
+            // Remove from favorites
+            removeMajorFromFavorites(major, university);
+            favBtn.classList.remove('active');
+            icon.style.color = '#cbd5e0';
+            showFavoriteToast(`Đã bỏ yêu thích "${major.name}"`, 'remove');
+        } else {
+            // Add to favorites
+            addMajorToFavorites(major, university);
+            favBtn.classList.add('active');
+            icon.style.color = '#ff4757';
+            showFavoriteToast(`Đã thêm "${major.name}" vào yêu thích`, 'add');
+        }
+    }
+
+    /**
+     * Add major to favorites
+     */
+    function addMajorToFavorites(major, university) {
+        const favoriteKey = `favorite_${university.short_code}_${major.major_id}`;
+        const favoritesListKey = 'favorite_majors_list';
+        
+        // Mark as favorite
+        localStorage.setItem(favoriteKey, 'true');
+        
+        // Add to favorites list
+        let favoritesList = JSON.parse(localStorage.getItem(favoritesListKey) || '[]');
+        
+        // Check if already exists
+        const existingIndex = favoritesList.findIndex(
+            item => item.school_short_code === university.short_code && 
+                   item.major_id === major.major_id
+        );
+        
+        if (existingIndex === -1) {
+            const favoriteItem = {
+                major_id: major.major_id,
+                major_name: major.name,
+                school_short_code: university.short_code,
+                school_name: university.name_vn,
+                school_logo: university.logo,
+                school_type: university.school_type,
+                min_tuition: major.min_tuition_fee_per_year,
+                max_tuition: major.max_tuition_fee_per_year,
+                university_start: university.start,
+                university_end: university.end,
+                location: university.country,
+                tags: major.tags,
+                status: major.status,
+                added_date: new Date().toISOString()
+            };
+            
+            favoritesList.push(favoriteItem);
+            localStorage.setItem(favoritesListKey, JSON.stringify(favoritesList));
+            
+            console.log('✅ Added major to favorites:', favoriteItem);
+        }
+        
+        // Update favorites count
+        updateFavoritesCount();
+    }
+
+    /**
+     * Remove major from favorites
+     */
+    function removeMajorFromFavorites(major, university) {
+        const favoriteKey = `favorite_${university.short_code}_${major.major_id}`;
+        const favoritesListKey = 'favorite_majors_list';
+        
+        // Remove favorite mark
+        localStorage.removeItem(favoriteKey);
+        
+        // Remove from favorites list
+        let favoritesList = JSON.parse(localStorage.getItem(favoritesListKey) || '[]');
+        favoritesList = favoritesList.filter(
+            item => !(item.school_short_code === university.short_code && 
+                     item.major_id === major.major_id)
+        );
+        
+        localStorage.setItem(favoritesListKey, JSON.stringify(favoritesList));
+        
+        console.log('✅ Removed major from favorites:', major.name);
+        
+        // Update favorites count
+        updateFavoritesCount();
+    }
+
+    /**
+     * Get all favorite majors
+     */
+    function getFavoriteMajors() {
+        const favoritesListKey = 'favorite_majors_list';
+        return JSON.parse(localStorage.getItem(favoritesListKey) || '[]');
+    }
+
+    /**
+     * Clear all favorites
+     */
+    function clearAllFavorites() {
+        if (confirm('Bạn có chắc muốn xóa tất cả ngành yêu thích?')) {
+            const favoritesListKey = 'favorite_majors_list';
+            const favoritesList = JSON.parse(localStorage.getItem(favoritesListKey) || '[]');
+            
+            // Remove individual favorite marks
+            favoritesList.forEach(item => {
+                const favoriteKey = `favorite_${item.school_short_code}_${item.major_id}`;
+                localStorage.removeItem(favoriteKey);
+            });
+            
+            // Clear favorites list
+            localStorage.removeItem(favoritesListKey);
+            
+            // Update UI
+            updateFavoritesCount();
+            
+            showFavoriteToast('Đã xóa tất cả ngành yêu thích', 'remove');
+            
+            console.log('✅ Cleared all favorites');
+        }
+    }
+
+    /**
+     * Update favorites count in UI using automatic system
+     */
+    function updateFavoritesCount() {
+        // Use the automatic footer system if available
+        if (window.FooterFavoriteManager && window.FooterFavoriteManager.updateFavoritesCount) {
+            const count = window.FooterFavoriteManager.updateFavoritesCount();
+            
+            // Update any favorites count displays on current page
+            const countElements = document.querySelectorAll('.favorites-count');
+            countElements.forEach(element => {
+                element.textContent = count;
+            });
+            
+            return count;
+        }
+        
+        // Fallback to manual update if footer system not available
+        const favoritesList = getFavoriteMajors();
+        const count = favoritesList.length;
+        
+        // Update any favorites count displays
+        const countElements = document.querySelectorAll('.favorites-count');
+        countElements.forEach(element => {
+            element.textContent = count;
+        });
+        
+        // Update heart button if exists
+        const heartBtn = document.querySelector('.nav-btn.tim');
+        if (heartBtn) {
+            if (count > 0) {
+                heartBtn.classList.add('has-favorites');
+                heartBtn.setAttribute('data-count', count);
+            } else {
+                heartBtn.classList.remove('has-favorites');
+                heartBtn.removeAttribute('data-count');
+            }
+        }
+        
+        console.log('📊 Updated favorites count:', count);
+        return count;
+    }
+
+    /**
+     * Show favorite toast notification
+     */
+    function showFavoriteToast(message, type = 'add') {
+        // Remove existing toast
+        const existingToast = document.querySelector('.favorite-toast');
+        if (existingToast) {
+            existingToast.remove();
+        }
+        
+        // Create toast
+        const toast = document.createElement('div');
+        toast.className = 'favorite-toast';
+        toast.innerHTML = `
+            <div class="toast-content">
+                <i class="fas fa-heart" style="color: ${type === 'add' ? '#ff4757' : '#cbd5e0'}"></i>
+                <span>${message}</span>
+            </div>
+        `;
+        
+        // Add styles
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: ${type === 'add' ? '#10b981' : '#ef4444'};
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 10000;
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        `;
+        
+        // Style toast content
+        const content = toast.querySelector('.toast-content');
+        content.style.cssText = `
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        `;
+        
+        document.body.appendChild(toast);
+        
+        // Show toast
+        setTimeout(() => {
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateX(-50%) translateY(-10px)';
+        }, 100);
+        
+        // Hide toast
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(-50%) translateY(10px)';
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.remove();
+                }
+            }, 300);
+        }, 3000);
+    }
+
+    /**
+     * Export favorites as JSON
+     */
+    function exportFavorites() {
+        const favoritesList = getFavoriteMajors();
+        if (favoritesList.length === 0) {
+            showFavoriteToast('Không có ngành yêu thích nào để xuất', 'remove');
+            return;
+        }
+        
+        const dataStr = JSON.stringify(favoritesList, null, 2);
+        const dataBlob = new Blob([dataStr], {type: 'application/json'});
+        const url = URL.createObjectURL(dataBlob);
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `nganh-yeu-thich-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        showFavoriteToast('Đã xuất danh sách yêu thích', 'add');
+    }
+
+    /**
+     * Import favorites from JSON
+     */
+    function importFavorites(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const importedFavorites = JSON.parse(e.target.result);
+                if (Array.isArray(importedFavorites)) {
+                    const favoritesListKey = 'favorite_majors_list';
+                    const existingFavorites = JSON.parse(localStorage.getItem(favoritesListKey) || '[]');
+                    
+                    // Merge favorites (avoid duplicates)
+                    importedFavorites.forEach(newItem => {
+                        const exists = existingFavorites.find(
+                            item => item.school_short_code === newItem.school_short_code && 
+                                   item.major_id === newItem.major_id
+                        );
+                        
+                        if (!exists) {
+                            existingFavorites.push(newItem);
+                            // Add individual favorite mark
+                            const favoriteKey = `favorite_${newItem.school_short_code}_${newItem.major_id}`;
+                            localStorage.setItem(favoriteKey, 'true');
+                        }
+                    });
+                    
+                    localStorage.setItem(favoritesListKey, JSON.stringify(existingFavorites));
+                    updateFavoritesCount();
+                    
+                    showFavoriteToast(`Đã nhập ${importedFavorites.length} ngành yêu thích`, 'add');
+                } else {
+                    throw new Error('Invalid format');
+                }
+            } catch (error) {
+                showFavoriteToast('Lỗi: File không đúng định dạng', 'remove');
+            }
+        };
+        reader.readAsText(file);
+        
+        // Reset input
+        event.target.value = '';
+    }
+
+    /**
+     * Export favorites to Excel function for chitiet-dh.js
+     */
+    function exportFavoritesToExcel() {
+        // Use the footer function if available
+        if (window.exportFavoritesToExcel && window.exportFavoritesToExcel !== exportFavoritesToExcel) {
+            window.exportFavoritesToExcel();
+            return;
+        }
+        
+        // Fallback implementation
+        const favoritesList = getFavoriteMajors();
+        if (favoritesList.length === 0) {
+            showFavoriteToast('Không có ngành yêu thích nào để xuất', 'error');
+            return;
+        }
+        
+        try {
+            // Create Excel content as CSV format (compatible with Excel)
+            let csvContent = '';
+            
+            // Add UTF-8 BOM for proper Vietnamese character display in Excel
+            csvContent += '\uFEFF';
+            
+            // Header row
+            const headers = [
+                'STT',
+                'Tên ngành',
+                'Mã ngành', 
+                'Tên trường',
+                'Mã trường',
+                'Loại trường',
+                'Học phí tối thiểu',
+                'Học phí tối đa',
+                'Khu vực',
+                'Tags',
+                'Trạng thái',
+                'Ngày thêm'
+            ];
+            csvContent += headers.join(',') + '\n';
+            
+            // Data rows
+            favoritesList.forEach((favorite, index) => {
+                const row = [
+                    index + 1,
+                    `"${(favorite.major_name || '').replace(/"/g, '""')}"`,
+                    `"${favorite.major_id || ''}"`,
+                    `"${(favorite.school_name || '').replace(/"/g, '""')}"`,
+                    `"${favorite.school_short_code || ''}"`,
+                    `"${favorite.school_type === 'public' ? 'Công lập' : favorite.school_type === 'private' ? 'Ngoài công lập' : (favorite.school_type || '')}"`,
+                    `"${formatTuitionForExcelLocal(favorite.min_tuition)}"`,
+                    `"${formatTuitionForExcelLocal(favorite.max_tuition)}"`,
+                    `"${(favorite.location || '').replace(/"/g, '""')}"`,
+                    `"${(favorite.tags || '').replace(/"/g, '""')}"`,
+                    `"${(favorite.status || '').replace(/"/g, '""')}"`,
+                    `"${formatDateForExcelLocal(favorite.added_date)}"`
+                ];
+                csvContent += row.join(',') + '\n';
+            });
+            
+            // Create blob and download
+            const blob = new Blob([csvContent], { 
+                type: 'text/csv;charset=utf-8;' 
+            });
+            const url = URL.createObjectURL(blob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `nganh-yeu-thich-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            showFavoriteToast('Đã xuất danh sách yêu thích dạng Excel (.csv)', 'add');
+            
+        } catch (error) {
+            console.error('Error exporting to Excel:', error);
+            showFavoriteToast('Có lỗi khi xuất file Excel', 'error');
+        }
+    }
+    
+    /**
+     * Format tuition for Excel display
+     */
+    function formatTuitionForExcelLocal(tuition) {
+        if (!tuition || tuition === '0' || tuition === 0) {
+            return 'Miễn phí';
+        }
+        
+        const numTuition = parseFloat(tuition);
+        if (isNaN(numTuition)) {
+            return tuition || '';
+        }
+        
+        if (numTuition >= 1000000) {
+            return `${(numTuition / 1000000).toFixed(1)} triệu`;
+        } else if (numTuition >= 1000) {
+            return `${(numTuition / 1000).toFixed(0)} nghìn`;
+        } else {
+            return `${numTuition} VNĐ`;
+        }
+    }
+    
+    /**
+     * Format date for Excel display
+     */
+    function formatDateForExcelLocal(dateString) {
+        if (!dateString) return '';
+        
+        try {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('vi-VN', {
+                day: '2-digit',
+                month: '2-digit', 
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        } catch (error) {
+            return dateString;
+        }
+    }
+
+    // Initialize favorites count when page loads
+    setTimeout(() => {
+        updateFavoritesCount();
+    }, 1000);
+
+    // Expose functions globally for use in other scripts
+    // ✨ Listen for favorite events from modal
+    window.addEventListener('favoriteRemoved', function(event) {
+        const { schoolShortCode, majorId } = event.detail;
+        console.log(`🔄 Received favoriteRemoved event: ${majorId} from ${schoolShortCode}`);
+        
+        // Update heart buttons on current university page
+        const heartButtons = document.querySelectorAll(`[data-major-id="${majorId}"] .major-fav-btn`);
+        heartButtons.forEach(btn => {
+            const icon = btn.querySelector('i');
+            if (icon) {
+                btn.classList.remove('active');
+                btn.style.color = '#cbd5e0';
+                icon.className = 'far fa-heart';
+                icon.style.color = '#cbd5e0';
+            }
+        });
+        
+        updateFavoritesCount();
+    });
+    
+    window.addEventListener('allFavoritesCleared', function() {
+        console.log(`🔄 Received allFavoritesCleared event`);
+        
+        // Update all heart buttons on current page
+        const heartButtons = document.querySelectorAll('.major-fav-btn');
+        heartButtons.forEach(btn => {
+            const icon = btn.querySelector('i');
+            if (icon) {
+                btn.classList.remove('active');
+                btn.style.color = '#cbd5e0';
+                icon.className = 'far fa-heart';
+                icon.style.color = '#cbd5e0';
+            }
+        });
+        
+        updateFavoritesCount();
+    });
+
+    window.FavoriteManager = {
+        toggleMajorFavorite,
+        addMajorToFavorites,
+        removeMajorFromFavorites,
+        getFavoriteMajors,
+        clearAllFavorites,
+        updateFavoritesCount,
+        exportFavorites,
+        exportFavoritesToExcel,
+        importFavorites,
+        showFavoriteToast
+    };
+
+    // Function to track school view
+    async function trackSchoolView(schoolId) {
+        try {
+            const response = await fetch('https://timtruonghoc.pythonanywhere.com/tracking/increment-school-view/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    school_id: schoolId
+                })
+            });
+            
+            if (response.ok) {
+                console.log('✅ School view tracked successfully');
+            } else {
+                console.log('⚠️ Failed to track school view');
+            }
+        } catch (error) {
+            console.log('⚠️ Error tracking school view:', error);
+        }
+    }
+
 });
