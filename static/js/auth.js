@@ -117,10 +117,36 @@ const AuthManager = {
                 userDataString = localStorage.getItem('user_data');
             }
             
+            // Nếu không có, thử key từ auto_login.js
+            if (!userDataString) {
+                userDataString = localStorage.getItem('userData');
+            }
+            
             if (userDataString) {
                 // Parse chuỗi JSON thành đối tượng và trả về
                 const userData = JSON.parse(userDataString);
                 console.log('Dữ liệu người dùng đã được tải từ localStorage:', userData);
+                
+                // Kiểm tra và chuẩn hóa cấu trúc dữ liệu
+                if (userData && !userData.auth_token && userData.id) {
+                    // Dữ liệu từ auto_login.js - chuyển đổi sang cấu trúc chuẩn
+                    const normalizedData = {
+                        auth_token: {
+                            id: userData.id,
+                            email: userData.email,
+                            first_name: userData.first_name,
+                            last_name: userData.last_name,
+                            date_of_birth: userData.date_of_birth,
+                            living_place: userData.living_place,
+                            sex: userData.sex,
+                            user_photo: userData.user_photo,
+                            role: userData.role
+                        }
+                    };
+                    console.log('✅ Dữ liệu đã được chuẩn hóa:', normalizedData);
+                    return normalizedData;
+                }
+                
                 return userData;
             }
         } catch (e) {

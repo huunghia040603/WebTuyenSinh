@@ -54,11 +54,17 @@ class AutoLogin {
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
         localStorage.removeItem('user_data');
+        localStorage.removeItem('userData');
         
         // Reset chat state
         this.resetChatState();
         
         console.log('🚪 Đã đăng xuất');
+        
+        // Cập nhật UI ngay lập tức nếu có hàm updateAuthUI
+        if (window.updateAuthUI && typeof window.updateAuthUI === 'function') {
+            window.updateAuthUI();
+        }
         
         // Nếu đang ở trang /account thì chuyển về trang chủ
         if (window.location.pathname === '/account') {

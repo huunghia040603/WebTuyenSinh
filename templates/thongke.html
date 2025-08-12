@@ -163,6 +163,16 @@
         margin-bottom: 5px;
     }
     
+    .clickable {
+        cursor: pointer;
+        transition: color 0.2s ease;
+    }
+    
+    .clickable:hover {
+        color: #667eea !important;
+        /* text-decoration: underline; */
+    }
+    
     .item-school {
         font-size: 0.9rem;
         color: #666;
@@ -496,7 +506,7 @@ async function loadTopSchools() {
                 <div class="item-info ${outstandingClass}">
                     <img src="${school.logo || '/static/images/logo/0.jpg'}" alt="${school.name_vn}" class="item-logo">
                     <div class="item-details">
-                        <div class="item-name">
+                        <div class="item-name clickable" data-school-id="${school.id}" data-school-name="${school.name_vn}" data-school-short-code="${school.short_code || ''}">
                             ${school.name_vn}
                             ${outstandingBadge}
                         </div>
@@ -513,6 +523,27 @@ async function loadTopSchools() {
         });
         
         container.appendChild(ul);
+        
+        // Thêm event listeners cho các tên trường clickable
+        const schoolNames = container.querySelectorAll('.item-name.clickable');
+        schoolNames.forEach(element => {
+            element.addEventListener('click', function() {
+                const schoolId = this.getAttribute('data-school-id');
+                const schoolName = this.getAttribute('data-school-name');
+                const schoolShortCode = this.getAttribute('data-school-short-code');
+                console.log('🖱️ Click vào trường:', schoolName, 'ID:', schoolId, 'Short Code:', schoolShortCode);
+                
+                if (schoolShortCode) {
+                    // Chuyển đến trang chi tiết trường sử dụng short code
+                    window.location.href = `/${schoolShortCode}`;
+                } else if (schoolId) {
+                    // Fallback: sử dụng ID nếu không có short code
+                    window.location.href = `/chitiet-dh?id=${schoolId}`;
+                } else {
+                    console.warn('⚠️ Không có ID hoặc short code trường để chuyển hướng');
+                }
+            });
+        });
         
     } catch (error) {
         console.error('Error loading top schools:', error);
@@ -564,11 +595,13 @@ async function loadTopMajors() {
                 <div class="item-info ${itemClass}">
                     <img src="${major.school_logo || '/static/images/logo/0.jpg'}" alt="${major.school_name}" class="item-logo">
                     <div class="item-details">
-                        <div class="item-name">
+                        <div class="item-name clickable" data-major-id="${major.major_id}" data-major-name="${major.name}" data-school-name="${major.school_name}" data-school-short-code="${major.school_short_code || ''}">
                             ${major.name}
                             ${badgeHtml}
                         </div>
-                        <div class="item-school">${major.school_name} • Mã: ${major.major_id}</div>
+                        <div class="item-school clickable" data-school-id="${major.school_id || ''}" data-school-name="${major.school_name}" data-school-short-code="${major.school_short_code || ''}">
+                            ${major.school_name} • Mã: ${major.major_id}
+                        </div>
                     </div>
                 </div>
                 <div class="item-views">
@@ -581,6 +614,48 @@ async function loadTopMajors() {
         });
         
         container.appendChild(ul);
+        
+        // Thêm event listeners cho các tên ngành và tên trường clickable
+        const majorNames = container.querySelectorAll('.item-name.clickable');
+        const schoolNames = container.querySelectorAll('.item-school.clickable');
+        
+        majorNames.forEach(element => {
+            element.addEventListener('click', function() {
+                const majorId = this.getAttribute('data-major-id');
+                const majorName = this.getAttribute('data-major-name');
+                const schoolShortCode = this.getAttribute('data-school-short-code');
+                console.log('🖱️ Click vào ngành:', majorName, 'Major ID:', majorId, 'School Short Code:', schoolShortCode);
+                
+                if (majorId && schoolShortCode) {
+                    // Chuyển đến trang chi tiết ngành sử dụng major_id và school_short_code
+                    window.location.href = `/chitiet-nganh-rieng?major_id=${majorId}&school_short_code=${schoolShortCode}`;
+                } else if (majorId) {
+                    // Fallback: chỉ sử dụng major_id
+                    window.location.href = `/chitiet-nganh-rieng?major_id=${majorId}`;
+                } else {
+                    console.warn('⚠️ Không có major_id hoặc school_short_code để chuyển hướng');
+                }
+            });
+        });
+        
+        schoolNames.forEach(element => {
+            element.addEventListener('click', function() {
+                const schoolId = this.getAttribute('data-school-id');
+                const schoolName = this.getAttribute('data-school-name');
+                const schoolShortCode = this.getAttribute('data-school-short-code');
+                console.log('🖱️ Click vào tên trường trong ngành:', schoolName, 'ID:', schoolId, 'Short Code:', schoolShortCode);
+                
+                if (schoolShortCode) {
+                    // Chuyển đến trang chi tiết trường sử dụng short code
+                    window.location.href = `/${schoolShortCode}`;
+                } else if (schoolId) {
+                    // Fallback: sử dụng ID nếu không có short code
+                    window.location.href = `/chitiet-dh?id=${schoolId}`;
+                } else {
+                    console.warn('⚠️ Không có ID hoặc short code trường để chuyển hướng');
+                }
+            });
+        });
         
     } catch (error) {
         console.error('Error loading top majors:', error);

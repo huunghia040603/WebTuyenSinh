@@ -507,6 +507,35 @@
             min-width: auto;
         }
         
+        /* Style cho email không thể chỉnh sửa */
+        #edit-email {
+            display: inline-block;
+            padding: 8px 12px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            color: #6c757d;
+            font-weight: 500;
+            cursor: not-allowed;
+            user-select: none;
+            position: relative;
+        }
+        
+        #edit-email::after {
+            content: "🔒";
+            margin-left: 8px;
+            font-size: 0.9em;
+            opacity: 0.7;
+        }
+        
+        .form-hint {
+            display: block;
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-top: 4px;
+            font-style: italic;
+        }
+        
         .info-value {
             font-size: 1.1rem;
             color: #2d3748;
@@ -1126,7 +1155,8 @@
 
                 <div class="form-group">
                     <label>Email:</label>
-                    <span id="edit-email"></span>
+                    <span id="edit-email" title="Email không thể thay đổi vì đây là thông tin đăng nhập chính"></span>
+                    <small class="form-hint">Email không thể thay đổi vì đây là thông tin đăng nhập chính</small>
                 </div>
                 <div class="form-group">
                     <label>Ngày sinh:</label>
