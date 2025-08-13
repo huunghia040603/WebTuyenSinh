@@ -766,5 +766,227 @@ class TopMajorsSerializer(serializers.ModelSerializer):
         fields = ['id', 'major_id', 'name', 'school_name', 'school_short_code', 'school_logo', 'tags', 'view_count', 'rank']
 
 
+# ---
+## Serializers cho Hệ Thống Quản Lý Thuật Ngữ Ngành Học
+# ---
+
+class TermCategorySerializer(serializers.ModelSerializer):
+    terms_count = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = TermCategory
+        fields = ['id', 'name', 'name_en', 'description', 'icon', 'color', 'is_active', 'terms_count', 'created_at']
+    
+    def get_terms_count(self, obj):
+        return obj.terms.filter(status='approved').count()
+
+
+class TermSynonymSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TermSynonym
+        fields = ['id', 'synonym_vn', 'synonym_en', 'created_at']
+
+
+class TermTranslationSerializer(serializers.ModelSerializer):
+    language_display = serializers.CharField(source='get_language_display', read_only=True)
+    
+    class Meta:
+        model = TermTranslation
+        fields = ['id', 'language', 'language_display', 'translation', 'pronunciation', 'notes', 'created_at']
+
+
+class TermRelatedSerializer(serializers.ModelSerializer):
+    related_term_info = serializers.SerializerMethodField()
+    relationship_display = serializers.CharField(source='get_relationship_display', read_only=True)
+    
+    class Meta:
+        model = TermRelated
+        fields = ['id', 'related_term', 'related_term_info', 'relationship', 'relationship_display', 'description', 'created_at']
+    
+    def get_related_term_info(self, obj):
+        return {
+            'id': obj.related_term.id,
+            'term_vn': obj.related_term.term_vn,
+            'term_en': obj.related_term.term_en,
+            'category': obj.related_term.category.name,
+            'difficulty_level': obj.related_term.get_difficulty_level_display()
+        }
+
+
+class TermSerializer(serializers.ModelSerializer):
+    category_info = TermCategorySerializer(source='category', read_only=True)
+    field_group_name = serializers.CharField(source='field_group.name', read_only=True)
+    major_name = serializers.CharField(source='major.name', read_only=True)
+    major_id = serializers.CharField(source='major.major_id', read_only=True)
+    school_name = serializers.CharField(source='major.school.name_vn', read_only=True)
+    created_by_name = serializers.CharField(source='created_by.email', read_only=True)
+    status_display = serializers.CharField(source='get_status_display', read_only=True)
+    difficulty_display = serializers.CharField(source='get_difficulty_level_display', read_only=True)
+    synonyms = TermSynonymSerializer(many=True, read_only=True)
+    translations = TermTranslationSerializer(many=True, read_only=True)
+    related_terms = TermRelatedSerializer(many=True, read_only=True)
+    average_rating = serializers.SerializerMethodField()
+    ratings_count = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Term
+        fields = [
+            'id', 'term_vn', 'term_en', 'abbreviation', 'category', 'category_info',
+            'field_group', 'field_group_name', 'major', 'major_name', 'major_id', 'school_name',
+            'definition', 'definition_en', 'context', 'examples', 'difficulty_level', 'difficulty_display',
+            'tags', 'pronunciation', 'status', 'status_display', 'is_featured', 'view_count', 'search_count',
+            'created_by', 'created_by_name', 'created_at', 'updated_at', 'approved_at',
+            'synonyms', 'translations', 'related_terms', 'average_rating', 'ratings_count'
+        ]
+    
+    def get_average_rating(self, obj):
+        ratings = obj.ratings.all()
+        if ratings.exists():
+            return sum(r.rating for r in ratings) / ratings.count()
+        return 0
+    
+    def get_ratings_count(self, obj):
+        return obj.ratings.count()
+
+
+class TermSearchSerializer(serializers.ModelSerializer):
+    """Serializer cho tìm kiếm thuật ngữ"""
+    category_info = TermCategorySerializer(source='category', read_only=True)
+    field_group_name = serializers.CharField(source='field_group.name', read_only=True)
+    major_name = serializers.CharField(source='major.name', read_only=True)
+    school_name = serializers.CharField(source='major.school.name_vn', read_only=True)
+    difficulty_display = serializers.CharField(source='get_difficulty_level_display', read_only=True)
+    average_rating = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Term
+        fields = [
+            'id', 'term_vn', 'term_en', 'abbreviation', 'category_info', 'field_group_name',
+            'major_name', 'school_name', 'definition', 'difficulty_level', 'difficulty_display',
+            'tags', 'is_featured', 'view_count', 'average_rating'
+        ]
+    
+    def get_average_rating(self, obj):
+        ratings = obj.ratings.all()
+        if ratings.exists():
+            return sum(r.rating for r in ratings) / ratings.count()
+        return 0
+
+
+class UserTermCollectionSerializer(serializers.ModelSerializer):
+    items_count = serializers.SerializerMethodField()
+    user_email = serializers.CharField(source='user.email', read_only=True)
+    
+    class Meta:
+        model = UserTermCollection
+        fields = ['id', 'name', 'description', 'is_public', 'color', 'items_count', 'user_email', 'created_at', 'updated_at']
+    
+    def get_items_count(self, obj):
+        return obj.items.count()
+
+
+class UserTermCollectionItemSerializer(serializers.ModelSerializer):
+    term_info = TermSerializer(source='term', read_only=True)
+    
+    class Meta:
+        model = UserTermCollectionItem
+        fields = ['id', 'collection', 'term', 'term_info', 'notes', 'is_favorite', 'added_at']
+
+
+class TermContributionSerializer(serializers.ModelSerializer):
+    contributor_email = serializers.CharField(source='contributor.email', read_only=True)
+    contribution_type_display = serializers.CharField(source='get_contribution_type_display', read_only=True)
+    status_display = serializers.CharField(source='get_status_display', read_only=True)
+    reviewed_by_email = serializers.CharField(source='reviewed_by.email', read_only=True)
+    
+    class Meta:
+        model = TermContribution
+        fields = [
+            'id', 'contributor', 'contributor_email', 'contribution_type', 'contribution_type_display',
+            'term', 'title', 'content', 'suggested_term_vn', 'suggested_term_en', 'suggested_definition',
+            'status', 'status_display', 'reviewed_by', 'reviewed_by_email', 'review_notes',
+            'created_at', 'reviewed_at'
+        ]
+
+
+class TermSearchHistorySerializer(serializers.ModelSerializer):
+    user_email = serializers.CharField(source='user.email', read_only=True)
+    clicked_term_info = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = TermSearchHistory
+        fields = ['id', 'user', 'user_email', 'search_query', 'results_count', 'clicked_term', 'clicked_term_info', 'search_filters', 'created_at']
+    
+    def get_clicked_term_info(self, obj):
+        if obj.clicked_term:
+            return {
+                'id': obj.clicked_term.id,
+                'term_vn': obj.clicked_term.term_vn,
+                'term_en': obj.clicked_term.term_en,
+                'category': obj.clicked_term.category.name
+            }
+        return None
+
+
+class TermViewHistorySerializer(serializers.ModelSerializer):
+    user_email = serializers.CharField(source='user.email', read_only=True)
+    term_info = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = TermViewHistory
+        fields = ['id', 'user', 'user_email', 'term', 'term_info', 'view_duration', 'source', 'created_at']
+    
+    def get_term_info(self, obj):
+        return {
+            'id': obj.term.id,
+            'term_vn': obj.term.term_vn,
+            'term_en': obj.term.term_en,
+            'category': obj.term.category.name
+        }
+
+
+class TermRatingSerializer(serializers.ModelSerializer):
+    user_email = serializers.CharField(source='user.email', read_only=True)
+    term_info = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = TermRating
+        fields = ['id', 'user', 'user_email', 'term', 'term_info', 'rating', 'comment', 'is_helpful', 'created_at']
+    
+    def get_term_info(self, obj):
+        return {
+            'id': obj.term.id,
+            'term_vn': obj.term.term_vn,
+            'term_en': obj.term.term_en,
+            'category': obj.term.category.name
+        }
+
+
+class TermStatsSerializer(serializers.Serializer):
+    """Serializer cho thống kê thuật ngữ"""
+    total_terms = serializers.IntegerField()
+    total_categories = serializers.IntegerField()
+    total_users = serializers.IntegerField()
+    total_languages = serializers.IntegerField()
+    top_categories = serializers.ListField()
+    recent_terms = serializers.ListField()
+    featured_terms = serializers.ListField()
+
+
+class TermSearchRequestSerializer(serializers.Serializer):
+    """Serializer cho request tìm kiếm thuật ngữ"""
+    query = serializers.CharField(max_length=255, required=False)
+    category = serializers.IntegerField(required=False)
+    field_group = serializers.IntegerField(required=False)
+    major = serializers.IntegerField(required=False)
+    difficulty_level = serializers.CharField(max_length=20, required=False)
+    language = serializers.CharField(max_length=10, required=False)
+    is_featured = serializers.BooleanField(required=False)
+    page = serializers.IntegerField(default=1)
+    page_size = serializers.IntegerField(default=20)
+    sort_by = serializers.CharField(max_length=50, default='created_at')
+    sort_order = serializers.CharField(max_length=4, default='desc')
+
+
 
 

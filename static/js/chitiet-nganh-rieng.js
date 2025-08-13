@@ -22,6 +22,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Load data - majorId bây giờ là mã ngành thực tế
     loadMajorData(majorId, schoolId, schoolShortCode);
+    
+    // Add test button for debugging (only in development)
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        addTestButton();
+    }
 });
 
 // Load major data
@@ -46,7 +51,10 @@ async function loadMajorData(majorId, schoolId, schoolShortCode) {
         
         // Track major view
         if (currentMajor && currentMajor.id) {
+            console.log('📊 Tracking major view for ID:', currentMajor.id, 'Major ID:', currentMajor.major_id);
             trackMajorView(currentMajor.id);
+        } else {
+            console.warn('⚠️ Cannot track major view - missing major data');
         }
         
     } catch (error) {
@@ -993,6 +1001,19 @@ function testGetBaseMajorId() {
     });
 }
 
+// Test function for tracking
+function testTracking() {
+    if (currentMajor && currentMajor.id) {
+        console.log('🧪 Testing tracking for major:', currentMajor);
+        trackMajorView(currentMajor.id);
+    } else {
+        console.warn('⚠️ No current major data available for testing');
+    }
+}
+
+// Add test button to page for debugging
+
+
 function showError(message) {
     console.error('❌ Error:', message);
     // You can implement a more sophisticated error display here
@@ -1010,6 +1031,8 @@ function goBack() {
 // Function to track major view
 async function trackMajorView(majorId) {
     try {
+        console.log('📊 Sending tracking request for major ID:', majorId);
+        
         const response = await fetch('https://timtruonghoc.pythonanywhere.com/tracking/increment-major-view/', {
             method: 'POST',
             headers: {
@@ -1021,11 +1044,13 @@ async function trackMajorView(majorId) {
         });
         
         if (response.ok) {
-            console.log('✅ Major view tracked successfully');
+            const result = await response.json();
+            console.log('✅ Major view tracked successfully:', result);
         } else {
-            console.log('⚠️ Failed to track major view');
+            const errorText = await response.text();
+            console.error('❌ Failed to track major view. Status:', response.status, 'Response:', errorText);
         }
     } catch (error) {
-        console.log('⚠️ Error tracking major view:', error);
+        console.error('❌ Error tracking major view:', error);
     }
 }

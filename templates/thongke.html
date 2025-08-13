@@ -420,11 +420,23 @@
             <canvas id="viewsChart" class="chart-canvas" style="display: none;"></canvas>
         </div>
     </div>
+    
+    <!-- Debug Section (only in development) -->
+    <!-- <div id="debug-section" style="display: none; margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+        <h3>🔧 Debug Tools</h3>
+        <button onclick="testTrackingFromStats()" style="margin: 5px; padding: 10px 15px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
+            🧪 Test Tracking
+        </button>
+        <button onclick="refreshStatistics()" style="margin: 5px; padding: 10px 15px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">
+            🔄 Refresh Stats
+        </button>
+    </div> -->
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="/debug_tracking.js"></script>
 <script>
 // Check if Chart.js loaded successfully
 if (typeof Chart === 'undefined') {
@@ -471,6 +483,13 @@ async function loadOverviewStats() {
         console.error('Error loading overview stats:', error);
         showError('overview', 'Không thể tải dữ liệu tổng quan');
     }
+}
+
+// Refresh statistics after tracking
+async function refreshStatistics() {
+    console.log('🔄 Refreshing statistics...');
+    await loadOverviewStats();
+    await loadTopMajors();
 }
 
 // Load top schools
@@ -595,7 +614,7 @@ async function loadTopMajors() {
                 <div class="item-info ${itemClass}">
                     <img src="${major.school_logo || '/static/images/logo/0.jpg'}" alt="${major.school_name}" class="item-logo">
                     <div class="item-details">
-                        <div class="item-name clickable" data-major-id="${major.major_id}" data-major-name="${major.name}" data-school-name="${major.school_name}" data-school-short-code="${major.school_short_code || ''}">
+                        <div class="item-name clickable" data-major-id="${major.major_id}" data-major-db-id="${major.id}" data-major-name="${major.name}" data-school-name="${major.school_name}" data-school-short-code="${major.school_short_code || ''}" data-school-id="${major.school_id || ''}">
                             ${major.name}
                             ${badgeHtml}
                         </div>
@@ -622,9 +641,18 @@ async function loadTopMajors() {
         majorNames.forEach(element => {
             element.addEventListener('click', function() {
                 const majorId = this.getAttribute('data-major-id');
+                const majorDbId = this.getAttribute('data-major-db-id');
                 const majorName = this.getAttribute('data-major-name');
                 const schoolShortCode = this.getAttribute('data-school-short-code');
-                console.log('🖱️ Click vào ngành:', majorName, 'Major ID:', majorId, 'School Short Code:', schoolShortCode);
+                const schoolId = this.getAttribute('data-school-id');
+                console.log('🖱️ Click vào ngành:', majorName, 'Major ID:', majorId, 'Major DB ID:', majorDbId, 'School Short Code:', schoolShortCode, 'School ID:', schoolId);
+                
+                // Track click trước khi chuyển hướng - sử dụng database ID để tracking chính xác
+                if (majorDbId) {
+                    trackMajorClickByDbId(majorDbId, majorName);
+                } else if (majorId) {
+                    trackMajorClick(majorId, majorName);
+                }
                 
                 if (majorId && schoolShortCode) {
                     // Chuyển đến trang chi tiết ngành sử dụng major_id và school_short_code
@@ -660,6 +688,106 @@ async function loadTopMajors() {
     } catch (error) {
         console.error('Error loading top majors:', error);
         showError('top-majors', 'Không thể tải dữ liệu top ngành');
+    }
+}
+
+// Track major click from statistics page
+async function trackMajorClick(majorId, majorName) {
+    try {
+        console.log('📊 Tracking major click from stats page:', majorId, majorName);
+        
+        const response = await fetch(`${API_BASE_URL}/tracking/increment-major-view/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                major_id: majorId
+            })
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            console.log('✅ Major click tracked successfully:', result);
+            
+            // Refresh statistics after successful tracking
+            setTimeout(() => {
+                refreshStatistics();
+            }, 1000); // Wait 1 second before refreshing
+            
+        } else {
+            const errorText = await response.text();
+            console.error('❌ Failed to track major click. Status:', response.status, 'Response:', errorText);
+        }
+    } catch (error) {
+        console.error('❌ Error tracking major click:', error);
+    }
+}
+
+// Track major click with school ID for more accurate tracking
+async function trackMajorClickWithSchool(majorId, schoolId, majorName) {
+    try {
+        console.log('📊 Tracking major click with school from stats page:', majorId, schoolId, majorName);
+        
+        const response = await fetch(`${API_BASE_URL}/tracking/increment-major-view/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                major_id: majorId,
+                school_id: schoolId
+            })
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            console.log('✅ Major click with school tracked successfully:', result);
+            
+            // Refresh statistics after successful tracking
+            setTimeout(() => {
+                refreshStatistics();
+            }, 1000); // Wait 1 second before refreshing
+            
+        } else {
+            const errorText = await response.text();
+            console.error('❌ Failed to track major click with school. Status:', response.status, 'Response:', errorText);
+        }
+    } catch (error) {
+        console.error('❌ Error tracking major click with school:', error);
+    }
+}
+
+// Track major click by database ID for precise tracking
+async function trackMajorClickByDbId(majorDbId, majorName) {
+    try {
+        console.log('📊 Tracking major click by database ID from stats page:', majorDbId, majorName);
+        
+        const response = await fetch(`${API_BASE_URL}/tracking/increment-major-view/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                major_id: majorDbId  // Sử dụng database ID thay vì major_id field
+            })
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            console.log('✅ Major click by database ID tracked successfully:', result);
+            
+            // Refresh statistics after successful tracking
+            setTimeout(() => {
+                refreshStatistics();
+            }, 1000); // Wait 1 second before refreshing
+            
+        } else {
+            const errorText = await response.text();
+            console.error('❌ Failed to track major click by database ID. Status:', response.status, 'Response:', errorText);
+        }
+    } catch (error) {
+        console.error('❌ Error tracking major click by database ID:', error);
     }
 }
 
@@ -849,6 +977,18 @@ document.addEventListener('DOMContentLoaded', function() {
             startRefreshInterval();
         }
     });
+    
+    // Show debug section in development
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        document.getElementById('debug-section').style.display = 'block';
+    }
 });
+
+// Test tracking from stats page
+async function testTrackingFromStats() {
+    console.log('🧪 Testing tracking from stats page...');
+    // Test với Fulbright Computer Science (ID: 1683)
+    await trackMajorClickByDbId(1683, 'Khoa học Máy tính (Fulbright)');
+}
 </script>
 {% endblock %} 

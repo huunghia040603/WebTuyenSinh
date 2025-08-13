@@ -543,4 +543,325 @@ class DailyViewStats(models.Model):
         return f"Thống kê ngày {self.date} - Trường: {self.total_school_views}, Ngành: {self.total_major_views}"
 
 
+# ---
+## Models Hệ Thống Quản Lý Thuật Ngữ Ngành Học
+# ---
+
+class TermCategory(models.Model):
+    """Danh mục thuật ngữ (ví dụ: Công nghệ thông tin, Y học, Kinh tế...)"""
+    name = models.CharField(max_length=255, verbose_name="Tên danh mục")
+    name_en = models.CharField(max_length=255, blank=True, null=True, verbose_name="Tên danh mục (Tiếng Anh)")
+    description = models.TextField(blank=True, null=True, verbose_name="Mô tả")
+    icon = models.CharField(max_length=100, blank=True, null=True, verbose_name="Icon (FontAwesome)")
+    color = models.CharField(max_length=7, default="#0a4191", verbose_name="Màu sắc")
+    is_active = models.BooleanField(default=True, verbose_name="Trạng thái hoạt động")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Ngày tạo")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Ngày cập nhật")
+    
+    class Meta:
+        verbose_name = "Danh mục thuật ngữ"
+        verbose_name_plural = "Danh mục thuật ngữ"
+        ordering = ['name']
+    
+    def __str__(self):
+        return self.name
+
+
+class Term(models.Model):
+    """Model chính cho thuật ngữ ngành học"""
+    STATUS_CHOICES = [
+        ('draft', 'Bản nháp'),
+        ('pending', 'Chờ duyệt'),
+        ('approved', 'Đã duyệt'),
+        ('rejected', 'Từ chối'),
+    ]
+    
+    DIFFICULTY_CHOICES = [
+        ('beginner', 'Cơ bản'),
+        ('intermediate', 'Trung cấp'),
+        ('advanced', 'Nâng cao'),
+        ('expert', 'Chuyên sâu'),
+    ]
+    
+    # Thông tin cơ bản
+    term_vn = models.CharField(max_length=255, verbose_name="Thuật ngữ (Tiếng Việt)")
+    term_en = models.CharField(max_length=255, verbose_name="Thuật ngữ (Tiếng Anh)")
+    abbreviation = models.CharField(max_length=50, blank=True, null=True, verbose_name="Viết tắt")
+    
+    # Phân loại
+    category = models.ForeignKey(TermCategory, on_delete=models.CASCADE, related_name='terms', verbose_name="Danh mục")
+    field_group = models.ForeignKey(FieldGroup, on_delete=models.CASCADE, related_name='terms', verbose_name="Nhóm lĩnh vực")
+    major = models.ForeignKey(Major, on_delete=models.CASCADE, related_name='terms', verbose_name="Ngành học")
+    
+    # Nội dung
+    definition = models.TextField(verbose_name="Định nghĩa")
+    definition_en = models.TextField(blank=True, null=True, verbose_name="Định nghĩa (Tiếng Anh)")
+    context = models.TextField(blank=True, null=True, verbose_name="Ngữ cảnh sử dụng")
+    examples = models.TextField(blank=True, null=True, verbose_name="Ví dụ")
+    
+    # Thông tin bổ sung
+    difficulty_level = models.CharField(max_length=20, choices=DIFFICULTY_CHOICES, default='intermediate', verbose_name="Mức độ khó")
+    tags = models.CharField(max_length=500, blank=True, null=True, verbose_name="Tags (phân cách bằng dấu phẩy)")
+    pronunciation = models.CharField(max_length=255, blank=True, null=True, verbose_name="Phát âm")
+    
+    # Trạng thái và quản lý
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft', verbose_name="Trạng thái")
+    is_featured = models.BooleanField(default=False, verbose_name="Thuật ngữ nổi bật")
+    view_count = models.IntegerField(default=0, verbose_name="Lượt xem")
+    search_count = models.IntegerField(default=0, verbose_name="Lượt tìm kiếm")
+    
+    # Người tạo và cập nhật
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='created_terms', verbose_name="Người tạo")
+    updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='updated_terms', verbose_name="Người cập nhật")
+    approved_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='approved_terms', verbose_name="Người duyệt")
+    
+    # Thời gian
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Ngày tạo")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Ngày cập nhật")
+    approved_at = models.DateTimeField(blank=True, null=True, verbose_name="Ngày duyệt")
+    
+    class Meta:
+        verbose_name = "Thuật ngữ"
+        verbose_name_plural = "Thuật ngữ"
+        ordering = ['-created_at']
+        unique_together = [['term_vn', 'major'], ['term_en', 'major']]
+        indexes = [
+            models.Index(fields=['term_vn']),
+            models.Index(fields=['term_en']),
+            models.Index(fields=['abbreviation']),
+            models.Index(fields=['status']),
+            models.Index(fields=['is_featured']),
+        ]
+    
+    def __str__(self):
+        return f"{self.term_vn} ({self.term_en}) - {self.major.name}"
+    
+    def increment_view_count(self):
+        """Tăng lượt xem"""
+        self.view_count += 1
+        self.save(update_fields=['view_count'])
+    
+    def increment_search_count(self):
+        """Tăng lượt tìm kiếm"""
+        self.search_count += 1
+        self.save(update_fields=['search_count'])
+
+
+class TermSynonym(models.Model):
+    """Từ đồng nghĩa của thuật ngữ"""
+    term = models.ForeignKey(Term, on_delete=models.CASCADE, related_name='synonyms', verbose_name="Thuật ngữ chính")
+    synonym_vn = models.CharField(max_length=255, verbose_name="Từ đồng nghĩa (Tiếng Việt)")
+    synonym_en = models.CharField(max_length=255, blank=True, null=True, verbose_name="Từ đồng nghĩa (Tiếng Anh)")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Ngày tạo")
+    
+    class Meta:
+        verbose_name = "Từ đồng nghĩa"
+        verbose_name_plural = "Từ đồng nghĩa"
+        unique_together = [['term', 'synonym_vn'], ['term', 'synonym_en']]
+    
+    def __str__(self):
+        return f"{self.synonym_vn} -> {self.term.term_vn}"
+
+
+class TermRelated(models.Model):
+    """Thuật ngữ liên quan"""
+    RELATIONSHIP_CHOICES = [
+        ('synonym', 'Đồng nghĩa'),
+        ('antonym', 'Trái nghĩa'),
+        ('broader', 'Rộng hơn'),
+        ('narrower', 'Hẹp hơn'),
+        ('related', 'Liên quan'),
+        ('prerequisite', 'Điều kiện tiên quyết'),
+    ]
+    
+    term = models.ForeignKey(Term, on_delete=models.CASCADE, related_name='related_terms', verbose_name="Thuật ngữ chính")
+    related_term = models.ForeignKey(Term, on_delete=models.CASCADE, related_name='related_from', verbose_name="Thuật ngữ liên quan")
+    relationship = models.CharField(max_length=20, choices=RELATIONSHIP_CHOICES, verbose_name="Mối quan hệ")
+    description = models.TextField(blank=True, null=True, verbose_name="Mô tả mối quan hệ")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Ngày tạo")
+    
+    class Meta:
+        verbose_name = "Thuật ngữ liên quan"
+        verbose_name_plural = "Thuật ngữ liên quan"
+        unique_together = ['term', 'related_term', 'relationship']
+    
+    def __str__(self):
+        return f"{self.term.term_vn} -{self.get_relationship_display()}- {self.related_term.term_vn}"
+
+
+class TermTranslation(models.Model):
+    """Bản dịch thuật ngữ sang các ngôn ngữ khác"""
+    LANGUAGE_CHOICES = [
+        ('en', 'English'),
+        ('fr', 'Français'),
+        ('de', 'Deutsch'),
+        ('ja', '日本語'),
+        ('ko', '한국어'),
+        ('zh', '中文'),
+        ('es', 'Español'),
+        ('ru', 'Русский'),
+    ]
+    
+    term = models.ForeignKey(Term, on_delete=models.CASCADE, related_name='translations', verbose_name="Thuật ngữ gốc")
+    language = models.CharField(max_length=10, choices=LANGUAGE_CHOICES, verbose_name="Ngôn ngữ")
+    translation = models.CharField(max_length=255, verbose_name="Bản dịch")
+    pronunciation = models.CharField(max_length=255, blank=True, null=True, verbose_name="Phát âm")
+    notes = models.TextField(blank=True, null=True, verbose_name="Ghi chú")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Ngày tạo")
+    
+    class Meta:
+        verbose_name = "Bản dịch thuật ngữ"
+        verbose_name_plural = "Bản dịch thuật ngữ"
+        unique_together = ['term', 'language']
+    
+    def __str__(self):
+        return f"{self.term.term_vn} -> {self.get_language_display()}: {self.translation}"
+
+
+class UserTermCollection(models.Model):
+    """Bộ sưu tập thuật ngữ của người dùng"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='term_collections', verbose_name="Người dùng")
+    name = models.CharField(max_length=255, verbose_name="Tên bộ sưu tập")
+    description = models.TextField(blank=True, null=True, verbose_name="Mô tả")
+    is_public = models.BooleanField(default=False, verbose_name="Công khai")
+    color = models.CharField(max_length=7, default="#0a4191", verbose_name="Màu sắc")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Ngày tạo")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Ngày cập nhật")
+    
+    class Meta:
+        verbose_name = "Bộ sưu tập thuật ngữ"
+        verbose_name_plural = "Bộ sưu tập thuật ngữ"
+        unique_together = ['user', 'name']
+    
+    def __str__(self):
+        return f"{self.user.email} - {self.name}"
+
+
+class UserTermCollectionItem(models.Model):
+    """Thuật ngữ trong bộ sưu tập của người dùng"""
+    collection = models.ForeignKey(UserTermCollection, on_delete=models.CASCADE, related_name='items', verbose_name="Bộ sưu tập")
+    term = models.ForeignKey(Term, on_delete=models.CASCADE, related_name='user_collections', verbose_name="Thuật ngữ")
+    notes = models.TextField(blank=True, null=True, verbose_name="Ghi chú cá nhân")
+    is_favorite = models.BooleanField(default=False, verbose_name="Yêu thích")
+    added_at = models.DateTimeField(auto_now_add=True, verbose_name="Ngày thêm")
+    
+    class Meta:
+        verbose_name = "Thuật ngữ trong bộ sưu tập"
+        verbose_name_plural = "Thuật ngữ trong bộ sưu tập"
+        unique_together = ['collection', 'term']
+    
+    def __str__(self):
+        return f"{self.collection.name} - {self.term.term_vn}"
+
+
+class TermContribution(models.Model):
+    """Đóng góp thuật ngữ từ người dùng"""
+    CONTRIBUTION_TYPE_CHOICES = [
+        ('new_term', 'Thuật ngữ mới'),
+        ('edit_definition', 'Chỉnh sửa định nghĩa'),
+        ('add_example', 'Thêm ví dụ'),
+        ('add_translation', 'Thêm bản dịch'),
+        ('report_error', 'Báo cáo lỗi'),
+        ('suggestion', 'Đề xuất cải thiện'),
+    ]
+    
+    STATUS_CHOICES = [
+        ('pending', 'Chờ xử lý'),
+        ('reviewing', 'Đang xem xét'),
+        ('approved', 'Đã chấp nhận'),
+        ('rejected', 'Từ chối'),
+        ('implemented', 'Đã triển khai'),
+    ]
+    
+    contributor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='term_contributions', verbose_name="Người đóng góp")
+    contribution_type = models.CharField(max_length=20, choices=CONTRIBUTION_TYPE_CHOICES, verbose_name="Loại đóng góp")
+    term = models.ForeignKey(Term, on_delete=models.CASCADE, null=True, blank=True, related_name='contributions', verbose_name="Thuật ngữ liên quan")
+    
+    # Nội dung đóng góp
+    title = models.CharField(max_length=255, verbose_name="Tiêu đề")
+    content = models.TextField(verbose_name="Nội dung")
+    suggested_term_vn = models.CharField(max_length=255, blank=True, null=True, verbose_name="Thuật ngữ đề xuất (VN)")
+    suggested_term_en = models.CharField(max_length=255, blank=True, null=True, verbose_name="Thuật ngữ đề xuất (EN)")
+    suggested_definition = models.TextField(blank=True, null=True, verbose_name="Định nghĩa đề xuất")
+    
+    # Trạng thái và xử lý
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending', verbose_name="Trạng thái")
+    reviewed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='reviewed_contributions', verbose_name="Người xem xét")
+    review_notes = models.TextField(blank=True, null=True, verbose_name="Ghi chú xem xét")
+    
+    # Thời gian
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Ngày đóng góp")
+    reviewed_at = models.DateTimeField(blank=True, null=True, verbose_name="Ngày xem xét")
+    
+    class Meta:
+        verbose_name = "Đóng góp thuật ngữ"
+        verbose_name_plural = "Đóng góp thuật ngữ"
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.contributor.email} - {self.get_contribution_type_display()} - {self.title}"
+
+
+class TermSearchHistory(models.Model):
+    """Lịch sử tìm kiếm thuật ngữ"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='term_search_history', verbose_name="Người dùng")
+    search_query = models.CharField(max_length=255, verbose_name="Từ khóa tìm kiếm")
+    results_count = models.IntegerField(default=0, verbose_name="Số kết quả")
+    clicked_term = models.ForeignKey(Term, on_delete=models.SET_NULL, null=True, blank=True, related_name='search_clicks', verbose_name="Thuật ngữ được click")
+    search_filters = models.JSONField(blank=True, null=True, verbose_name="Bộ lọc tìm kiếm")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Thời gian tìm kiếm")
+    
+    class Meta:
+        verbose_name = "Lịch sử tìm kiếm"
+        verbose_name_plural = "Lịch sử tìm kiếm"
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user', '-created_at']),
+            models.Index(fields=['search_query']),
+        ]
+    
+    def __str__(self):
+        return f"{self.user.email} - {self.search_query}"
+
+
+class TermViewHistory(models.Model):
+    """Lịch sử xem thuật ngữ"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='term_view_history', verbose_name="Người dùng")
+    term = models.ForeignKey(Term, on_delete=models.CASCADE, related_name='view_history', verbose_name="Thuật ngữ")
+    view_duration = models.IntegerField(default=0, verbose_name="Thời gian xem (giây)")
+    source = models.CharField(max_length=50, blank=True, null=True, verbose_name="Nguồn (search, collection, etc.)")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Thời gian xem")
+    
+    class Meta:
+        verbose_name = "Lịch sử xem thuật ngữ"
+        verbose_name_plural = "Lịch sử xem thuật ngữ"
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user', '-created_at']),
+            models.Index(fields=['term', '-created_at']),
+        ]
+    
+    def __str__(self):
+        return f"{self.user.email} - {self.term.term_vn}"
+
+
+class TermRating(models.Model):
+    """Đánh giá thuật ngữ"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='term_ratings', verbose_name="Người dùng")
+    term = models.ForeignKey(Term, on_delete=models.CASCADE, related_name='ratings', verbose_name="Thuật ngữ")
+    rating = models.IntegerField(choices=[(i, i) for i in range(1, 6)], verbose_name="Điểm đánh giá")
+    comment = models.TextField(blank=True, null=True, verbose_name="Nhận xét")
+    is_helpful = models.BooleanField(default=True, verbose_name="Hữu ích")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Ngày đánh giá")
+    
+    class Meta:
+        verbose_name = "Đánh giá thuật ngữ"
+        verbose_name_plural = "Đánh giá thuật ngữ"
+        unique_together = ['user', 'term']
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.user.email} - {self.term.term_vn} - {self.rating}/5"
+
+
 

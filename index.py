@@ -97,6 +97,14 @@ def chat_test():
 def debug_auth():
     return render_template('debug_auth.html')
 
+@app.route('/thuatngu')
+def thuatngu():
+    return render_template('thuatngu.html')
+
+@app.route('/demo-smart-terms')
+def demo_smart_terms():
+    return render_template('demo_smart_terms.html')
+
 @app.route('/test-chat-flow')
 def test_chat_flow():
     return render_template('test_chat_flow.html')
@@ -641,8 +649,6 @@ def all_major():
         "previous": None
     }
     return jsonify(mock_data)
-
-
 
 # Google Auth được xử lý bởi Django backend trên PythonAnywhere
 
