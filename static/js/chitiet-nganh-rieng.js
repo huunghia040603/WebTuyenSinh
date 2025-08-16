@@ -3,6 +3,23 @@ let currentMajor = null;
 let currentSchool = null;
 let generalMajorData = null;
 
+// Utility function để decode HTML entities và loại bỏ HTML tags
+function cleanHtmlText(text) {
+    if (!text) return '';
+    
+    // Tạo một element tạm để decode HTML entities
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = text;
+    
+    // Lấy text content (loại bỏ HTML tags)
+    let cleanText = tempDiv.textContent || tempDiv.innerText || '';
+    
+    // Loại bỏ các ký tự xuống dòng và khoảng trắng thừa
+    cleanText = cleanText.replace(/\s+/g, ' ').trim();
+    
+    return cleanText;
+}
+
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 Initializing chi tiết ngành riêng page');
@@ -628,32 +645,32 @@ function updateGeneralInfo() {
     }
     
     console.log('🔍 Updating content sections...');
-    
-    // Utility function để decode HTML entities và loại bỏ HTML tags
-    function cleanHtmlText(text) {
-        if (!text) return '';
-        
-        // Tạo một element tạm để decode HTML entities
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = text;
-        
-        // Lấy text content (loại bỏ HTML tags)
-        let cleanText = tempDiv.textContent || tempDiv.innerText || '';
-        
-        // Loại bỏ các ký tự xuống dòng và khoảng trắng thừa
-        cleanText = cleanText.replace(/\s+/g, ' ').trim();
-        
-        return cleanText;
-    }
 
     // Update content sections
     console.log('🔍 Original short_description (chitiet-nganh-rieng):', generalMajorData.short_description);
     const cleanDescription = cleanHtmlText(generalMajorData.short_description);
     console.log('✨ Cleaned short_description (chitiet-nganh-rieng):', cleanDescription);
+    
+    console.log('🔍 Updating sections with data:');
+    console.log('- generalInfo:', cleanDescription ? 'has content' : 'no content');
+    console.log('- trainingProgram:', generalMajorData.program ? 'has content' : 'no content');
+    console.log('- careerOpportunities:', generalMajorData.job ? 'has content' : 'no content');
+    console.log('- suitableQualities:', generalMajorData.suitable ? 'has content' : 'no content');
+    
     updateContentSection('generalInfo', cleanDescription);
     updateContentSection('trainingProgram', generalMajorData.program);
     updateContentSection('careerOpportunities', generalMajorData.job);
     updateContentSection('suitableQualities', generalMajorData.suitable);
+    
+    // Debug: Log all available data
+    console.log('🔍 All general major data:', {
+        name: generalMajorData.name,
+        all_major_id: generalMajorData.all_major_id,
+        short_description: generalMajorData.short_description,
+        program: generalMajorData.program,
+        job: generalMajorData.job,
+        suitable: generalMajorData.suitable
+    });
     
     console.log('✅ updateGeneralInfo completed successfully');
 }
@@ -673,8 +690,15 @@ function highlightNumbers(text) {
 
 // Update content section
 function updateContentSection(sectionId, content) {
+    console.log(`🔍 Updating section: ${sectionId} with content:`, content ? content.substring(0, 100) + '...' : 'null');
+    
     const section = document.getElementById(sectionId);
-    if (!section) return;
+    if (!section) {
+        console.error(`❌ Section element not found: ${sectionId}`);
+        return;
+    }
+    
+    console.log(`✅ Found section element: ${sectionId}`);
     
     if (content) {
         // Format chương trình đào tạo đặc biệt
@@ -801,18 +825,79 @@ function formatCareerOpportunities(content) {
 function formatSuitableQualities(content) {
     if (!content) return '<p>Thông tin đang được cập nhật.</p>';
     
-    // Tách nội dung theo dấu phẩy hoặc chấm phẩy
-    const qualities = content.split(/[,;]/).map(item => item.trim()).filter(item => item);
+    console.log('🔍 Raw suitable qualities:', content);
     
-    if (qualities.length === 0) {
+    // Clean HTML text trước khi phân ô
+    let cleanContent = cleanHtmlText(content);
+    console.log('✨ Cleaned suitable qualities:', cleanContent);
+    
+    // Thay thế các dấu phân cách khác bằng dấu phẩy
+    cleanContent = cleanContent.replace(/[.;]/g, ',');
+    
+    // Xử lý trường hợp có "và" hoặc "and"
+    cleanContent = cleanContent.replace(/\s+và\s+/gi, ',');
+    cleanContent = cleanContent.replace(/\s+and\s+/gi, ',');
+    
+    // Tách nội dung theo dấu phẩy
+    let qualities = cleanContent.split(',').map(item => item.trim()).filter(item => item && item.length > 2);
+    
+    // Nếu không tìm thấy đủ qualities, thử tách theo cách khác
+    if (qualities.length < 3) {
+        console.log('⚠️ Not enough qualities found, trying alternative parsing...');
+        
+        // Thử tách theo dấu chấm
+        qualities = cleanContent.split('.').map(item => item.trim()).filter(item => item && item.length > 2);
+        
+        // Nếu vẫn không đủ, thử tách theo dấu xuống dòng
+        if (qualities.length < 3) {
+            qualities = cleanContent.split(/\n/).map(item => item.trim()).filter(item => item && item.length > 2);
+        }
+        
+        // Nếu vẫn không đủ, thử tách theo dấu gạch ngang
+        if (qualities.length < 3) {
+            qualities = cleanContent.split('-').map(item => item.trim()).filter(item => item && item.length > 2);
+        }
+    }
+    
+    console.log('📋 Parsed suitable qualities:', qualities);
+    
+    // Xử lý các từ bị cắt ngắn và ghép lại
+    let processedQualities = [];
+    for (let i = 0; i < qualities.length; i++) {
+        let currentQuality = qualities[i];
+        
+        // Kiểm tra xem có phải từ bị cắt ngắn không
+        if (currentQuality.length <= 3 && i < qualities.length - 1) {
+            // Thử ghép với từ tiếp theo
+            let nextQuality = qualities[i + 1];
+            let combinedQuality = currentQuality + ' ' + nextQuality;
+            
+            // Kiểm tra xem từ ghép có có nghĩa không
+            if (combinedQuality.length > 5 && !combinedQuality.includes('và') && !combinedQuality.includes('and')) {
+                processedQualities.push(combinedQuality);
+                i++; // Bỏ qua từ tiếp theo vì đã ghép
+                continue;
+            }
+        }
+        
+        // Nếu không ghép được, thêm từ hiện tại
+        processedQualities.push(currentQuality);
+    }
+    
+    console.log('🔧 Processed suitable qualities:', processedQualities);
+    
+    if (processedQualities.length === 0) {
         return '<p>Thông tin đang được cập nhật.</p>';
     }
     
     let html = '<div class="suitable-qualities-grid">';
-    qualities.forEach(quality => {
+    processedQualities.forEach(quality => {
         if (quality.length > 0) {
+            // Loại bỏ các ký tự đặc biệt không cần thiết
+            let cleanQuality = quality.replace(/[()]/g, '').trim();
+            
             // Viết hoa chữ cái đầu của từ đầu tiên
-            const words = quality.split(' ');
+            const words = cleanQuality.split(' ');
             const capitalizedQuality = words.map((word, index) => {
                 if (index === 0) {
                     return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
@@ -821,11 +906,47 @@ function formatSuitableQualities(content) {
                 }
             }).join(' ');
             
-            html += `<div class="suitable-quality-card">${capitalizedQuality}</div>`;
+            // Chỉ hiển thị nếu quality có ý nghĩa và đủ dài
+            if (capitalizedQuality.length > 3) {
+                // Chuẩn hóa một số từ đặc biệt
+                let finalQuality = capitalizedQuality;
+                
+                // Xử lý các từ viết tắt hoặc không đầy đủ
+                if (finalQuality.toLowerCase().includes('yê')) {
+                    finalQuality = 'Yêu thích';
+                } else if (finalQuality.toLowerCase().includes('u thí')) {
+                    finalQuality = 'Ưu thế';
+                } else if (finalQuality.toLowerCase().includes('ch ngô')) {
+                    finalQuality = 'Chủ động';
+                } else if (finalQuality.toLowerCase().includes('n ngữ')) {
+                    finalQuality = 'Ngoại ngữ';
+                } else if (finalQuality.toLowerCase().includes('văn hó')) {
+                    finalQuality = 'Văn hóa';
+                } else if (finalQuality.toLowerCase().includes('a anh-mỹ')) {
+                    finalQuality = 'Am hiểu Anh-Mỹ';
+                } else if (finalQuality.toLowerCase().includes('khả năng giao tiếp')) {
+                    finalQuality = 'Khả năng giao tiếp';
+                } else if (finalQuality.toLowerCase().includes('ham học hỏi')) {
+                    finalQuality = 'Ham học hỏi';
+                } else if (finalQuality.toLowerCase().includes('năng động')) {
+                    finalQuality = 'Năng động';
+                } else if (finalQuality.toLowerCase().includes('kiê') || finalQuality.toLowerCase().includes('n trì')) {
+                    finalQuality = 'Kiên trì';
+                } else if (finalQuality.toLowerCase().includes('phá')) {
+                    finalQuality = 'Phân tích';
+                } else if (finalQuality.toLowerCase().includes('tâ')) {
+                    finalQuality = 'Tư duy';
+                } else if (finalQuality.toLowerCase().includes('m chuẩn')) {
+                    finalQuality = 'Mục tiêu chuẩn';
+                }
+                
+                html += `<div class="suitable-quality-card">${finalQuality}</div>`;
+            }
         }
     });
     html += '</div>';
     
+    console.log('✅ Suitable qualities HTML generated:', html);
     return html;
 }
 
