@@ -629,8 +629,28 @@ function updateGeneralInfo() {
     
     console.log('🔍 Updating content sections...');
     
+    // Utility function để decode HTML entities và loại bỏ HTML tags
+    function cleanHtmlText(text) {
+        if (!text) return '';
+        
+        // Tạo một element tạm để decode HTML entities
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = text;
+        
+        // Lấy text content (loại bỏ HTML tags)
+        let cleanText = tempDiv.textContent || tempDiv.innerText || '';
+        
+        // Loại bỏ các ký tự xuống dòng và khoảng trắng thừa
+        cleanText = cleanText.replace(/\s+/g, ' ').trim();
+        
+        return cleanText;
+    }
+
     // Update content sections
-    updateContentSection('generalInfo', generalMajorData.short_description);
+    console.log('🔍 Original short_description (chitiet-nganh-rieng):', generalMajorData.short_description);
+    const cleanDescription = cleanHtmlText(generalMajorData.short_description);
+    console.log('✨ Cleaned short_description (chitiet-nganh-rieng):', cleanDescription);
+    updateContentSection('generalInfo', cleanDescription);
     updateContentSection('trainingProgram', generalMajorData.program);
     updateContentSection('careerOpportunities', generalMajorData.job);
     updateContentSection('suitableQualities', generalMajorData.suitable);
@@ -669,11 +689,19 @@ function updateContentSection(sectionId, content) {
         else if (sectionId === 'suitableQualities') {
             section.innerHTML = formatSuitableQualities(content);
         }
+        // Sử dụng textContent cho generalInfo để tránh render HTML
+        else if (sectionId === 'generalInfo') {
+            section.textContent = content;
+        }
         else {
             section.innerHTML = content;
         }
     } else {
-        section.innerHTML = '<p>Thông tin đang được cập nhật.</p>';
+        if (sectionId === 'generalInfo') {
+            section.textContent = 'Thông tin đang được cập nhật.';
+        } else {
+            section.innerHTML = '<p>Thông tin đang được cập nhật.</p>';
+        }
     }
 }
 
@@ -719,8 +747,23 @@ function formatTrainingProgram(content) {
 function formatCareerOpportunities(content) {
     if (!content) return '<p>Thông tin đang được cập nhật.</p>';
     
+    console.log('🔍 Raw career opportunities:', content);
+    
+    // Clean HTML text trước khi phân ô
+    let cleanContent = cleanHtmlText(content);
+    console.log('✨ Cleaned career opportunities:', cleanContent);
+    
+    // Thay thế các dấu phân cách khác bằng dấu phẩy
+    cleanContent = cleanContent.replace(/[.;]/g, ',');
+    
+    // Xử lý trường hợp có "và" hoặc "and"
+    cleanContent = cleanContent.replace(/\s+và\s+/gi, ',');
+    cleanContent = cleanContent.replace(/\s+and\s+/gi, ',');
+    
     // Tách nội dung theo dấu phẩy hoặc chấm phẩy
-    const jobs = content.split(/[,;]/).map(item => item.trim()).filter(item => item);
+    const jobs = cleanContent.split(',').map(item => item.trim()).filter(item => item && item.length > 2);
+    
+    console.log('📋 Parsed career opportunities:', jobs);
     
     if (jobs.length === 0) {
         return '<p>Thông tin đang được cập nhật.</p>';
@@ -729,8 +772,11 @@ function formatCareerOpportunities(content) {
     let html = '<div class="career-opportunities-grid">';
     jobs.forEach(job => {
         if (job.length > 0) {
+            // Loại bỏ các ký tự đặc biệt không cần thiết
+            let cleanJob = job.replace(/[()]/g, '').trim();
+            
             // Viết hoa chữ cái đầu của từ đầu tiên
-            const words = job.split(' ');
+            const words = cleanJob.split(' ');
             const capitalizedJob = words.map((word, index) => {
                 if (index === 0) {
                     return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
@@ -739,11 +785,15 @@ function formatCareerOpportunities(content) {
                 }
             }).join(' ');
             
-            html += `<div class="career-opportunity-card">${capitalizedJob}</div>`;
+            // Chỉ hiển thị nếu job có ý nghĩa
+            if (capitalizedJob.length > 3) {
+                html += `<div class="career-opportunity-card">${capitalizedJob}</div>`;
+            }
         }
     });
     html += '</div>';
     
+    console.log('✅ Career opportunities HTML generated:', html);
     return html;
 }
 

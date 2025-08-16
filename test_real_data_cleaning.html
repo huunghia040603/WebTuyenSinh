@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Real Data HTML Cleaning</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 2rem;
+            background: #f8fafc;
+        }
+
+        .test-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border: 1px solid #e2e8f0;
+        }
+
+        .original {
+            background: #fee2e2;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 0.5rem 0;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .cleaned {
+            background: #dcfce7;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 0.5rem 0;
+            white-space: pre-wrap;
+        }
+
+        .test-button {
+            padding: 0.5rem 1rem;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0.5rem;
+        }
+
+        .label {
+            font-weight: bold;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        .input-area {
+            width: 100%;
+            min-height: 100px;
+            padding: 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 12px;
+            margin: 0.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Real Data HTML Cleaning</h1>
+    
+    <div class="test-section">
+        <h3>Test với dữ liệu thực tế</h3>
+        <div class="label">Nhập dữ liệu HTML:</div>
+        <textarea class="input-area" id="inputData" placeholder="Nhập dữ liệu HTML entities và tags ở đây..."></textarea>
+        <button class="test-button" onclick="testRealData()">Test Clean</button>
+        
+        <div class="label">Original:</div>
+        <div class="original" id="original"></div>
+        <div class="label">Cleaned:</div>
+        <div class="cleaned" id="cleaned"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test với dữ liệu mẫu</h3>
+        <button class="test-button" onclick="loadSampleData()">Load Sample Data</button>
+        <button class="test-button" onclick="testSampleData()">Test Sample</button>
+        
+        <div class="label">Sample Original:</div>
+        <div class="original" id="sampleOriginal"></div>
+        <div class="label">Sample Cleaned:</div>
+        <div class="cleaned" id="sampleCleaned"></div>
+    </div>
+
+    <script>
+        // Utility function để decode HTML entities và loại bỏ HTML tags
+        function cleanHtmlText(text) {
+            if (!text) return '';
+            
+            console.log('🔍 Input text:', text);
+            
+            // Tạo một element tạm để decode HTML entities
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = text;
+            
+            // Lấy text content (loại bỏ HTML tags)
+            let cleanText = tempDiv.textContent || tempDiv.innerText || '';
+            
+            console.log('📝 After textContent:', cleanText);
+            
+            // Loại bỏ các ký tự xuống dòng và khoảng trắng thừa
+            cleanText = cleanText.replace(/\s+/g, ' ').trim();
+            
+            console.log('✨ Final cleaned text:', cleanText);
+            
+            return cleanText;
+        }
+
+        function testRealData() {
+            const inputData = document.getElementById('inputData').value;
+            if (!inputData.trim()) {
+                alert('Vui lòng nhập dữ liệu để test!');
+                return;
+            }
+            
+            const cleaned = cleanHtmlText(inputData);
+            
+            document.getElementById('original').textContent = inputData;
+            document.getElementById('cleaned').textContent = cleaned;
+        }
+
+        function loadSampleData() {
+            const sampleData = `<p>C&ocirc;ng nghệ th&ocirc;ng tin l&agrave; ng&agrave;nh học rộng lớn tập trung v&agrave;o việc nghi&ecirc;n cứu, ph&aacute;t triển, triển khai, v&agrave; quản l&yacute; c&aacute;c hệ thống th&ocirc;ng tin dựa tr&ecirc;n m&aacute;y t&iacute;nh, cả phần cứng v&agrave; phần mềm. Ng&agrave;nh n&agrave;y bao gồm nhiều lĩnh vực như lập tr&igrave;nh, cơ sở dữ liệu, mạng m&aacute;y t&iacute;nh, hệ điều h&agrave;nh, tr&iacute; tuệ nh&acirc;n tạo, an to&agrave;n th&ocirc;ng tin, nhằm tạo ra c&aacute;c giải ph&aacute;p c&ocirc;ng nghệ phục vụ mọi mặt của đời sống v&agrave; kinh doanh.</p>`;
+            
+            document.getElementById('inputData').value = sampleData;
+        }
+
+        function testSampleData() {
+            const sampleData = `<p>C&ocirc;ng nghệ th&ocirc;ng tin l&agrave; ng&agrave;nh học rộng lớn tập trung v&agrave;o việc nghi&ecirc;n cứu, ph&aacute;t triển, triển khai, v&agrave; quản l&yacute; c&aacute;c hệ thống th&ocirc;ng tin dựa tr&ecirc;n m&aacute;y t&iacute;nh, cả phần cứng v&agrave; phần mềm. Ng&agrave;nh n&agrave;y bao gồm nhiều lĩnh vực như lập tr&igrave;nh, cơ sở dữ liệu, mạng m&aacute;y t&iacute;nh, hệ điều h&agrave;nh, tr&iacute; tuệ nh&acirc;n tạo, an to&agrave;n th&ocirc;ng tin, nhằm tạo ra c&aacute;c giải ph&aacute;p c&ocirc;ng nghệ phục vụ mọi mặt của đời sống v&agrave; kinh doanh.</p>`;
+            
+            const cleaned = cleanHtmlText(sampleData);
+            
+            document.getElementById('sampleOriginal').textContent = sampleData;
+            document.getElementById('sampleCleaned').textContent = cleaned;
+        }
+
+        // Auto-load sample data
+        window.onload = function() {
+            loadSampleData();
+        };
+    </script>
+</body>
+</html>

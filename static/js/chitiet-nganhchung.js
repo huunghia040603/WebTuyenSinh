@@ -176,8 +176,37 @@ window.addEventListener('load', function () {
         }
     }
 
+    // Utility function để decode HTML entities và loại bỏ HTML tags
+    function cleanHtmlText(text) {
+        if (!text) return '';
+        
+        // Tạo một element tạm để decode HTML entities
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = text;
+        
+        // Lấy text content (loại bỏ HTML tags)
+        let cleanText = tempDiv.textContent || tempDiv.innerText || '';
+        
+        // Loại bỏ các ký tự xuống dòng và khoảng trắng thừa
+        cleanText = cleanText.replace(/\s+/g, ' ').trim();
+        
+        return cleanText;
+    }
+
     function updateMajorDescription(major) {
-        setInnerHTMLOrText('majorDescription', major.short_description, 'Không có thông tin mô tả');
+        console.log('🔍 Original short_description:', major.short_description);
+        const cleanDescription = cleanHtmlText(major.short_description);
+        console.log('✨ Cleaned short_description:', cleanDescription);
+        
+        // Sử dụng textContent thay vì innerHTML để tránh render HTML
+        const element = document.getElementById('majorDescription');
+        if (element) {
+            if (cleanDescription) {
+                element.textContent = cleanDescription;
+            } else {
+                element.textContent = 'Không có thông tin mô tả';
+            }
+        }
     }
 
     function updateMajorSuitable(major) {
@@ -238,14 +267,11 @@ window.addEventListener('load', function () {
         const majorJobs = document.getElementById('majorJobs');
         if (majorJobs) {
             if (major.job) {
-                console.log('Raw job data:', major.job);
+                console.log('🔍 Raw job data:', major.job);
                 
-                // Xử lý dữ liệu HTML nếu có
-                let jobText = major.job;
-                if (jobText.includes('<p>') || jobText.includes('<br>')) {
-                    // Loại bỏ HTML tags
-                    jobText = jobText.replace(/<[^>]*>/g, '');
-                }
+                // Clean HTML text trước khi phân ô
+                let jobText = cleanHtmlText(major.job);
+                console.log('✨ Cleaned job text:', jobText);
                 
                 // Thay thế các dấu phân cách khác bằng dấu phẩy
                 jobText = jobText.replace(/[.;]/g, ',');
@@ -257,7 +283,7 @@ window.addEventListener('load', function () {
                 // Tách dữ liệu theo dấu phẩy, tạo các ô
                 const jobs = jobText.split(',').map(item => item.trim()).filter(item => item && item.length > 2);
                 
-                console.log('Parsed jobs:', jobs);
+                console.log('📋 Parsed jobs:', jobs);
                 
                 if (jobs.length > 0) {
                     let html = '<div class="chitiet-jobs">';
@@ -284,11 +310,14 @@ window.addEventListener('load', function () {
                     });
                     html += '</div>';
                     majorJobs.innerHTML = html;
+                    console.log('✅ Jobs HTML generated:', html);
                 } else {
                     majorJobs.textContent = 'Không có thông tin việc làm';
+                    console.log('❌ No jobs found after parsing');
                 }
             } else {
                 majorJobs.textContent = 'Không có thông tin việc làm';
+                console.log('❌ No job data available');
             }
         }
     }
@@ -572,8 +601,8 @@ window.addEventListener('load', function () {
         try {
             console.log('Loading schools teaching major:', majorId);
             
-            // Sử dụng API schools để lấy tất cả trường và lọc theo ngành
-            const apiUrl = `https://timtruonghoc.pythonanywhere.com/schools/`;
+            // Sử dụng API hiện có: schools_teaching_major
+            const apiUrl = `https://timtruonghoc.pythonanywhere.com/all_major/${majorId}/schools_teaching_major/`;
             console.log('API URL for schools:', apiUrl);
             
             const response = await fetch(apiUrl);
@@ -584,71 +613,27 @@ window.addEventListener('load', function () {
             }
             
             const data = await response.json();
-            console.log('All schools data:', data);
+            console.log('API response:', data);
             
-            // Xử lý cấu trúc pagination
-            const schools = data.results || data;
-            console.log('Schools array:', schools);
-            
-            // Lọc các trường có ngành học tương ứng
-            if (schools && schools.length > 0) {
-                const schoolsWithMajor = schools.filter(school => {
-                    if (school.majors_data && Array.isArray(school.majors_data)) {
-                        console.log('Checking school:', school.name_vn || school.name);
-                        console.log('School majors:', school.majors_data.map(m => m.major_id));
-                        console.log('Looking for major:', majorId);
-                        return school.majors_data.some(major => {
-                            const match = major.major_id === majorId;
-                            if (match) {
-                                console.log('Found match in school:', school.name_vn || school.name);
-                            }
-                            return match;
-                        });
-                    }
-                    return false;
-                });
+            if (data.schools && data.schools.length > 0) {
+                const suggestedSchools = data.schools.map(school => ({
+                    id: school.id,
+                    name: school.name,
+                    short_code: school.short_code,
+                    logo: school.logo,
+                    school_type: school.school_type,
+                    country: school.country,
+                    tag: school.tag || 'none',
+                    admission_score: school.admission_score,
+                    score_year: school.score_year,
+                    tuition_min: school.tuition_min,
+                    tuition_max: school.tuition_max
+                }));
                 
-                console.log('Schools with major', majorId, ':', schoolsWithMajor);
-                
-                if (schoolsWithMajor.length > 0) {
-                    const suggestedSchools = schoolsWithMajor.map(school => ({
-                        id: school.id,
-                        name: school.name_vn || school.name,
-                        short_code: school.short_code,
-                        logo: school.logo,
-                        school_type: school.school_type,
-                        country: school.country,
-                        tag: school.tag,
-                        admission_score: school.admission_score,
-                        score_year: school.score_year,
-                        tuition_min: school.min_tuition_fee_per_year,
-                        tuition_max: school.max_tuition_fee_per_year
-                    }));
-                    
-                    console.log('Suggested schools:', suggestedSchools);
-                    updateSuggestedSchools(suggestedSchools);
-                } else {
-                    console.log('No schools found teaching this major, showing top schools as fallback');
-                    // Fallback: hiển thị top 10 trường
-                    const topSchools = schools.slice(0, 10).map(school => ({
-                        id: school.id,
-                        name: school.name_vn || school.name,
-                        short_code: school.short_code,
-                        logo: school.logo,
-                        school_type: school.school_type,
-                        country: school.country,
-                        tag: school.tag,
-                        admission_score: school.admission_score,
-                        score_year: school.score_year,
-                        tuition_min: school.min_tuition_fee_per_year,
-                        tuition_max: school.max_tuition_fee_per_year
-                    }));
-                    
-                    console.log('Fallback top schools:', topSchools);
-                    updateSuggestedSchools(topSchools);
-                }
+                console.log('Suggested schools:', suggestedSchools);
+                updateSuggestedSchools(suggestedSchools);
             } else {
-                console.log('No schools data available');
+                console.log('No schools found teaching this major');
                 showNoSchoolsMessage();
             }
         } catch (error) {

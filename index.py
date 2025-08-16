@@ -714,6 +714,10 @@ def test_jobs_parsing():
 def test_schools_loading():
     return render_template('test_schools_loading.html')
 
+@app.route("/test-real-data-cleaning")
+def test_real_data_cleaning():
+    return render_template('test_real_data_cleaning.html')
+
 @app.route("/test-format")
 def test_format():
     return render_template('test_format.html')

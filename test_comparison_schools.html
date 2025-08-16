@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Comparison Schools Loading</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 2rem;
+            background: #f8fafc;
+        }
+
+        .test-button {
+            padding: 1rem 2rem;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 1rem;
+        }
+
+        .result {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border: 1px solid #e2e8f0;
+        }
+
+        .school-item {
+            background: #f1f5f9;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 6px;
+            border-left: 4px solid #6366f1;
+        }
+
+        .school-name {
+            font-weight: bold;
+            color: #1e293b;
+        }
+
+        .school-details {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .loading {
+            color: #6366f1;
+            font-style: italic;
+        }
+
+        .error {
+            color: #ef4444;
+            font-weight: bold;
+        }
+
+        .success {
+            color: #10b981;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Comparison Schools Loading</h1>
+    
+    <button class="test-button" onclick="testLoadSchoolsForMajor('7480201')">Test Load Schools for CNTT (7480201)</button>
+    <button class="test-button" onclick="testLoadSchoolsForMajor('7340101')">Test Load Schools for Luật (7340101)</button>
+    <button class="test-button" onclick="testLoadSchoolsForMajor('7340205')">Test Load Schools for Kinh tế (7340205)</button>
+    
+    <div id="result" class="result"></div>
+
+    <script>
+        // Copy function from so-sanh-nganh.js
+        async function loadSchoolsForMajor(majorId) {
+            try {
+                console.log('Loading schools for major:', majorId);
+                
+                // Sử dụng API schools để lấy tất cả trường và lọc theo ngành
+                const apiUrl = `https://timtruonghoc.pythonanywhere.com/schools/`;
+                console.log('API URL for schools:', apiUrl);
+                
+                const response = await fetch(apiUrl);
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('All schools data:', data);
+                
+                // Xử lý cấu trúc pagination
+                const schools = data.results || data;
+                console.log('Schools array:', schools);
+                
+                // Lọc các trường có ngành học tương ứng
+                if (schools && schools.length > 0) {
+                    const schoolsWithMajor = schools.filter(school => {
+                        if (school.majors_data && Array.isArray(school.majors_data)) {
+                            console.log('Checking school:', school.name_vn || school.name);
+                            console.log('School majors:', school.majors_data.map(m => m.major_id));
+                            console.log('Looking for major:', majorId);
+                            return school.majors_data.some(major => {
+                                const match = major.major_id === majorId;
+                                if (match) {
+                                    console.log('Found match in school:', school.name_vn || school.name);
+                                }
+                                return match;
+                            });
+                        }
+                        return false;
+                    });
+                    
+                    console.log('Schools with major', majorId, ':', schoolsWithMajor.length);
+                    
+                    if (schoolsWithMajor.length > 0) {
+                        const suggestedSchools = schoolsWithMajor.map(school => ({
+                            id: school.id,
+                            name: school.name_vn || school.name,
+                            short_code: school.short_code,
+                            logo: school.logo,
+                            school_type: school.school_type,
+                            country: school.country,
+                            tag: school.tag,
+                            admission_score: school.admission_score,
+                            score_year: school.score_year,
+                            tuition_min: school.min_tuition_fee_per_year,
+                            tuition_max: school.max_tuition_fee_per_year
+                        }));
+                        
+                        console.log('Suggested schools:', suggestedSchools);
+                        return suggestedSchools;
+                    } else {
+                        console.log('No schools found teaching this major, showing top schools as fallback');
+                        // Fallback: hiển thị top 5 trường
+                        const topSchools = schools.slice(0, 5).map(school => ({
+                            id: school.id,
+                            name: school.name_vn || school.name,
+                            short_code: school.short_code,
+                            logo: school.logo,
+                            school_type: school.school_type,
+                            country: school.country,
+                            tag: school.tag,
+                            admission_score: school.admission_score,
+                            score_year: school.score_year,
+                            tuition_min: school.min_tuition_fee_per_year,
+                            tuition_max: school.max_tuition_fee_per_year
+                        }));
+                        
+                        console.log('Fallback top schools:', topSchools);
+                        return topSchools;
+                    }
+                } else {
+                    console.log('No schools data available');
+                    return [];
+                }
+            } catch (error) {
+                console.error('Error loading schools:', error);
+                return [];
+            }
+        }
+
+        async function testLoadSchoolsForMajor(majorId) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `<p class="loading">Loading schools for major ${majorId}...</p>`;
+            
+            try {
+                const schools = await loadSchoolsForMajor(majorId);
+                
+                if (schools.length > 0) {
+                    resultDiv.innerHTML = `
+                        <h3>🎯 Schools for Major ${majorId}</h3>
+                        <p class="success">✅ Found ${schools.length} schools</p>
+                        
+                        <h4>🏫 Schools:</h4>
+                        ${schools.map(school => `
+                            <div class="school-item">
+                                <div class="school-name">${school.name}</div>
+                                <div class="school-details">
+                                    <div><strong>Code:</strong> ${school.short_code}</div>
+                                    <div><strong>Type:</strong> ${school.school_type}</div>
+                                    <div><strong>Country:</strong> ${school.country}</div>
+                                    <div><strong>Tag:</strong> ${school.tag || 'none'}</div>
+                                    <div><strong>Admission Score:</strong> ${school.admission_score || 'N/A'}</div>
+                                    <div><strong>Tuition:</strong> ${school.tuition_min || 'N/A'} - ${school.tuition_max || 'N/A'}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <h3>🎯 Schools for Major ${majorId}</h3>
+                        <p class="error">❌ No schools found</p>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html> 

@@ -91,9 +91,29 @@ function renderMajors(majors) {
         majorTitle.classList.add('major-title');
         majorTitle.textContent = major.name;
        
+        // Utility function để decode HTML entities và loại bỏ HTML tags
+        function cleanHtmlText(text) {
+            if (!text) return '';
+            
+            // Tạo một element tạm để decode HTML entities
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = text;
+            
+            // Lấy text content (loại bỏ HTML tags)
+            let cleanText = tempDiv.textContent || tempDiv.innerText || '';
+            
+            // Loại bỏ các ký tự xuống dòng và khoảng trắng thừa
+            cleanText = cleanText.replace(/\s+/g, ' ').trim();
+            
+            return cleanText;
+        }
+
         const majorDescription = document.createElement('p');
         majorDescription.classList.add('major-description');
-        majorDescription.innerHTML = major.short_description || 'Không có mô tả ngắn.';
+        console.log('🔍 Original short_description (nganhchung):', major.short_description);
+        const cleanDescription = cleanHtmlText(major.short_description);
+        console.log('✨ Cleaned short_description (nganhchung):', cleanDescription);
+        majorDescription.textContent = cleanDescription || 'Không có mô tả ngắn.';
        
         const majorInfoDiv = document.createElement('div');
         majorInfoDiv.classList.add('major-info');

@@ -67,6 +67,8 @@ urlpatterns = [
     path('tracking/top-majors/', top_majors, name='top-majors'),
     path('tracking/statistics/', view_statistics, name='view-statistics'),
 
+
+
     # Gemini AI chat endpoint - Đã loại bỏ
     # path('api/gemini-chat/', gemini_chat, name='gemini-chat'),
 ]

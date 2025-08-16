@@ -686,60 +686,212 @@ class AllMajorViewByField(viewsets.ModelViewSet, generics.ListAPIView):
     def schools_teaching_major(self, request, pk=None):
         """
         API tối ưu để lấy danh sách trường có dạy ngành cụ thể.
+        Tìm kiếm theo mã ngành gốc (all_major_id) trong bảng Major.
         """
         try:
-            # Lấy ngành từ pk
-            major = self.get_object()
-            major_id = major.all_major_id
+            # Lấy ngành từ pk (pk có thể là id hoặc all_major_id)
+            from .models import AllMajorOfAllSchool, School, Major
+            
+            try:
+                # Thử tìm theo all_major_id trước
+                major = AllMajorOfAllSchool.objects.get(all_major_id=pk)
+                all_major_id = pk
+                print(f"✅ Found major by all_major_id: {pk}")
+            except AllMajorOfAllSchool.DoesNotExist:
+                try:
+                    # Nếu không tìm được, thử tìm theo id
+                    major = AllMajorOfAllSchool.objects.get(id=pk)
+                    all_major_id = major.all_major_id
+                    print(f"✅ Found major by id: {pk}, all_major_id: {all_major_id}")
+                except AllMajorOfAllSchool.DoesNotExist:
+                    print(f"❌ Cannot find major with pk: {pk}")
+                    return Response({
+                        'error': f'Không tìm thấy ngành với mã: {pk}',
+                        'detail': 'Major not found'
+                    }, status=404)
 
-            # Tối ưu hóa query để lấy trường có dạy ngành này
-            from django.db.models import Q
-            from .models import School, Major
+            print(f"🔍 Searching for schools teaching major with all_major_id: {all_major_id}")
 
-            # Lọc trường có ngành tương ứng
-            schools = School.objects.filter(
-                school_major__major_id__icontains=major_id
-            ).select_related().prefetch_related(
-                'school_major'
-            ).distinct()
+            # Bước 1: Tìm các major có major_id chứa all_major_id
+            print(f"🔍 Searching for majors with major_id containing: {all_major_id}")
+            
+            # Debug: In ra một số major để kiểm tra
+            sample_majors = Major.objects.all()[:5]
+            print(f"Sample majors: {[(m.major_id, m.name) for m in sample_majors]}")
+            
+            majors = Major.objects.filter(
+                major_id__icontains=all_major_id
+            ).select_related('school').prefetch_related('admission_scores')
 
-            # Serialize dữ liệu tối thiểu
+            print(f"Found {majors.count()} majors with major_id containing {all_major_id}")
+            
+            # Debug: In ra các major tìm được
+            for m in majors[:3]:
+                print(f"  - Major: {m.major_id} | {m.name} | School: {m.school.name_vn if m.school else 'No school'}")
+
+            # Bước 2: Lấy danh sách trường từ các major tìm được
             schools_data = []
-            for school in schools:
-                # Lấy điểm chuẩn của ngành tại trường này
-                major_at_school = school.school_major.filter(
-                    major_id__icontains=major_id
-                ).first()
+            seen_school_ids = set()
 
-                # Lấy điểm chuẩn gần nhất
-                latest_score = None
-                if major_at_school:
-                    latest_score = major_at_school.admission_scores.order_by('-year').first()
+            for major_obj in majors:
+                try:
+                    school = major_obj.school
+                    
+                    # Kiểm tra trường có tồn tại không
+                    if not school:
+                        continue
 
-                schools_data.append({
-                    'id': school.id,
-                    'name': school.name_vn,
-                    'short_code': school.short_code,
-                    'logo': school.logo,
-                    'school_type': school.school_type,
-                    'country': school.country,
-                    'admission_score': latest_score.score if latest_score else None,
-                    'score_year': latest_score.year if latest_score else None,
-                    'major_id_at_school': major_at_school.major_id if major_at_school else None,
-                    'tuition_min': major_at_school.min_tuition_fee_per_year if major_at_school else school.start,
-                    'tuition_max': major_at_school.max_tuition_fee_per_year if major_at_school else school.end,
-                })
+                    # Tránh trùng lặp trường
+                    if school.id in seen_school_ids:
+                        continue
+                    seen_school_ids.add(school.id)
+
+                    # Lấy điểm chuẩn gần nhất của ngành tại trường này
+                    latest_score = None
+                    try:
+                        latest_score = major_obj.admission_scores.order_by('-year').first()
+                    except Exception as score_error:
+                        print(f"Error getting admission score for major {major_obj.id}: {score_error}")
+
+                    # Xử lý học phí
+                    tuition_min = None
+                    tuition_max = None
+                    
+                    if major_obj.min_tuition_fee_per_year:
+                        tuition_min = major_obj.min_tuition_fee_per_year
+                    elif school.start:
+                        tuition_min = school.start
+                        
+                    if major_obj.max_tuition_fee_per_year:
+                        tuition_max = major_obj.max_tuition_fee_per_year
+                    elif school.end:
+                        tuition_max = school.end
+
+                    schools_data.append({
+                        'id': school.id,
+                        'name': school.name_vn or school.name_en or 'Unknown',
+                        'short_code': school.short_code or '',
+                        'logo': school.logo or '',
+                        'school_type': school.school_type or '',
+                        'country': school.country or '',
+                        'tag': school.tag or 'none',
+                        'admission_score': latest_score.score if latest_score else None,
+                        'score_year': latest_score.year if latest_score else None,
+                        'major_id_at_school': major_obj.major_id or '',
+                        'tuition_min': tuition_min,
+                        'tuition_max': tuition_max,
+                    })
+                    
+                except Exception as major_error:
+                    print(f"Error processing major {major_obj.id}: {major_error}")
+                    continue
 
             # Sắp xếp theo điểm chuẩn (cao nhất trước)
             schools_data.sort(key=lambda x: (x['admission_score'] or 0), reverse=True)
 
+            print(f"Returning {len(schools_data)} schools for major {all_major_id}")
+
+            # Nếu không tìm thấy trường nào, trả về thông báo
+            if len(schools_data) == 0:
+                print(f"⚠️ No schools found for major {all_major_id}")
+                return Response({
+                    'all_major_id': all_major_id,
+                    'major_name': major.name,
+                    'schools': [],
+                    'message': f'Chưa có trường nào đào tạo ngành {major.name}',
+                    'debug_info': {
+                        'searched_all_major_id': all_major_id,
+                        'total_majors_in_db': Major.objects.count(),
+                        'sample_major_ids': list(Major.objects.values_list('major_id', flat=True)[:5])
+                    }
+                })
+
             return Response({
-                'major_id': major_id,
+                'all_major_id': all_major_id,
                 'major_name': major.name,
-                'schools': schools_data[:20]  # Giới hạn 20 trường đầu
+                'schools': schools_data  # Bỏ giới hạn, hiển thị tất cả
             })
 
         except Exception as e:
+            print(f"Error in schools_teaching_major: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return Response({
+                'error': str(e),
+                'detail': 'Internal server error occurred'
+            }, status=500)
+
+    @action(detail=False, methods=['get'])
+    def test_data(self, request):
+        """
+        API test để kiểm tra dữ liệu
+        """
+        from .models import AllMajorOfAllSchool, Major, School
+        
+        try:
+            # Lấy một số dữ liệu mẫu
+            all_majors_sample = AllMajorOfAllSchool.objects.all()[:5]
+            majors_sample = Major.objects.all()[:5]
+            schools_sample = School.objects.all()[:5]
+            
+            return Response({
+                'all_majors_sample': [
+                    {'id': m.id, 'all_major_id': m.all_major_id, 'name': m.name} 
+                    for m in all_majors_sample
+                ],
+                'majors_sample': [
+                    {'id': m.id, 'major_id': m.major_id, 'name': m.name, 'school': m.school.name_vn if m.school else 'No school'} 
+                    for m in majors_sample
+                ],
+                'schools_sample': [
+                    {'id': s.id, 'name': s.name_vn, 'short_code': s.short_code} 
+                    for s in schools_sample
+                ],
+                'counts': {
+                    'all_majors': AllMajorOfAllSchool.objects.count(),
+                    'majors': Major.objects.count(),
+                    'schools': School.objects.count()
+                }
+            })
+        except Exception as e:
+            return Response({
+                'error': str(e)
+            }, status=500)
+
+    @action(detail=False, methods=['get'])
+    def all_for_comparison(self, request):
+        """
+        API để lấy tất cả ngành cho trang so sánh (không có pagination)
+        """
+        from .models import AllMajorOfAllSchool
+        
+        try:
+            # Lấy tất cả ngành, sắp xếp theo opportunities giảm dần
+            majors = AllMajorOfAllSchool.objects.all().order_by('-opportunities', 'name')
+            
+            # Serialize với dữ liệu cần thiết cho so sánh
+            majors_data = []
+            for major in majors:
+                majors_data.append({
+                    'id': major.id,
+                    'all_major_id': major.all_major_id,
+                    'name': major.name,
+                    'opportunities': major.opportunities,
+                    'training_duration': major.training_duration,
+                    'salary': major.salary,
+                    'tuition_fee_per_year': major.tuition_fee_per_year,
+                    'tag': major.tag,
+                    'field_name': major.field.name if major.field else None
+                })
+            
+            return Response({
+                'results': majors_data,
+                'count': len(majors_data),
+                'message': 'Tất cả ngành cho so sánh'
+            })
+            
+        except Exception as e:
+            print(f"Error in all_for_comparison: {str(e)}")
             return Response({
                 'error': str(e)
             }, status=500)
@@ -1808,5 +1960,8 @@ def view_statistics(request):
         'daily_stats': daily_data,
         'last_7_days': len(daily_data)
     })
+
+
+
 
 

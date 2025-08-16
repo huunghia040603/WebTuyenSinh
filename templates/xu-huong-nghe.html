@@ -8,13 +8,17 @@
     .hero-section {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
-        padding: 120px 0 100px;
+        padding: 80px 0 60px;
         text-align: center;
         position: relative;
-        min-height: 60vh;
+        min-height: 40vh;
         display: flex;
         align-items: center;
         overflow: hidden;
+        border-radius: 24px;
+        margin: 24px;
+        box-shadow: 0 12px 32px rgba(2,6,23,0.06);
+        border: 1px solid #e5e7eb;
     }
 
     .hero-section::before {
@@ -114,6 +118,12 @@
     }
 
     /* Container width for all sections */
+    .page-container {
+        max-width: 1350px;
+        margin: 0 auto;
+        /* padding: 2rem; */
+    }
+    
     .container {
         max-width: 1350px;
         margin: 0 auto;
@@ -152,10 +162,10 @@
     }
 
     .overview-card {
-        background: white;
+        background: linear-gradient(180deg,#ffffff, #f8fafc);
         border-radius: 16px;
         padding: 2rem;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        box-shadow: 0 12px 32px rgba(2,6,23,0.06);
         border: 1px solid #e5e7eb;
         transition: all 0.3s ease;
     }
@@ -203,10 +213,10 @@
     }
 
     .major-card {
-        background: white;
+        background: linear-gradient(180deg,#ffffff, #f8fafc);
         border-radius: 16px;
         padding: 1.5rem;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        box-shadow: 0 12px 32px rgba(2,6,23,0.06);
         border: 1px solid #e5e7eb;
         transition: all 0.3s ease;
         cursor: pointer;
@@ -383,10 +393,10 @@
     }
 
     .comparison-tool {
-        background: white;
+        background: linear-gradient(180deg,#ffffff, #f8fafc);
         border-radius: 16px;
-        padding: 2rem;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        /* padding: 2rem; */
+        box-shadow: 0 12px 32px rgba(2,6,23,0.06);
         border: 1px solid #e5e7eb;
         margin-bottom: 3rem;
     }
@@ -396,7 +406,7 @@
         grid-template-columns: 1fr auto 1fr;
         gap: 2rem;
         align-items: center;
-        margin-bottom: 2rem;
+        margin: 2rem;
     }
 
     .searchable-select-container {
@@ -477,6 +487,7 @@
         border-radius: 12px;
         padding: 1.5rem;
         border: 1px solid #e5e7eb;
+        margin: 1rem;
     }
 
     .comparison-card h4 {
@@ -522,10 +533,10 @@
     }
 
     .news-card {
-        background: white;
+        background: linear-gradient(180deg,#ffffff, #f8fafc);
         border-radius: 16px;
         overflow: hidden;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        box-shadow: 0 12px 32px rgba(2,6,23,0.06);
         border: 1px solid #e5e7eb;
         transition: all 0.3s ease;
     }
@@ -625,10 +636,10 @@
     }
 
     .job-card {
-        background: white;
+        background: linear-gradient(180deg,#ffffff, #f8fafc);
         border-radius: 16px;
         padding: 1.5rem;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        box-shadow: 0 12px 32px rgba(2,6,23,0.06);
         border: 1px solid #e5e7eb;
         transition: all 0.3s ease;
     }
@@ -812,6 +823,7 @@
 {% endblock %}
 
 {% block content %}
+<div class="page-container">
 <!-- Hero Section -->
 <section class="hero-section">
     <div class="hero-content">
@@ -1133,7 +1145,8 @@ document.addEventListener('DOMContentLoaded', function() {
         openArticleModal(title, getTemplateHtml(target));
       });
     }
-  });
+      });
 });
 </script>
+</div>
 {% endblock %} 
