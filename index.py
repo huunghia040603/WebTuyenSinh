@@ -1,6 +1,30 @@
 from flask import Flask, render_template, request, redirect, jsonify, session, json
 from flask_cors import CORS
 import requests
+import sys
+import os
+
+# Import Django models
+try:
+    import django
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings')
+    django.setup()
+    from models import ExpertApplication, ConsultationRequest
+    DJANGO_AVAILABLE = True
+except ImportError as e:
+    print(f"Không thể import Django models: {e}")
+    DJANGO_AVAILABLE = False
+
+# Thêm đường dẫn để import AI advisor
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+# Import AI advisor
+try:
+    from ai_advisor_new import ai_advisor
+    AI_AVAILABLE = True
+except ImportError as e:
+    print(f"Không thể import AI advisor: {e}")
+    AI_AVAILABLE = False
 
 app = Flask(__name__)
 CORS(app, origins=['http://localhost:5000', 'http://127.0.0.1:5000'])
@@ -649,6 +673,173 @@ def all_major():
         "previous": None
     }
     return jsonify(mock_data)
+
+@app.route("/xu-huong-nghe")
+def xu_huong_nghe():
+    return render_template('xu-huong-nghe.html')
+
+@app.route("/test-modal")
+def test_modal():
+    return render_template('test_modal.html')
+
+@app.route("/test-success-modal")
+def test_success_modal():
+    return render_template('dang-ky-tu-van.html')
+
+@app.route("/test-success-modal-demo")
+def test_success_modal_demo():
+    return render_template('test_success_modal.html')
+
+@app.route("/test-format")
+def test_format():
+    return render_template('test_format.html')
+
+@app.route("/dang-ky-tu-van")
+def dang_ky_tu_van():
+    return render_template('dang-ky-tu-van.html')
+
+# AI Chat API endpoints
+@app.route("/api/gemini-chat/", methods=['POST'])
+def gemini_chat():
+    """API endpoint cho AI chat"""
+    if not AI_AVAILABLE:
+        return jsonify({
+            'success': False,
+            'error': 'AI service không khả dụng'
+        }), 503
+    
+    try:
+        data = request.get_json()
+        message = data.get('message', '')
+        history = data.get('history', [])
+        user_id = data.get('user_id', 'anonymous')
+        
+        if not message:
+            return jsonify({
+                'success': False,
+                'error': 'Tin nhắn không được để trống'
+            }), 400
+        
+        # Gọi AI advisor
+        response = ai_advisor.generate_response(message, history, user_id)
+        
+        return jsonify({
+            'success': True,
+            'response': response,
+            'user_id': user_id
+        })
+        
+    except Exception as e:
+        print(f"Lỗi trong AI chat: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Có lỗi xảy ra khi xử lý tin nhắn'
+        }), 500
+
+@app.route("/api/user-form-data/<user_id>")
+def user_form_data(user_id):
+    """API endpoint để lấy dữ liệu form đã thu thập"""
+    if not AI_AVAILABLE:
+        return jsonify({
+            'success': False,
+            'error': 'AI service không khả dụng'
+        }), 503
+    
+    try:
+        form_data = ai_advisor.get_user_form_data(user_id)
+        
+        if form_data:
+            return jsonify({
+                'success': True,
+                'form_data': form_data
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Không tìm thấy dữ liệu cho user này'
+            }), 404
+            
+    except Exception as e:
+        print(f"Lỗi khi lấy form data: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Có lỗi xảy ra khi lấy dữ liệu'
+        }), 500
+
+@app.route("/api/expert-applications/", methods=['POST'])
+def expert_applications():
+    """API endpoint cho đăng ký chuyên gia tư vấn"""
+    try:
+        data = request.get_json()
+        
+        # Validate required fields
+        required_fields = ['full_name', 'email', 'phone']
+        for field in required_fields:
+            if not data.get(field):
+                return jsonify({
+                    'success': False,
+                    'error': f'Trường {field} là bắt buộc'
+                }), 400
+        
+        # Mock response - trong thực tế sẽ lưu vào database
+        print(f"Đăng ký chuyên gia mới: {data['full_name']} - {data['email']}")
+        
+        return jsonify({
+            'success': True,
+            'message': 'Đăng ký thành công! Chúng tôi sẽ liên hệ sớm nhất.'
+        })
+        
+    except Exception as e:
+        print(f"Lỗi khi đăng ký chuyên gia: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Có lỗi xảy ra khi đăng ký'
+        }), 500
+
+@app.route("/api/consultation-requests/", methods=['POST'])
+def consultation_requests():
+    """API endpoint cho yêu cầu tư vấn từ AI"""
+    try:
+        data = request.get_json()
+        
+        # Validate required fields
+        required_fields = ['full_name', 'email', 'phone']
+        for field in required_fields:
+            if not data.get(field):
+                return jsonify({
+                    'success': False,
+                    'error': f'Trường {field} là bắt buộc'
+                }), 400
+        
+        # Lưu vào database nếu Django available
+        if DJANGO_AVAILABLE:
+            try:
+                consultation = ConsultationRequest.objects.create(
+                    full_name=data['full_name'],
+                    email=data['email'],
+                    phone=data['phone'],
+                    conversation_summary=data.get('conversation_summary', '')
+                )
+                print(f"Đã lưu yêu cầu tư vấn AI: {consultation.full_name} - {consultation.email}")
+            except Exception as db_error:
+                print(f"Lỗi database: {db_error}")
+                # Fallback to mock nếu database lỗi
+                print(f"Yêu cầu tư vấn mới (mock): {data['full_name']} - {data['email']}")
+        else:
+            # Mock response nếu Django không available
+            print(f"Yêu cầu tư vấn mới (mock): {data['full_name']} - {data['email']}")
+        
+        return jsonify({
+            'success': True,
+            'message': 'Yêu cầu tư vấn đã được ghi nhận!'
+        })
+        
+    except Exception as e:
+        print(f"Lỗi khi tạo yêu cầu tư vấn: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Có lỗi xảy ra khi tạo yêu cầu'
+        }), 500
 
 # Google Auth được xử lý bởi Django backend trên PythonAnywhere
 

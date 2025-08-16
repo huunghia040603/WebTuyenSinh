@@ -1,5 +1,18 @@
 from rest_framework import serializers
 from .models import *
+
+
+class ExpertApplicationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExpertApplication
+        fields = '__all__'
+
+
+class ConsultationRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ConsultationRequest
+        fields = '__all__'
+
 import os
 from .utils import register_social_user, get_tokens_for_user
 from .google_social_auth import Google, GOOGLE_CLIENT_ID
@@ -24,7 +37,7 @@ class GoogleSocialAuthSerializer(serializers.Serializer):
         Override validate method to process auth_token and return user data directly
         """
         auth_token = attrs.get('auth_token')
-        
+
         # Call the auth_token validation logic
         return self.validate_auth_token(auth_token)
 
@@ -34,7 +47,7 @@ class GoogleSocialAuthSerializer(serializers.Serializer):
         try:
             print(f"Starting Google token validation...")
             print(f"Auth token received: {auth_token[:50]}...")
-            
+
             # 1. Xác minh token với Google
             # Hàm này sẽ ném ra lỗi nếu token không hợp lệ/hết hạn.
             user_data = Google.validate(auth_token)
@@ -422,7 +435,7 @@ class MessageSerializer(serializers.ModelSerializer):
             'reactions', 'my_reaction'
         ]
         read_only_fields = ['sender', 'created_at', 'updated_at']
-    
+
     def get_is_deleted_for_me(self, obj):
         request = self.context.get('request')
         if request and request.user.is_authenticated:
@@ -550,7 +563,7 @@ class ChatRoomCreateSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.ModelSerializer):
     password = serializers.CharField(max_length=68, min_length=6, write_only=True)
     username = serializers.CharField(max_length=255, min_length=2)
-    
+
     tokens = serializers.SerializerMethodField()
 
     def get_tokens(self, obj):
@@ -659,16 +672,16 @@ class LogoutSerializer(serializers.Serializer):
 
 class UserUpdateSerializer(serializers.ModelSerializer):
     user_photo = serializers.CharField(required=False, allow_blank=True)
-    
+
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'user_photo', 'date_of_birth', 'living_place', 'sex']
-        
+
     def update(self, instance, validated_data):
         # Update các field được cung cấp
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
-        
+
         instance.save()
         return instance
 
@@ -677,16 +690,16 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 class SimpleRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=6)
     confirm_password = serializers.CharField(write_only=True)
-    
+
     class Meta:
         model = User
         fields = ['email', 'first_name', 'last_name', 'password', 'confirm_password']
-    
+
     def validate(self, attrs):
         if attrs['password'] != attrs['confirm_password']:
             raise serializers.ValidationError("Mật khẩu xác nhận không khớp")
         return attrs
-    
+
     def create(self, validated_data):
         validated_data.pop('confirm_password')
         user = User.objects.create_user(
@@ -702,11 +715,11 @@ class SimpleRegistrationSerializer(serializers.ModelSerializer):
 class SimpleLoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField()
-    
+
     def validate(self, attrs):
         email = attrs.get('email')
         password = attrs.get('password')
-        
+
         if email and password:
             user = authenticate(username=email, password=password)
             if not user:
@@ -716,7 +729,7 @@ class SimpleLoginSerializer(serializers.Serializer):
             attrs['user'] = user
         else:
             raise serializers.ValidationError('Vui lòng nhập đầy đủ thông tin')
-        
+
         return attrs
 
 
@@ -725,7 +738,7 @@ class SchoolViewCountSerializer(serializers.ModelSerializer):
     school_name = serializers.CharField(source='school.name_vn', read_only=True)
     school_logo = serializers.CharField(source='school.logo', read_only=True)
     school_short_code = serializers.CharField(source='school.short_code', read_only=True)
-    
+
     class Meta:
         model = SchoolViewCount
         fields = ['id', 'school', 'school_name', 'school_logo', 'school_short_code', 'view_count', 'last_viewed', 'created_at']
@@ -736,7 +749,7 @@ class MajorViewCountSerializer(serializers.ModelSerializer):
     school_name = serializers.CharField(source='major.school.name_vn', read_only=True)
     school_short_code = serializers.CharField(source='major.school.short_code', read_only=True)
     school_logo = serializers.CharField(source='major.school.logo', read_only=True)
-    
+
     class Meta:
         model = MajorViewCount
         fields = ['id', 'major', 'major_name', 'major_id', 'school_name', 'school_short_code', 'school_logo', 'view_count', 'last_viewed', 'created_at']
@@ -749,7 +762,7 @@ class DailyViewStatsSerializer(serializers.ModelSerializer):
 class TopSchoolsSerializer(serializers.ModelSerializer):
     view_count = serializers.IntegerField(required=False, default=0)
     rank = serializers.IntegerField(required=False, default=0)
-    
+
     class Meta:
         model = School
         fields = ['id', 'name_vn', 'short_code', 'logo', 'school_type', 'country', 'tag', 'view_count', 'rank']
@@ -760,7 +773,7 @@ class TopMajorsSerializer(serializers.ModelSerializer):
     school_name = serializers.CharField(source='school.name_vn', read_only=True)
     school_short_code = serializers.CharField(source='school.short_code', read_only=True)
     school_logo = serializers.CharField(source='school.logo', read_only=True)
-    
+
     class Meta:
         model = Major
         fields = ['id', 'major_id', 'name', 'school_name', 'school_short_code', 'school_logo', 'tags', 'view_count', 'rank']
@@ -772,11 +785,11 @@ class TopMajorsSerializer(serializers.ModelSerializer):
 
 class TermCategorySerializer(serializers.ModelSerializer):
     terms_count = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = TermCategory
         fields = ['id', 'name', 'name_en', 'description', 'icon', 'color', 'is_active', 'terms_count', 'created_at']
-    
+
     def get_terms_count(self, obj):
         return obj.terms.filter(status='approved').count()
 
@@ -789,7 +802,7 @@ class TermSynonymSerializer(serializers.ModelSerializer):
 
 class TermTranslationSerializer(serializers.ModelSerializer):
     language_display = serializers.CharField(source='get_language_display', read_only=True)
-    
+
     class Meta:
         model = TermTranslation
         fields = ['id', 'language', 'language_display', 'translation', 'pronunciation', 'notes', 'created_at']
@@ -798,11 +811,11 @@ class TermTranslationSerializer(serializers.ModelSerializer):
 class TermRelatedSerializer(serializers.ModelSerializer):
     related_term_info = serializers.SerializerMethodField()
     relationship_display = serializers.CharField(source='get_relationship_display', read_only=True)
-    
+
     class Meta:
         model = TermRelated
         fields = ['id', 'related_term', 'related_term_info', 'relationship', 'relationship_display', 'description', 'created_at']
-    
+
     def get_related_term_info(self, obj):
         return {
             'id': obj.related_term.id,
@@ -827,7 +840,7 @@ class TermSerializer(serializers.ModelSerializer):
     related_terms = TermRelatedSerializer(many=True, read_only=True)
     average_rating = serializers.SerializerMethodField()
     ratings_count = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = Term
         fields = [
@@ -838,13 +851,13 @@ class TermSerializer(serializers.ModelSerializer):
             'created_by', 'created_by_name', 'created_at', 'updated_at', 'approved_at',
             'synonyms', 'translations', 'related_terms', 'average_rating', 'ratings_count'
         ]
-    
+
     def get_average_rating(self, obj):
         ratings = obj.ratings.all()
         if ratings.exists():
             return sum(r.rating for r in ratings) / ratings.count()
         return 0
-    
+
     def get_ratings_count(self, obj):
         return obj.ratings.count()
 
@@ -857,7 +870,7 @@ class TermSearchSerializer(serializers.ModelSerializer):
     school_name = serializers.CharField(source='major.school.name_vn', read_only=True)
     difficulty_display = serializers.CharField(source='get_difficulty_level_display', read_only=True)
     average_rating = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = Term
         fields = [
@@ -865,7 +878,7 @@ class TermSearchSerializer(serializers.ModelSerializer):
             'major_name', 'school_name', 'definition', 'difficulty_level', 'difficulty_display',
             'tags', 'is_featured', 'view_count', 'average_rating'
         ]
-    
+
     def get_average_rating(self, obj):
         ratings = obj.ratings.all()
         if ratings.exists():
@@ -876,18 +889,18 @@ class TermSearchSerializer(serializers.ModelSerializer):
 class UserTermCollectionSerializer(serializers.ModelSerializer):
     items_count = serializers.SerializerMethodField()
     user_email = serializers.CharField(source='user.email', read_only=True)
-    
+
     class Meta:
         model = UserTermCollection
         fields = ['id', 'name', 'description', 'is_public', 'color', 'items_count', 'user_email', 'created_at', 'updated_at']
-    
+
     def get_items_count(self, obj):
         return obj.items.count()
 
 
 class UserTermCollectionItemSerializer(serializers.ModelSerializer):
     term_info = TermSerializer(source='term', read_only=True)
-    
+
     class Meta:
         model = UserTermCollectionItem
         fields = ['id', 'collection', 'term', 'term_info', 'notes', 'is_favorite', 'added_at']
@@ -898,7 +911,7 @@ class TermContributionSerializer(serializers.ModelSerializer):
     contribution_type_display = serializers.CharField(source='get_contribution_type_display', read_only=True)
     status_display = serializers.CharField(source='get_status_display', read_only=True)
     reviewed_by_email = serializers.CharField(source='reviewed_by.email', read_only=True)
-    
+
     class Meta:
         model = TermContribution
         fields = [
@@ -912,11 +925,11 @@ class TermContributionSerializer(serializers.ModelSerializer):
 class TermSearchHistorySerializer(serializers.ModelSerializer):
     user_email = serializers.CharField(source='user.email', read_only=True)
     clicked_term_info = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = TermSearchHistory
         fields = ['id', 'user', 'user_email', 'search_query', 'results_count', 'clicked_term', 'clicked_term_info', 'search_filters', 'created_at']
-    
+
     def get_clicked_term_info(self, obj):
         if obj.clicked_term:
             return {
@@ -931,11 +944,11 @@ class TermSearchHistorySerializer(serializers.ModelSerializer):
 class TermViewHistorySerializer(serializers.ModelSerializer):
     user_email = serializers.CharField(source='user.email', read_only=True)
     term_info = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = TermViewHistory
         fields = ['id', 'user', 'user_email', 'term', 'term_info', 'view_duration', 'source', 'created_at']
-    
+
     def get_term_info(self, obj):
         return {
             'id': obj.term.id,
@@ -948,11 +961,11 @@ class TermViewHistorySerializer(serializers.ModelSerializer):
 class TermRatingSerializer(serializers.ModelSerializer):
     user_email = serializers.CharField(source='user.email', read_only=True)
     term_info = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = TermRating
         fields = ['id', 'user', 'user_email', 'term', 'term_info', 'rating', 'comment', 'is_helpful', 'created_at']
-    
+
     def get_term_info(self, obj):
         return {
             'id': obj.term.id,
