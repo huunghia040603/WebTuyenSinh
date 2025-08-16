@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Hiệu Ứng Thông Minh</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 2rem;
+            background: #f8fafc;
+        }
+
+        .test-section {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 1rem 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .test-button {
+            padding: 1rem 2rem;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .test-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+        }
+
+        .form-field {
+            margin: 1rem 0;
+        }
+
+        .form-field input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .form-field input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e5e7eb;
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            z-index: 10000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: linear-gradient(90deg, #10b981, #059669);
+        }
+
+        .notification.error {
+            background: linear-gradient(90deg, #ef4444, #dc2626);
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 10px 15px;
+            background: #eef2ff;
+            border-radius: 14px;
+            width: fit-content;
+            margin: 10px 0;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #6366f1;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 53%, 80%, 100% {
+                transform: translate3d(0,0,0);
+            }
+            40%, 43% {
+                transform: translate3d(0, -30px, 0);
+            }
+            70% {
+                transform: translate3d(0, -15px, 0);
+            }
+            90% {
+                transform: translate3d(0, -4px, 0);
+            }
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .loading-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #6366f1;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Hiệu Ứng Thông Minh</h1>
+
+    <div class="test-section">
+        <h2>📝 Form Validation</h2>
+        <div class="form-field">
+            <label>Email:</label>
+            <input type="email" id="test-email" placeholder="Nhập email">
+        </div>
+        <div class="form-field">
+            <label>Số điện thoại:</label>
+            <input type="tel" id="test-phone" placeholder="Nhập số điện thoại">
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <button class="test-button" onclick="testValidation()">Test Validation</button>
+    </div>
+
+    <div class="test-section">
+        <h2>🔔 Notifications</h2>
+        <button class="test-button" onclick="showSuccessNotification()">Success Notification</button>
+        <button class="test-button" onclick="showErrorNotification()">Error Notification</button>
+    </div>
+
+    <div class="test-section">
+        <h2>⌨️ Typing Indicator</h2>
+        <button class="test-button" onclick="showTypingIndicator()">Show Typing</button>
+        <div id="typing-container"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>⏳ Loading Overlay</h2>
+        <button class="test-button" onclick="showLoading()">Show Loading</button>
+    </div>
+
+    <div class="test-section">
+        <h2>🎉 Confetti Effect</h2>
+        <button class="test-button" onclick="createConfetti()">Create Confetti</button>
+    </div>
+
+    <script>
+        // Form validation test
+        function testValidation() {
+            const email = document.getElementById('test-email').value;
+            const phone = document.getElementById('test-phone').value;
+            
+            let progress = 0;
+            if (email) progress += 50;
+            if (phone) progress += 50;
+            
+            document.getElementById('progress-fill').style.width = progress + '%';
+            
+            if (progress === 100) {
+                showSuccessNotification();
+            }
+        }
+
+        // Notification functions
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        function showSuccessNotification() {
+            showNotification('Thành công! Dữ liệu đã được lưu.', 'success');
+        }
+
+        function showErrorNotification() {
+            showNotification('Có lỗi xảy ra! Vui lòng thử lại.', 'error');
+        }
+
+        // Typing indicator test
+        function showTypingIndicator() {
+            const container = document.getElementById('typing-container');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'typing-indicator';
+            typingDiv.innerHTML = `
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            `;
+            container.appendChild(typingDiv);
+            
+            setTimeout(() => {
+                typingDiv.remove();
+            }, 3000);
+        }
+
+        // Loading overlay test
+        function showLoading() {
+            const overlay = document.createElement('div');
+            overlay.className = 'loading-overlay';
+            overlay.innerHTML = '<div class="loading-spinner"></div>';
+            document.body.appendChild(overlay);
+            
+            setTimeout(() => {
+                overlay.classList.add('show');
+            }, 10);
+            
+            setTimeout(() => {
+                overlay.classList.remove('show');
+                setTimeout(() => {
+                    overlay.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        // Confetti effect test
+        function createConfetti() {
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.style.position = 'fixed';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.top = '-10px';
+                confetti.style.width = '10px';
+                confetti.style.height = '10px';
+                confetti.style.background = ['#6366f1', '#8b5cf6', '#10b981', '#f59e0b'][Math.floor(Math.random() * 4)];
+                confetti.style.borderRadius = '50%';
+                confetti.style.pointerEvents = 'none';
+                confetti.style.zIndex = '9998';
+                confetti.style.animation = `fall ${Math.random() * 3 + 2}s linear forwards`;
+                
+                document.body.appendChild(confetti);
+                
+                setTimeout(() => {
+                    confetti.remove();
+                }, 5000);
+            }
+        }
+
+        // Add CSS for confetti
+        const confettiStyle = document.createElement('style');
+        confettiStyle.textContent = `
+            @keyframes fall {
+                to {
+                    transform: translateY(100vh) rotate(360deg);
+                }
+            }
+        `;
+        document.head.appendChild(confettiStyle);
+
+        // Add input event listeners
+        document.getElementById('test-email').addEventListener('input', testValidation);
+        document.getElementById('test-phone').addEventListener('input', testValidation);
+    </script>
+</body>
+</html> 

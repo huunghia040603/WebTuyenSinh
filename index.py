@@ -690,6 +690,30 @@ def test_success_modal():
 def test_success_modal_demo():
     return render_template('test_success_modal.html')
 
+@app.route("/test-effects")
+def test_effects():
+    return render_template('test_effects.html')
+
+@app.route("/test-chat-fix")
+def test_chat_fix():
+    return render_template('test_chat_fix.html')
+
+@app.route("/test-success-icon")
+def test_success_icon():
+    return render_template('test_success_icon.html')
+
+@app.route("/test-schools-api")
+def test_schools_api():
+    return render_template('test_schools_api.html')
+
+@app.route("/test-jobs-parsing")
+def test_jobs_parsing():
+    return render_template('test_jobs_parsing.html')
+
+@app.route("/test-schools-loading")
+def test_schools_loading():
+    return render_template('test_schools_loading.html')
+
 @app.route("/test-format")
 def test_format():
     return render_template('test_format.html')

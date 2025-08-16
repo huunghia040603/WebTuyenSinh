@@ -32,7 +32,7 @@
 .chat-box{border:1px solid #e5e7eb;border-radius:16px;overflow:hidden;background:#fff}
 .chat-header{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;padding:0.9rem 1rem;font-weight:700;display:flex;align-items:center;gap:.5rem; color:#0f172a}
 .chat-body{height:460px;overflow:auto;padding:1rem;background:#fafbff}
-.chat-suggestions{display:flex;flex-wrap:wrap;gap:.5rem;padding:.5rem;border-top:1px dashed #e5e7eb;background:#fff; padding-bottom: 0px;}
+.chat-suggestions{display:flex;flex-wrap:wrap;gap:.5rem;padding:.5rem;border-top:1px dashed #e5e7eb;background:#fff; padding-bottom: 0px; overflow: hidden; position: relative;}
 .chat-suggestions .chip{padding:.45rem .7rem;border:1px solid #e5e7eb;border-radius:999px;background:#fff;color:#334155;cursor:pointer;font-size:.7rem}
 .chat-suggestions .chip:hover{border-color:#6366f1;color:#6366f1}
 .chat-input{display:flex;gap:0.5rem;padding:0.75rem;border:0px solid #e5e7eb !important;background:#fff}
@@ -202,10 +202,13 @@
 
 .success-icon {
   margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .success-icon svg {
-  fill: #10B981;
+  filter: drop-shadow(0 4px 8px rgba(16, 185, 129, 0.3));
 }
 
 .success-title {
@@ -277,6 +280,425 @@
 
 .success-btn svg {
   fill: currentColor;
+}
+
+/* Hiệu ứng thông minh và sinh động */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 53%, 80%, 100% {
+    transform: translate3d(0,0,0);
+  }
+  40%, 43% {
+    transform: translate3d(0, -30px, 0);
+  }
+  70% {
+    transform: translate3d(0, -15px, 0);
+  }
+  90% {
+    transform: translate3d(0, -4px, 0);
+  }
+}
+
+@keyframes successIconAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) rotate(-180deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2) rotate(0deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* Animation cho các section */
+.section {
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.section:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+/* Hiệu ứng hover cho form fields */
+.field {
+  transition: all 0.3s ease;
+}
+
+.field:hover {
+  transform: translateY(-2px);
+}
+
+.field:hover .input,
+.field:hover .textarea {
+  border-color: #6366f1;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.15);
+}
+
+/* Hiệu ứng focus với glow */
+.input:focus,
+.textarea:focus {
+  animation: pulse 0.3s ease-in-out;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2), 0 4px 15px rgba(99, 102, 241, 0.15);
+}
+
+/* Hiệu ứng cho buttons */
+.btn {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn:hover::before {
+  left: 100%;
+}
+
+.btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+}
+
+/* Hiệu ứng cho chat suggestions */
+.chat-suggestions .chip {
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  transform-origin: center;
+}
+
+.chat-suggestions .chip::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(99, 102, 241, 0.1);
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  transform: translate(-50%, -50%);
+}
+
+.chat-suggestions .chip:hover::before {
+  width: 100%;
+  height: 100%;
+}
+
+.chat-suggestions .chip:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.15);
+  z-index: 10;
+}
+
+/* Hiệu ứng cho chat messages */
+.message {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.message.ai {
+  animation-delay: 0.1s;
+}
+
+/* Hiệu ứng typing indicator */
+.typing-indicator {
+  display: flex;
+  gap: 4px;
+  padding: 10px 15px;
+  background: #eef2ff;
+  border-radius: 14px;
+  width: fit-content;
+  margin: 10px 0;
+}
+
+.typing-dots {
+  display: flex;
+  gap: 4px;
+}
+
+.typing-dot {
+  width: 8px;
+  height: 8px;
+  background: #6366f1;
+  border-radius: 50%;
+  animation: bounce 1.4s infinite ease-in-out;
+}
+
+.typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+/* Hiệu ứng cho page hero */
+.page-hero {
+  position: relative;
+  overflow: hidden;
+}
+
+.page-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+  animation: shimmer 3s infinite;
+}
+
+/* Hiệu ứng cho success modal */
+.success-modal-content {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.success-icon {
+  animation: successIconAppear 1s ease-out 0.5s both;
+}
+
+.success-title {
+  animation: fadeInUp 0.6s ease-out 0.3s both;
+}
+
+.success-message {
+  animation: fadeInUp 0.6s ease-out 0.6s both;
+}
+
+.success-btn {
+  animation: fadeInUp 0.6s ease-out 0.9s both;
+}
+
+/* Hiệu ứng loading cho form submission */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.loading-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #6366f1;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Hiệu ứng cho form validation */
+.field.error .input,
+.field.error .textarea {
+  border-color: #ef4444;
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.field.success .input,
+.field.success .textarea {
+  border-color: #10b981;
+  animation: successPulse 0.5s ease-in-out;
+}
+
+@keyframes successPulse {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+/* Hiệu ứng cho AI chat */
+.chat-header {
+  position: relative;
+  overflow: hidden;
+}
+
+.chat-header::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  animation: shimmer 2s infinite;
+}
+
+/* Hiệu ứng cho form fields khi có dữ liệu */
+.field.has-content .input,
+.field.has-content .textarea {
+  border-color: #10b981;
+  background: linear-gradient(135deg, #f0fdf4, #ffffff);
+}
+
+/* Hiệu ứng cho progress indicator */
+.progress-bar {
+  width: 100%;
+  margin: 0 0 20px 0;
+}
+
+.progress-label {
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.progress-text {
+  color: #6366f1;
+  font-weight: 600;
+}
+
+.progress-bar-container {
+  height: 6px;
+  background: #f1f5f9;
+  border-radius: 3px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  width: 0%;
+  transition: width 0.8s ease;
+  border-radius: 3px;
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+}
+
+/* Hiệu ứng cho notification */
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 15px 20px;
+  border-radius: 10px;
+  color: white;
+  font-weight: 600;
+  z-index: 10000;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+}
+
+.notification.show {
+  transform: translateX(0);
+}
+
+.notification.success {
+  background: linear-gradient(90deg, #10b981, #059669);
+}
+
+.notification.error {
+  background: linear-gradient(90deg, #ef4444, #dc2626);
+}
+
+/* Hiệu ứng cho floating elements */
+.floating-element {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Hiệu ứng cho card hover */
+.card {
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(2, 6, 23, 0.1);
+}
+
+/* Hiệu ứng cho form submission */
+.form-submitting {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.form-submitting .btn {
+  position: relative;
+}
+
+.form-submitting .btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid transparent;
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
 </style>
 {% endblock %}
@@ -620,8 +1042,8 @@ function showSuccessModal() {
     <div class="success-modal-content">
       <div class="success-icon">
         <svg width="60" height="60" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="12" cy="12" r="10" stroke="#10B981" stroke-width="2"/>
-          <path d="M8 12L11 15L16 9" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="12" cy="12" r="10" fill="#10B981" stroke="#10B981" stroke-width="2"/>
+          <path d="M8 12L11 15L16 9" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
       
@@ -639,10 +1061,7 @@ function showSuccessModal() {
           </ul>
         </div>
         
-        <div class="process-info">
-          <h3>📋 Quy trình tư vấn chi tiết:</h3>
-          <a href="https://timtruonghoc.vn" target="_blank" class="process-link">timtruonghoc.vn</a>
-        </div>
+       
       </div>
       
       <button onclick="goToHomepage()" class="success-btn">
@@ -803,6 +1222,307 @@ chatSuggestions.addEventListener('click', (e) => {
   handleUserInput();
 });
 
-appendMessage('ai', 'Xin chào! Mình là Trợ lý AI của timtruonghoc.vn tư vấn tuyển sinh.\n\nBạn có câu hỏi gì muốn hỏi mình không ?\n');
+// Hiệu ứng thông minh và sinh động
+document.addEventListener('DOMContentLoaded', function() {
+  // Hiệu ứng typing indicator cho AI
+  function showTypingIndicator() {
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'message ai typing-indicator';
+    typingDiv.innerHTML = `
+      <div class="bubble">
+        <div class="typing-dots">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+      </div>
+    `;
+    chatBody.appendChild(typingDiv);
+    chatBody.scrollTop = chatBody.scrollHeight;
+    return typingDiv;
+  }
+
+  // Hiệu ứng form validation thông minh
+  function validateField(field) {
+    const input = field.querySelector('.input, .textarea');
+    const value = input.value.trim();
+    
+    field.classList.remove('error', 'success', 'has-content');
+    
+    if (value.length > 0) {
+      field.classList.add('has-content');
+      
+      // Validation logic
+      if (input.type === 'email' && !isValidEmail(value)) {
+        field.classList.add('error');
+        showNotification('Email không hợp lệ', 'error');
+      } else if (input.id === 'ex_phone' && !isValidPhone(value)) {
+        field.classList.add('error');
+        showNotification('Số điện thoại không hợp lệ', 'error');
+      } else {
+        field.classList.add('success');
+      }
+    }
+  }
+
+  // Hiệu ứng progress bar
+  function updateProgressBar() {
+    const requiredFields = ['ex_full_name', 'ex_email', 'ex_phone'];
+    const filledFields = requiredFields.filter(id => {
+      const field = document.getElementById(id);
+      return field && field.value.trim().length > 0;
+    });
+    
+    const progress = (filledFields.length / requiredFields.length) * 100;
+    
+    // Tạo progress bar nếu chưa có
+    let progressBar = document.querySelector('.progress-bar');
+    if (!progressBar) {
+      progressBar = document.createElement('div');
+      progressBar.className = 'progress-bar';
+      progressBar.innerHTML = `
+        <div class="progress-label">Tiến độ điền form: <span class="progress-text">0%</span></div>
+        <div class="progress-bar-container">
+          <div class="progress-fill"></div>
+        </div>
+      `;
+      
+      // Thêm vào đầu section thay vì form-grid
+      const section = document.querySelector('.section.card');
+      if (section) {
+        section.insertBefore(progressBar, section.firstChild);
+      }
+    }
+    
+    const progressFill = progressBar.querySelector('.progress-fill');
+    const progressText = progressBar.querySelector('.progress-text');
+    
+    progressFill.style.width = progress + '%';
+    if (progressText) {
+      progressText.textContent = Math.round(progress) + '%';
+    }
+  }
+
+  // Hiệu ứng notification
+  function showNotification(message, type = 'success') {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.classList.add('show');
+    }, 100);
+    
+    setTimeout(() => {
+      notification.classList.remove('show');
+      setTimeout(() => {
+        notification.remove();
+      }, 300);
+    }, 3000);
+  }
+
+  // Hiệu ứng loading overlay
+  function showLoadingOverlay() {
+    const overlay = document.createElement('div');
+    overlay.className = 'loading-overlay';
+    overlay.innerHTML = '<div class="loading-spinner"></div>';
+    document.body.appendChild(overlay);
+    
+    setTimeout(() => {
+      overlay.classList.add('show');
+    }, 10);
+    
+    return overlay;
+  }
+
+  // Hiệu ứng form submission
+  function addFormSubmissionEffects() {
+    const form = document.querySelector('.section.card');
+    const submitBtn = document.getElementById('ex_submit');
+    
+    submitBtn.addEventListener('click', function() {
+      form.classList.add('form-submitting');
+      const overlay = showLoadingOverlay();
+      
+      // Simulate loading time
+      setTimeout(() => {
+        form.classList.remove('form-submitting');
+        overlay.classList.remove('show');
+        setTimeout(() => {
+          overlay.remove();
+        }, 300);
+      }, 2000);
+    });
+  }
+
+  // Hiệu ứng cho chat suggestions
+  function addChatSuggestionEffects() {
+    const chips = document.querySelectorAll('.chat-suggestions .chip');
+    chips.forEach((chip, index) => {
+      chip.style.animationDelay = `${index * 0.1}s`;
+      chip.addEventListener('click', function() {
+        this.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+          this.style.transform = '';
+        }, 150);
+      });
+    });
+  }
+
+  // Hiệu ứng cho form fields
+  function addFormFieldEffects() {
+    const fields = document.querySelectorAll('.field');
+    fields.forEach(field => {
+      const input = field.querySelector('.input, .textarea');
+      if (input) {
+        input.addEventListener('input', () => {
+          validateField(field);
+          updateProgressBar();
+        });
+        
+        input.addEventListener('focus', () => {
+          field.style.transform = 'translateY(-2px)';
+        });
+        
+        input.addEventListener('blur', () => {
+          field.style.transform = '';
+        });
+      }
+    });
+  }
+
+  // Hiệu ứng parallax cho page hero
+  function addParallaxEffect() {
+    const hero = document.querySelector('.page-hero');
+    if (hero) {
+      window.addEventListener('scroll', () => {
+        const scrolled = window.pageYOffset;
+        const rate = scrolled * -0.5;
+        hero.style.transform = `translateY(${rate}px)`;
+      });
+    }
+  }
+
+  // Hiệu ứng floating elements
+  function addFloatingElements() {
+    const cards = document.querySelectorAll('.card');
+    cards.forEach((card, index) => {
+      card.style.animationDelay = `${index * 0.2}s`;
+    });
+  }
+
+  // Hiệu ứng cho success modal
+  function enhanceSuccessModal() {
+    const originalShowSuccessModal = window.showSuccessModal;
+    window.showSuccessModal = function() {
+      const modal = originalShowSuccessModal();
+      
+      // Thêm confetti effect
+      createConfetti();
+      
+      return modal;
+    };
+  }
+
+  // Hiệu ứng confetti
+  function createConfetti() {
+    for (let i = 0; i < 50; i++) {
+      const confetti = document.createElement('div');
+      confetti.style.position = 'fixed';
+      confetti.style.left = Math.random() * 100 + 'vw';
+      confetti.style.top = '-10px';
+      confetti.style.width = '10px';
+      confetti.style.height = '10px';
+      confetti.style.background = ['#6366f1', '#8b5cf6', '#10b981', '#f59e0b'][Math.floor(Math.random() * 4)];
+      confetti.style.borderRadius = '50%';
+      confetti.style.pointerEvents = 'none';
+      confetti.style.zIndex = '9998';
+      confetti.style.animation = `fall ${Math.random() * 3 + 2}s linear forwards`;
+      
+      document.body.appendChild(confetti);
+      
+      setTimeout(() => {
+        confetti.remove();
+      }, 5000);
+    }
+  }
+
+  // CSS animation cho confetti
+  const confettiStyle = document.createElement('style');
+  confettiStyle.textContent = `
+    @keyframes fall {
+      to {
+        transform: translateY(100vh) rotate(360deg);
+      }
+    }
+  `;
+  document.head.appendChild(confettiStyle);
+
+  // Utility functions
+  function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  function isValidPhone(phone) {
+    return /^[0-9]{10,11}$/.test(phone.replace(/\s/g, ''));
+  }
+
+  // Khởi tạo tất cả hiệu ứng
+  addFormFieldEffects();
+  addFormSubmissionEffects();
+  addChatSuggestionEffects();
+  addParallaxEffect();
+  addFloatingElements();
+  enhanceSuccessModal();
+  
+  // Hiển thị welcome message với animation
+  setTimeout(() => {
+    appendMessage('ai', '**Xin chào! 👋** Tôi là trợ lý AI tư vấn tuyển sinh. Tôi có thể giúp bạn:\n\n• Tư vấn chọn ngành phù hợp\n• Thông tin về trường đại học\n• Xu hướng việc làm 2025\n• Kết nối chuyên gia tư vấn\n\nHãy hỏi tôi bất cứ điều gì! 😊');
+  }, 1000);
+});
+
+// Cập nhật hàm appendMessage để có hiệu ứng typing
+const originalAppendMessage = window.appendMessage;
+window.appendMessage = function(role, text) {
+  if (role === 'ai') {
+    const typingIndicator = showTypingIndicator();
+    
+    setTimeout(() => {
+      if (typingIndicator && typingIndicator.parentNode) {
+        typingIndicator.remove();
+      }
+      originalAppendMessage(role, text);
+    }, 1000 + Math.min(text.length * 30, 2000)); // Giới hạn thời gian typing
+  } else {
+    originalAppendMessage(role, text);
+  }
+};
+
+// Định nghĩa hàm showTypingIndicator ở global scope
+function showTypingIndicator() {
+  // Xóa typing indicator cũ nếu có
+  const existingTyping = document.querySelector('.typing-indicator');
+  if (existingTyping) {
+    existingTyping.remove();
+  }
+  
+  const typingDiv = document.createElement('div');
+  typingDiv.className = 'message ai typing-indicator';
+  typingDiv.innerHTML = `
+    <div class="bubble">
+      <div class="typing-dots">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>
+    </div>
+  `;
+  chatBody.appendChild(typingDiv);
+  chatBody.scrollTop = chatBody.scrollHeight;
+  return typingDiv;
+}
+
+// Hàm hiển thị modal thành công hiện đại
 </script>
 {% endblock %}
