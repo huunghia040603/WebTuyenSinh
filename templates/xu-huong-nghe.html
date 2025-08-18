@@ -1,0 +1,1152 @@
+{% extends 'base.html' %}
+
+{% block title %}Xu Hướng Ngành Nghề Và Việc Làm - Tư Vấn Hướng Nghiệp{% endblock %}
+
+{% block stylesheets %}
+<style>
+    /* Hero Section */
+    .hero-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 80px 0 60px;
+        text-align: center;
+        position: relative;
+        min-height: 40vh;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        border-radius: 24px;
+        margin: 24px;
+        box-shadow: 0 12px 32px rgba(2,6,23,0.06);
+        border: 1px solid #e5e7eb;
+    }
+
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23dots)"/></svg>');
+        opacity: 0.3;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 1350px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 900;
+        margin-bottom: 1.5rem;
+        text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        animation: fadeInUp 1s ease-out;
+    }
+
+    .hero-subtitle {
+        font-size: 1.4rem;
+        margin-bottom: 3rem;
+        color: rgba(255, 255, 255, 0.95);
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+        line-height: 1.6;
+        font-weight: 400;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        animation: fadeInUp 1s ease-out 0.2s both;
+    }
+
+    .hero-stats {
+        display: flex;
+        justify-content: center;
+        gap: 60px;
+        margin-top: 80px;
+        flex-wrap: wrap;
+        animation: fadeInUp 1s ease-out 0.4s both;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 10px 24px;
+        background: rgba(0, 0, 0, 0.15) !important;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        min-width: 160px;
+        backdrop-filter: blur(20px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        background: rgb(246, 199, 103) !important;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
+        margin-bottom: 5px;
+    }
+
+    .stat-item:hover {
+        transform: translateY(-5px);
+    }
+
+    .hero-stats .stat-number {
+        font-size: 3rem;
+        font-weight: 900;
+        margin-bottom: 10px;
+        color: white;
+        display: block;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .stat-label {
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Container width for all sections */
+    .page-container {
+        max-width: 1350px;
+        margin: 0 auto;
+        /* padding: 2rem; */
+    }
+    
+    .container {
+        max-width: 1350px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    /* Market Overview Section */
+    .market-overview-section {
+        padding: 4rem 0;
+        background: #f8fafc;
+    }
+
+    .section-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 1rem;
+        color: #1e293b;
+    }
+
+    .section-subtitle {
+        text-align: center;
+        color: #6b7280;
+        font-size: 1.1rem;
+        margin-bottom: 3rem;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .overview-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .overview-card {
+        background: linear-gradient(180deg,#ffffff, #f8fafc);
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 12px 32px rgba(2,6,23,0.06);
+        border: 1px solid #e5e7eb;
+        transition: all 0.3s ease;
+    }
+
+    .overview-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        border-color: #667eea;
+    }
+
+    .overview-card h3 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .overview-card h3 i {
+        color: #667eea;
+    }
+
+    .chart-container {
+        height: 300px;
+        margin: 1.5rem 0;
+        position: relative;
+    }
+
+    /* Trending Majors Section */
+    .trending-majors-section {
+        padding: 4rem 0;
+        background: white;
+    }
+
+    .majors-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+        margin-bottom: 3rem;
+        max-width: 1350px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .major-card {
+        background: linear-gradient(180deg,#ffffff, #f8fafc);
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 12px 32px rgba(2,6,23,0.06);
+        border: 1px solid #e5e7eb;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .major-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        border-color: #667eea;
+    }
+
+    .major-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+
+    .major-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+
+    .major-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+    }
+
+    .major-tag {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .major-tag.hot {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .major-tag.find {
+        background: #dbeafe;
+        color: #2563eb;
+    }
+
+    .major-tag.grown {
+        background: #dcfce7;
+        color: #16a34a;
+    }
+
+    .major-tag.push {
+        background: #fef3c7;
+        color: #d97706;
+    }
+
+    .major-tag.normal {
+        background: #f3f4f6;
+        color: #6b7280;
+    }
+
+    .major-stats {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+
+    .major-stat {
+        text-align: center;
+        padding: 1rem;
+        background: #f8fafc;
+        border-radius: 8px;
+    }
+
+    .major-stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #667eea;
+        display: block;
+    }
+
+    .major-stat-label {
+        font-size: 0.8rem;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .major-description {
+        color: #4b5563;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+    }
+
+    .major-details {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .major-detail-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #6b7280;
+        font-size: 0.8rem;
+        background: #f8fafc;
+        padding: 0.5rem 0.75rem;
+        border-radius: 6px;
+    }
+
+    .major-detail-item i {
+        color: #667eea;
+        font-size: 0.9rem;
+    }
+
+    .major-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        border: none;
+    }
+
+    .btn-primary {
+        background: #667eea;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #5a67d8;
+        transform: translateY(-2px);
+    }
+
+    .btn-outline {
+        background: transparent;
+        color: #667eea;
+        border: 2px solid #667eea;
+    }
+
+    .btn-outline:hover {
+        background: #667eea;
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    /* Comparison Tool Section */
+    .comparison-section {
+        padding: 4rem 0;
+        background: #f8fafc;
+    }
+
+    .comparison-tool {
+        background: linear-gradient(180deg,#ffffff, #f8fafc);
+        border-radius: 16px;
+        /* padding: 2rem; */
+        box-shadow: 0 12px 32px rgba(2,6,23,0.06);
+        border: 1px solid #e5e7eb;
+        margin-bottom: 3rem;
+    }
+
+    .comparison-form {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 2rem;
+        align-items: center;
+        margin: 2rem;
+    }
+
+    .searchable-select-container {
+        position: relative;
+    }
+
+    .searchable-select-input {
+        width: 100%;
+        padding: 1rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 1rem;
+        background: white;
+        color: #1e293b;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
+
+    .searchable-select-input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .searchable-select-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-top: none;
+        border-radius: 0 0 8px 8px;
+        max-height: 300px;
+        overflow-y: auto;
+        z-index: 1000;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+
+    .searchable-select-option {
+        padding: 0.75rem 1rem;
+        cursor: pointer;
+        border-bottom: 1px solid #f1f5f9;
+        transition: background-color 0.2s ease;
+    }
+
+    .searchable-select-option:hover {
+        background-color: #f8fafc;
+    }
+
+    .searchable-select-option.selected {
+        background-color: #667eea;
+        color: white;
+    }
+
+    .searchable-select-option:last-child {
+        border-bottom: none;
+    }
+
+    .vs-badge {
+        background: #667eea;
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    .comparison-results {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+
+    .comparison-card {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 1.5rem;
+        border: 1px solid #e5e7eb;
+        margin: 1rem;
+    }
+
+    .comparison-card h4 {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+
+    .comparison-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .comparison-item:last-child {
+        border-bottom: none;
+    }
+
+    .comparison-label {
+        font-weight: 600;
+        color: #4b5563;
+    }
+
+    .comparison-value {
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    /* News Section */
+    .news-section {
+        padding: 4rem 0;
+        background: white;
+    }
+
+    .news-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+
+    .news-card {
+        background: linear-gradient(180deg,#ffffff, #f8fafc);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 12px 32px rgba(2,6,23,0.06);
+        border: 1px solid #e5e7eb;
+        transition: all 0.3s ease;
+    }
+
+    .news-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    }
+
+    .news-image {
+        height: 200px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 3rem;
+    }
+
+    .news-content {
+        padding: 1.5rem;
+    }
+
+    .news-date {
+        font-size: 0.8rem;
+        color: #6b7280;
+        margin-bottom: 0.5rem;
+    }
+
+    .news-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 1rem;
+        line-height: 1.4;
+    }
+
+    .news-excerpt {
+        color: #4b5563;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+
+    .news-tag {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        background: #e0f2fe;
+        color: #0a4191;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    /* Job Integration Section */
+    .jobs-section {
+        padding: 4rem 0;
+        background: #f8fafc;
+    }
+
+    .jobs-filter {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .filter-btn {
+        padding: 0.75rem 1.5rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        background: white;
+        color: #4b5563;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+    }
+
+    .filter-btn.active {
+        background: #667eea;
+        color: white;
+        border-color: #667eea;
+    }
+
+    .filter-btn:hover {
+        border-color: #667eea;
+        color: #667eea;
+    }
+
+    .filter-btn.active:hover {
+        color: white;
+    }
+
+    .jobs-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .job-card {
+        background: linear-gradient(180deg,#ffffff, #f8fafc);
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 12px 32px rgba(2,6,23,0.06);
+        border: 1px solid #e5e7eb;
+        transition: all 0.3s ease;
+    }
+
+    .job-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        border-color: #667eea;
+    }
+
+    .job-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+
+    .job-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+    }
+
+    .job-company {
+        color: #6b7280;
+        font-size: 0.9rem;
+    }
+
+    .job-salary {
+        background: #dcfce7;
+        color: #16a34a;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .job-details {
+        display: flex;
+        gap: 1rem;
+        margin: 1rem 0;
+        flex-wrap: wrap;
+    }
+
+    .job-detail {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #6b7280;
+        font-size: 0.9rem;
+    }
+
+    .job-description {
+        color: #4b5563;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+
+    .job-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2.5rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+        }
+
+        .hero-stats {
+            gap: 30px;
+        }
+
+        .stat-item {
+            min-width: 120px;
+            padding: 20px 16px;
+        }
+
+        .hero-stats .stat-number {
+            font-size: 2.2rem;
+        }
+
+        .comparison-form {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .comparison-results {
+            grid-template-columns: 1fr;
+        }
+
+        .overview-grid,
+        .news-grid,
+        .jobs-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .majors-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .hero-title {
+            font-size: 2rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1rem;
+        }
+
+        .hero-stats {
+            gap: 20px;
+        }
+
+        .stat-item {
+            min-width: 100px;
+            padding: 15px 12px;
+        }
+
+        .hero-stats .stat-number {
+            font-size: 1.8rem;
+        }
+
+        .majors-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .major-details {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .major-actions {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .major-actions .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    /* Dark mode support */
+    .dark-mode .market-overview-section,
+    .dark-mode .comparison-section,
+    .dark-mode .jobs-section {
+        background: var(--bg-secondary);
+    }
+
+    .dark-mode .trending-majors-section,
+    .dark-mode .news-section {
+        background: var(--bg-primary);
+    }
+
+    .dark-mode .overview-card,
+    .dark-mode .major-card,
+    .dark-mode .comparison-tool,
+    .dark-mode .news-card,
+    .dark-mode .job-card {
+        background: var(--card-bg);
+        border-color: var(--border-color);
+    }
+
+    .dark-mode .section-title {
+        color: var(--text-primary);
+    }
+
+    .dark-mode .section-subtitle {
+        color: var(--text-secondary);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-container">
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-content">
+        <h1 class="hero-title">Xu Hướng Ngành Nghề & Việc Làm</h1>
+        <p class="hero-subtitle">
+            Khám phá thị trường lao động, định hướng nghề nghiệp và tìm kiếm cơ hội việc làm phù hợp với xu hướng phát triển của thời đại
+        </p>
+        
+        <div class="hero-stats">
+            <div class="stat-item">
+                <span class="stat-number">200+</span>
+                <span class="stat-label">Ngành Nghề</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">85%</span>
+                <span class="stat-label">Tỷ Lệ Việc Làm</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">15M+</span>
+                <span class="stat-label">VND Lương TB</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">50+</span>
+                <span class="stat-label">Lĩnh Vực</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Market Overview Section -->
+<section class="market-overview-section">
+    <div class="container">
+        <h2 class="section-title">Tổng Quan Thị Trường</h2>
+        <p class="section-subtitle">Cập nhật những xu hướng và thống kê mới nhất về thị trường lao động Việt Nam</p>
+        
+        <div class="overview-grid">
+            <div class="overview-card">
+                <h3><i class="fas fa-chart-line"></i> Ngành Nghề Đang Phát Triển</h3>
+                <div class="chart-container">
+                    <canvas id="growthChart"></canvas>
+                </div>
+                <p>Top 5 ngành có tốc độ tăng trưởng cao nhất trong năm 2024</p>
+            </div>
+            
+            <div class="overview-card">
+                <h3><i class="fas fa-dollar-sign"></i> Mức Lương Trung Bình</h3>
+                <div class="chart-container">
+                    <canvas id="salaryChart"></canvas>
+                </div>
+                <p>Phân bố mức lương theo ngành nghề và kinh nghiệm</p>
+            </div>
+            
+            <div class="overview-card">
+                <h3><i class="fas fa-users"></i> Nhu Cầu Tuyển Dụng</h3>
+                <div class="chart-container">
+                    <canvas id="demandChart"></canvas>
+                </div>
+                <p>Các ngành có nhu cầu tuyển dụng cao nhất hiện tại</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Trending Majors Section -->
+<section class="trending-majors-section">
+    <div class="container">
+        <h2 class="section-title">Ngành Nghề Nổi Bật</h2>
+        <p class="section-subtitle">Khám phá các ngành nghề đang được săn đón và có tiềm năng phát triển mạnh</p>
+        
+        <div class="majors-grid" id="majors-grid">
+            <!-- Majors will be loaded here -->
+        </div>
+    </div>
+</section>
+
+<!-- Comparison Tool Section -->
+<section class="comparison-section">
+    <div class="container">
+        <h2 class="section-title">So Sánh Ngành Nghề</h2>
+        <p class="section-subtitle">Công cụ so sánh giúp bạn đưa ra quyết định nghề nghiệp sáng suốt</p>
+        
+        <div class="comparison-tool">
+            <div class="comparison-form">
+                <div class="searchable-select-container">
+                    <input type="text" class="searchable-select-input" id="major1-input" placeholder="Tìm kiếm ngành thứ nhất..." autocomplete="off">
+                    <div class="searchable-select-dropdown" id="major1-dropdown" style="display: none;">
+                        <!-- Options will be populated here -->
+                    </div>
+                    <input type="hidden" id="major1" value="">
+                </div>
+                <div class="vs-badge">VS</div>
+                <div class="searchable-select-container">
+                    <input type="text" class="searchable-select-input" id="major2-input" placeholder="Tìm kiếm ngành thứ hai..." autocomplete="off">
+                    <div class="searchable-select-dropdown" id="major2-dropdown" style="display: none;">
+                        <!-- Options will be populated here -->
+                    </div>
+                    <input type="hidden" id="major2" value="">
+                </div>
+            </div>
+            
+            <div class="comparison-results" id="comparison-results" style="display: none;">
+                <div class="comparison-card">
+                    <h4 id="major1-name">Ngành 1</h4>
+                    <div id="major1-details">
+                        <!-- Major 1 details will be loaded here -->
+                    </div>
+                </div>
+                <div class="comparison-card">
+                    <h4 id="major2-name">Ngành 2</h4>
+                    <div id="major2-details">
+                        <!-- Major 2 details will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- News Section -->
+<section class="news-section">
+    <div class="container">
+        <h2 class="section-title">Tin Tức & Phân Tích</h2>
+        <p class="section-subtitle">Cập nhật những tin tức mới nhất về thị trường lao động và xu hướng nghề nghiệp</p>
+        
+        <div class="news-grid">
+            <div class="news-card" data-article-target="article-ai-2025">
+                <div class="news-image">
+                    <i class="fas fa-newspaper"></i>
+                </div>
+                <div class="news-content">
+                    <div class="news-date">15/12/2024</div>
+                    <h3 class="news-title">Xu hướng AI và Machine Learning trong năm 2025</h3>
+                    <p class="news-excerpt">GenAI bước vào giai đoạn ứng dụng thực chiến; Edge AI, MLOps trưởng thành và nhu cầu nhân lực tăng mạnh.</p>
+                    <span class="news-tag">Công nghệ</span>
+                    <!-- <button class="btn btn-outline read-more" type="button">Đọc bài viết</button> -->
+                </div>
+            </div>
+            
+            <div class="news-card" data-article-target="article-labor-q4-2024">
+                <div class="news-image">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <div class="news-content">
+                    <div class="news-date">12/12/2024</div>
+                    <h3 class="news-title">Báo cáo thị trường lao động Q4/2024</h3>
+                    <p class="news-excerpt">CNTT, Y tế, Tài chính duy trì nhu cầu cao; lương trung bình tăng nhẹ 3–7% so với cùng kỳ.</p>
+                    <span class="news-tag">Phân tích</span>
+                    <!-- <button class="btn btn-outline read-more" type="button">Đọc bài viết</button> -->
+                </div>
+            </div>
+            
+            <div class="news-card" data-article-target="article-choose-major">
+                <div class="news-image">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div class="news-content">
+                    <div class="news-date">10/12/2024</div>
+                    <h3 class="news-title">Hướng dẫn chọn ngành học phù hợp với xu hướng</h3>
+                    <p class="news-excerpt">Khung 3 bước: Tự đánh giá — Khảo sát thị trường — Lập lộ trình học với ví dụ thực tế.</p>
+                    <span class="news-tag">Tư vấn</span>
+                    <!-- <button class="btn btn-outline read-more" type="button">Đọc bài viết</button> -->
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Hidden full articles -->
+<template id="article-ai-2025">
+    <div class="article-content">
+        <h3>Xu hướng AI và Machine Learning trong năm 2025</h3>
+        <p><strong>Tóm tắt:</strong> Năm 2025 đánh dấu giai đoạn AI/ML đi vào ứng dụng quy mô lớn trong doanh nghiệp. GenAI chuyển từ thử nghiệm sang tích hợp vào quy trình, MLOps trưởng thành giúp triển khai/bảo trì mô hình ổn định hơn, Edge AI bùng nổ nhờ thiết bị biên.</p>
+        <h4>Công nghệ nổi bật</h4>
+        <ul>
+            <li><strong>GenAI tại nơi làm việc:</strong> CoPilot, ChatOps, trợ lý AI nội bộ dùng dữ liệu doanh nghiệp (RAG, vector DB).</li>
+            <li><strong>MLOps 2.0:</strong> quan trắc mô hình (drift, bias), CI/CD cho pipeline dữ liệu, quản trị model registry.</li>
+            <li><strong>Edge AI:</strong> suy luận trên thiết bị (on-device), tối ưu chi phí/độ trễ, tăng cường quyền riêng tư.</li>
+            <li><strong>Multimodal:</strong> xử lý kết hợp văn bản, hình ảnh, giọng nói, video trong một pipeline.</li>
+        </ul>
+        <h4>Kỹ năng nên trang bị</h4>
+        <ul>
+            <li>Python, PyTorch/TensorFlow; LLM ops (tokenization, LoRA, quantization).</li>
+            <li>Data engineering: Airflow, Spark, lakehouse; SQL nâng cao.</li>
+            <li>DevOps/MLOps: Docker, Kubernetes, MLflow, Vertex ML, AWS SageMaker.</li>
+            <li>AI an toàn, đạo đức, bảo mật dữ liệu.</li>
+        </ul>
+        <h4>Cơ hội việc làm tiêu biểu</h4>
+        <ul>
+            <li>Machine Learning Engineer, Data Scientist, LLM Engineer.</li>
+            <li>MLOps Engineer, Prompt Engineer, AI Product Manager.</li>
+        </ul>
+        <h4>Khuyến nghị</h4>
+        <p>Học theo dự án thực tế, xây dựng portfolio (notebook, demo, blog). Ưu tiên kỹ năng triển khai bền vững (MLOps) và kiến trúc dữ liệu.</p>
+    </div>
+</template>
+
+<template id="article-labor-q4-2024">
+    <div class="article-content">
+        <h3>Báo cáo thị trường lao động Q4/2024</h3>
+        <p><strong>Tổng quan:</strong> Thị trường duy trì tăng trưởng ổn định, nhu cầu tuyển dụng tập trung vào công nghệ, y tế và tài chính. Mức lương trung bình tăng 3–7% so với cùng kỳ.</p>
+        <h4>Nhu cầu tuyển dụng theo lĩnh vực</h4>
+        <ul>
+            <li><strong>CNTT:</strong> Full-stack, Data/ML, Security, Cloud.</li>
+            <li><strong>Y tế:</strong> bác sĩ đa khoa, điều dưỡng, dược sĩ lâm sàng.</li>
+            <li><strong>Tài chính:</strong> phân tích tài chính, kiểm toán, quản trị rủi ro.</li>
+        </ul>
+        <h4>Mức lương tham khảo</h4>
+        <ul>
+            <li>CNTT: 15–45 triệu VND (mid-level); Data/ML: 20–60 triệu VND.</li>
+            <li>Y tế: 18–40 triệu VND; Tài chính: 15–35 triệu VND.</li>
+        </ul>
+        <h4>Khu vực và hình thức</h4>
+        <ul>
+            <li>Hà Nội, TP.HCM dẫn đầu nhu cầu; hybrid/remote tăng trong khối công nghệ.</li>
+        </ul>
+        <h4>Kỹ năng nổi bật</h4>
+        <ul>
+            <li>Kỹ năng số (data literacy), tiếng Anh chuyên ngành, tư duy phân tích.</li>
+            <li>Kỹ năng mềm: giao tiếp, hợp tác đa chức năng, quản lý thời gian.</li>
+        </ul>
+        <h4>Dự báo Q1/2025</h4>
+        <p>CNTT tiếp tục tăng trưởng nhờ chuyển đổi số; tài chính cân bằng; du lịch – dịch vụ phục hồi theo mùa.</p>
+    </div>
+</template>
+
+<template id="article-choose-major">
+    <div class="article-content">
+        <h3>Hướng dẫn chọn ngành học phù hợp với xu hướng</h3>
+        <p>Bài viết cung cấp khung 3 bước giúp học sinh/sinh viên chọn ngành dựa trên sở thích, năng lực và dữ liệu thị trường.</p>
+        <h4>Bước 1: Tự đánh giá</h4>
+        <ul>
+            <li>Tính cách, sở thích (MBTI/Interest inventory) → nhóm nghề phù hợp.</li>
+            <li>Năng lực nền tảng: toán, ngôn ngữ, tư duy logic, làm việc nhóm.</li>
+        </ul>
+        <h4>Bước 2: Khảo sát thị trường</h4>
+        <ul>
+            <li>Xem cơ hội việc làm (opportunities), mức lương, lộ trình nghề nghiệp.</li>
+            <li>Đối chiếu nhu cầu địa phương (Hà Nội, TP.HCM) và xu hướng toàn cầu.</li>
+        </ul>
+        <h4>Bước 3: Lập lộ trình học</h4>
+        <ul>
+            <li>Chọn ngành – trường – kỹ năng bổ trợ (ngoại ngữ, công cụ số).</li>
+            <li>Làm dự án, thực tập sớm; xây dựng hồ sơ năng lực.</li>
+        </ul>
+        <h4>Ví dụ nhanh</h4>
+        <p>Nếu thích công nghệ và sáng tạo: xem xét CNTT (Khoa học máy tính, Trí tuệ nhân tạo) hoặc Thiết kế số; nếu thích con người – xã hội: Tâm lý, Truyền thông số, Giáo dục.</p>
+        <h4>Lưu ý</h4>
+        <p>Không “chọn ngành theo trào lưu” nếu không phù hợp năng lực/cá tính; ưu tiên lộ trình có thể kiểm chứng bằng dự án và kết quả học tập.</p>
+    </div>
+</template>
+
+<!-- Job Integration Section -->
+<section class="jobs-section">
+    <div class="container">
+        <h2 class="section-title">Việc Làm Liên Quan</h2>
+        <p class="section-subtitle">Khám phá các cơ hội việc làm thực tế trong các ngành nghề bạn quan tâm</p>
+        
+        <div class="jobs-filter">
+            <button class="filter-btn active" data-filter="all">Tất cả</button>
+            <button class="filter-btn" data-filter="hot">Ngành hot</button>
+            <button class="filter-btn" data-filter="find">Đang thiếu nhân lực</button>
+            <button class="filter-btn" data-filter="grown">Đang phát triển</button>
+        </div>
+        
+        <div class="jobs-grid" id="jobs-grid">
+            <!-- Jobs will be loaded here -->
+        </div>
+    </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="/static/js/xu-huong-nghe.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  function openArticleModal(title, contentHtml) {
+    const system = window.xuHuongNgheSystem;
+    if (system && typeof system.createModal === 'function') {
+      const modal = system.createModal(title, contentHtml);
+      document.body.appendChild(modal);
+      modal.querySelector('.modal-close').addEventListener('click', () => modal.remove());
+      modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+      const esc = (ev) => { if (ev.key === 'Escape') { modal.remove(); document.removeEventListener('keydown', esc); } };
+      document.addEventListener('keydown', esc);
+    } else {
+      const modal = document.createElement('div');
+      modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:10000;';
+      modal.innerHTML = '<div style="background:#fff;max-width:800px;max-height:80vh;overflow:auto;border-radius:12px;padding:24px;position:relative;">'
+        + '<button style="position:absolute;top:12px;right:12px;font-size:20px;border:none;background:none;cursor:pointer;">&times;</button>'
+        + '<h2 style="margin-top:0;"></h2>'
+        + '<div class="body"></div>'
+        + '</div>';
+      modal.querySelector('h2').textContent = title;
+      modal.querySelector('.body').innerHTML = contentHtml;
+      document.body.appendChild(modal);
+      modal.querySelector('button').onclick = () => modal.remove();
+      modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+    }
+  }
+
+  function getTemplateHtml(id) {
+    const tpl = document.getElementById(id);
+    if (!tpl) return '';
+    return tpl.innerHTML;
+  }
+
+  document.querySelectorAll('.news-card').forEach(card => {
+    const target = card.getAttribute('data-article-target');
+    const titleEl = card.querySelector('.news-title');
+    const title = titleEl ? titleEl.textContent : 'Bài viết';
+    card.addEventListener('click', (e) => {
+      if (e.target && e.target.classList && e.target.classList.contains('read-more')) return;
+      if (!target) return;
+      openArticleModal(title, getTemplateHtml(target));
+    });
+    const btn = card.querySelector('.read-more');
+    if (btn) {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openArticleModal(title, getTemplateHtml(target));
+      });
+    }
+      });
+});
+</script>
+</div>
+{% endblock %} 

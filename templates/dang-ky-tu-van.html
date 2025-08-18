@@ -1,0 +1,1528 @@
+{% extends 'base.html' %}
+{% block title %}Đăng Ký Tư Vấn{% endblock %}
+{% block stylesheets %}
+<style>
+.page-hero{position:relative;overflow:hidden;background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 50%,#06b6d4 100%);color:#fff;border-radius:24px;padding:48px 32px;margin:24px 0}
+.page-hero .title{font-size:2.2rem;font-weight:900;margin:0 0 8px 0}
+.page-hero .subtitle{opacity:.95;max-width:900px}
+.page-hero .bg-blur{position:absolute;inset:-40px;background:radial-gradient(600px 200px at 10% 0%,rgba(255,255,255,.15),transparent),radial-gradient(600px 200px at 90% 100%,rgba(255,255,255,.12),transparent)}
+
+.page-container{max-width:1350px;margin:0 auto;padding:2rem}
+.two-col{display:grid;grid-template-columns:1.1fr 0.9fr;gap:2rem;align-items:start}
+.section{background:#ffffff;border:1px solid #e5e7eb;border-radius:16px;padding:1.5rem}
+.section h2{margin:0 0 0.25rem 0;color:#0f172a;font-weight:800;display:flex;align-items:center;gap:.6rem}
+.section h2 i{color:#6366f1}
+.section .subtitle{margin:.25rem 0 1rem 0;color:#64748b}
+.card{background:linear-gradient(180deg,#ffffff, #f8fafc);border-radius:16px;box-shadow:0 12px 32px rgba(2,6,23,0.06);border:1px solid #e5e7eb}
+
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem}
+.form-grid .full{grid-column:1/-1}
+.field{position:relative}
+.field label{display:block;font-size:14px;color:#334155;margin-bottom:6px}
+.input{width:300px;padding:0.9rem 1rem 0.9rem 2.6rem;border:1px solid #e2e8f0;border-radius:12px;background:#fff}
+.input:focus{outline:none;border-color:#6366f1;box-shadow:0 0 0 4px rgba(99,102,241,.12)}
+.field .icon{position:absolute;left:10px;top:38px;color:#94a3b8}
+.textarea{width:700px;min-height:160px;padding:0.9rem 1rem;border:1px solid #e2e8f0;border-radius:12px;resize:vertical}
+
+.btn{display:inline-flex;align-items:center;gap:0.6rem;padding:0.9rem 1.25rem;border-radius:10px;border:none;cursor:pointer;transition:all .2s}
+.btn-primary{background:linear-gradient(90deg,#6366f1,#8b5cf6);color:#fff}
+.btn-primary:hover{filter:brightness(0.98);transform:translateY(-1px)}
+.notice{margin-top:0.75rem;color:#16a34a;display:none;font-weight:600}
+
+.chat-box{border:1px solid #e5e7eb;border-radius:16px;overflow:hidden;background:#fff}
+.chat-header{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;padding:0.9rem 1rem;font-weight:700;display:flex;align-items:center;gap:.5rem; color:#0f172a}
+.chat-body{height:460px;overflow:auto;padding:1rem;background:#fafbff}
+.chat-suggestions{display:flex;flex-wrap:wrap;gap:.5rem;padding:.5rem;border-top:1px dashed #e5e7eb;background:#fff; padding-bottom: 0px; overflow: hidden; position: relative;}
+.chat-suggestions .chip{padding:.45rem .7rem;border:1px solid #e5e7eb;border-radius:999px;background:#fff;color:#334155;cursor:pointer;font-size:.7rem}
+.chat-suggestions .chip:hover{border-color:#6366f1;color:#6366f1}
+.chat-input{display:flex;gap:0.5rem;padding:0.75rem;border:0px solid #e5e7eb !important;background:#fff}
+.chat-input input{flex:1}
+
+.message{margin:0.5rem 0;display:flex}
+.message.user{justify-content:flex-end}
+.message .bubble{display:inline-block;padding:0.7rem 1rem;border-radius:14px;max-width:78%; font-size: 13px;}
+.message.user .bubble{background:linear-gradient(90deg,#6366f1,#8b5cf6);color:#fff}
+.message.ai .bubble{background:#eef2ff;color:#1e293b;border:1px solid #e5e7eb}
+
+/* CSS cho định dạng Markdown trong chat */
+.message.ai .bubble strong {
+  font-weight: 700;
+  color: #1e40af;
+}
+
+.message.ai .bubble ul {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.message.ai .bubble li {
+  margin: 0.25rem 0;
+  line-height: 1.4;
+}
+
+.message.ai .bubble br {
+  margin: 0.25rem 0;
+}
+
+/* Đảm bảo text có line-height tốt */
+.message.ai .bubble {
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+.small{font-size:11px;color:#6b7280; font-style: italic; margin-right: 10px; margin-top: 10px; }
+
+@media (max-width: 992px){.two-col{grid-template-columns:1fr}}
+
+/* Modal styles */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-content h3 {
+  margin: 0 0 1rem 0;
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.modal-content p {
+  margin: 0.5rem 0;
+  color: #334155;
+}
+
+.form-group {
+  margin: 1rem 0;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.button-group {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.button-group .btn {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.button-group .btn-primary {
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  color: white;
+}
+
+.button-group .btn-primary:hover {
+  filter: brightness(0.95);
+}
+
+.button-group .btn:not(.btn-primary) {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.button-group .btn:not(.btn-primary):hover {
+  background: #e2e8f0;
+}
+
+/* Modal thành công */
+.success-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+}
+
+.success-modal.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.success-modal-content {
+  background: #fff;
+  border-radius: 20px;
+  padding: 30px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  position: relative;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.success-icon {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.success-icon svg {
+  filter: drop-shadow(0 4px 8px rgba(16, 185, 129, 0.3));
+}
+
+.success-title {
+  color: #0f172a;
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 15px;
+}
+
+.success-message {
+  text-align: left;
+  margin-bottom: 25px;
+  color: #475569;
+}
+
+.success-message h3 {
+  color: #0f172a;
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+.success-message ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 10px;
+}
+
+.success-message li {
+  margin-bottom: 5px;
+  font-size: 0.9rem;
+  color: #475569;
+}
+
+.process-info {
+  margin-top: 20px;
+  text-align: left;
+  color: #475569;
+}
+
+.process-link {
+  color: #6366f1;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.process-link:hover {
+  text-decoration: underline;
+}
+
+.success-btn {
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  color: white;
+  padding: 12px 25px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition: background 0.3s ease;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+}
+
+.success-btn:hover {
+  background: linear-gradient(90deg, #8b5cf6, #6366f1);
+  transform: translateY(-2px);
+}
+
+.success-btn svg {
+  fill: currentColor;
+}
+
+/* Hiệu ứng thông minh và sinh động */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 53%, 80%, 100% {
+    transform: translate3d(0,0,0);
+  }
+  40%, 43% {
+    transform: translate3d(0, -30px, 0);
+  }
+  70% {
+    transform: translate3d(0, -15px, 0);
+  }
+  90% {
+    transform: translate3d(0, -4px, 0);
+  }
+}
+
+@keyframes successIconAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) rotate(-180deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2) rotate(0deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* Animation cho các section */
+.section {
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.section:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+/* Hiệu ứng hover cho form fields */
+.field {
+  transition: all 0.3s ease;
+}
+
+.field:hover {
+  transform: translateY(-2px);
+}
+
+.field:hover .input,
+.field:hover .textarea {
+  border-color: #6366f1;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.15);
+}
+
+/* Hiệu ứng focus với glow */
+.input:focus,
+.textarea:focus {
+  animation: pulse 0.3s ease-in-out;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2), 0 4px 15px rgba(99, 102, 241, 0.15);
+}
+
+/* Hiệu ứng cho buttons */
+.btn {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn:hover::before {
+  left: 100%;
+}
+
+.btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+}
+
+/* Hiệu ứng cho chat suggestions */
+.chat-suggestions .chip {
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  transform-origin: center;
+}
+
+.chat-suggestions .chip::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(99, 102, 241, 0.1);
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  transform: translate(-50%, -50%);
+}
+
+.chat-suggestions .chip:hover::before {
+  width: 100%;
+  height: 100%;
+}
+
+.chat-suggestions .chip:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.15);
+  z-index: 10;
+}
+
+/* Hiệu ứng cho chat messages */
+.message {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.message.ai {
+  animation-delay: 0.1s;
+}
+
+/* Hiệu ứng typing indicator */
+.typing-indicator {
+  display: flex;
+  gap: 4px;
+  padding: 10px 15px;
+  background: #eef2ff;
+  border-radius: 14px;
+  width: fit-content;
+  margin: 10px 0;
+}
+
+.typing-dots {
+  display: flex;
+  gap: 4px;
+}
+
+.typing-dot {
+  width: 8px;
+  height: 8px;
+  background: #6366f1;
+  border-radius: 50%;
+  animation: bounce 1.4s infinite ease-in-out;
+}
+
+.typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+/* Hiệu ứng cho page hero */
+.page-hero {
+  position: relative;
+  overflow: hidden;
+}
+
+.page-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+  animation: shimmer 3s infinite;
+}
+
+/* Hiệu ứng cho success modal */
+.success-modal-content {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.success-icon {
+  animation: successIconAppear 1s ease-out 0.5s both;
+}
+
+.success-title {
+  animation: fadeInUp 0.6s ease-out 0.3s both;
+}
+
+.success-message {
+  animation: fadeInUp 0.6s ease-out 0.6s both;
+}
+
+.success-btn {
+  animation: fadeInUp 0.6s ease-out 0.9s both;
+}
+
+/* Hiệu ứng loading cho form submission */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.loading-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #6366f1;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Hiệu ứng cho form validation */
+.field.error .input,
+.field.error .textarea {
+  border-color: #ef4444;
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.field.success .input,
+.field.success .textarea {
+  border-color: #10b981;
+  animation: successPulse 0.5s ease-in-out;
+}
+
+@keyframes successPulse {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+/* Hiệu ứng cho AI chat */
+.chat-header {
+  position: relative;
+  overflow: hidden;
+}
+
+.chat-header::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  animation: shimmer 2s infinite;
+}
+
+/* Hiệu ứng cho form fields khi có dữ liệu */
+.field.has-content .input,
+.field.has-content .textarea {
+  border-color: #10b981;
+  background: linear-gradient(135deg, #f0fdf4, #ffffff);
+}
+
+/* Hiệu ứng cho progress indicator */
+.progress-bar {
+  width: 100%;
+  margin: 0 0 20px 0;
+}
+
+.progress-label {
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.progress-text {
+  color: #6366f1;
+  font-weight: 600;
+}
+
+.progress-bar-container {
+  height: 6px;
+  background: #f1f5f9;
+  border-radius: 3px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  width: 0%;
+  transition: width 0.8s ease;
+  border-radius: 3px;
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+}
+
+/* Hiệu ứng cho notification */
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 15px 20px;
+  border-radius: 10px;
+  color: white;
+  font-weight: 600;
+  z-index: 10000;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+}
+
+.notification.show {
+  transform: translateX(0);
+}
+
+.notification.success {
+  background: linear-gradient(90deg, #10b981, #059669);
+}
+
+.notification.error {
+  background: linear-gradient(90deg, #ef4444, #dc2626);
+}
+
+/* Hiệu ứng cho floating elements */
+.floating-element {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Hiệu ứng cho card hover */
+.card {
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(2, 6, 23, 0.1);
+}
+
+/* Hiệu ứng cho form submission */
+.form-submitting {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.form-submitting .btn {
+  position: relative;
+}
+
+.form-submitting .btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid transparent;
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+</style>
+{% endblock %}
+{% block content %}
+<div class="page-container">
+  <div class="page-hero">
+    <div class="bg-blur"></div>
+    <div class="title">Đăng Ký Tư Vấn</div>
+    <div class="subtitle">Tham gia mạng lưới chuyên gia và trải nghiệm Trợ lý AI tư vấn tức thì. Kết nối – Hỏi đáp – Định hướng.</div>
+  </div>
+
+  <div class="two-col">
+  <div class="section card">
+    <h2><i class="fas fa-user-tie"></i> Đăng ký tư vấn - hướng nghiệp </h2>
+    <p class="subtitle">Tham gia mạng lưới chuyên gia để kết nối với học sinh – sinh viên và phụ huynh.</p>
+    <div class="form-grid" id="expert-form">
+      <div class="field"><label>Họ và tên *</label><i class="fas fa-user icon"></i><input class="input" id="ex_full_name" placeholder="Ví dụ: Nguyễn Văn A"/></div>
+      <div class="field"><label>Email *</label><i class="fas fa-envelope icon"></i><input class="input" id="ex_email" placeholder="email@domain.com"/></div>
+      <div class="field"><label>Số điện thoại *</label><i class="fas fa-phone icon"></i><input class="input" id="ex_phone" placeholder="0xxx..."/></div>
+      <div class="field"><label>Zalo (nếu có)</label><i class="fas fa-comment-dots icon"></i><input class="input" id="ex_zalo" placeholder="Số điện thoại Zalo"/></div>
+      <div class="field"><label>Trường quan tâm</label><i class="fas fa-school icon"></i><select class="input" id="ex_school_type">
+        <option value="">Trường quan tâm</option>
+        <option>Đại học</option>
+        <option>Cao đẳng</option>
+        <option>Trung cấp</option>
+        <option>Du học</option>
+        <option>Khác</option>
+      </select></div>
+      <div class="field"><label>Ngành của trường đã chọn</label><i class="fas fa-graduation-cap icon"></i><select class="input" id="ex_major">
+        <option value="">Ngành của trường đã chọn</option>
+      </select></div>
+      <div class="field full"><label>Facebook (nếu có)</label><i class="fab fa-facebook icon"></i><input class="input" id="ex_facebook" placeholder="https://facebook.com/username"/></div>
+      <div class="field full"><label>Giới thiệu bản thân & sở thích (không bắt buộc)</label><textarea class="textarea" id="ex_intro" placeholder="Chia sẻ về sở thích, định hướng, điểm mạnh... (không bắt buộc)"></textarea></div>
+      <div class="full">
+        <button class="btn btn-primary" id="ex_submit">Hoàn tất đăng ký</button>
+        <div class="notice" id="ex_notice">✅ Hồ sơ đã được tiếp nhận và đang xét duyệt.</div>
+      </div>
+    </div>
+    <div class="small">* Trường bắt buộc</div>
+  </div>
+
+  <div class="section card">
+    <h2><i class="fas fa-robot"></i> Trợ lý AI tư vấn tức thì</h2>
+    <p class="subtitle">Hỏi đáp tức thì về ngành nghề, việc làm, học tập. Khi cần, AI sẽ kết nối bạn với chuyên gia phù hợp.</p>
+    <div class="chat-box" id="ai_box">
+      <div class="chat-header">Trợ lý tư vấn AI</div>
+      <div class="chat-body" id="chat_body"></div>
+      <div class="chat-suggestions" id="chat_suggestions">
+        <button class="chip" data-text="Tư vấn chọn ngành theo điểm mạnh">Tư vấn chọn ngành theo điểm mạnh</button>
+        <button class="chip" data-text="Xu hướng việc làm năm 2025">Xu hướng việc làm năm 2025</button>
+        <button class="chip" data-text="Lộ trình học để vào ngành Data/AI">Lộ trình học Data/AI</button>
+        <button class="chip" data-text="Kết nối chuyên gia tư vấn">Kết nối chuyên gia tư vấn</button>
+      </div>
+      <div class="chat-input">
+        <input class="input" id="chat_input" placeholder="Nhập câu hỏi của bạn..."/>
+        <button class="btn btn-primary" id="chat_send">Gửi</button>
+      </div>
+    </div>
+    <div class="small">Khi cần tư vấn sâu, AI sẽ gợi ý chuyển sang chuyên gia và thu thập thông tin liên hệ của bạn.</div>
+  </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+// Ngành theo Trường quan tâm
+const SCHOOL_TYPE_TO_MAJORS = {
+  'Đại học': ['Công nghệ thông tin', 'Kinh tế', 'Y khoa', 'Luật', 'Sư phạm'],
+  'Cao đẳng': ['Điện - Điện tử', 'Du lịch', 'Thiết kế đồ họa', 'Kế toán'],
+  'Trung cấp': ['Điều dưỡng', 'Cơ khí', 'Xây dựng'],
+  'Du học': ['STEM', 'Kinh doanh quốc tế', 'Truyền thông', 'Khoa học dữ liệu'],
+  'Khác': ['Tư vấn hướng nghiệp', 'Kỹ năng mềm']
+};
+
+const exSchoolType = document.getElementById('ex_school_type');
+const exMajor = document.getElementById('ex_major');
+exSchoolType.addEventListener('change', () => {
+  const majors = SCHOOL_TYPE_TO_MAJORS[exSchoolType.value] || [];
+  exMajor.innerHTML = '<option value="">Ngành của trường đã chọn</option>' + majors.map(m => `<option>${m}</option>`).join('');
+});
+
+// Submit Expert application
+async function submitExpert() {
+  const payload = {
+    full_name: document.getElementById('ex_full_name').value.trim(),
+    email: document.getElementById('ex_email').value.trim(),
+    phone: document.getElementById('ex_phone').value.trim(),
+    zalo_phone: document.getElementById('ex_zalo').value.trim() || null,
+    interested_school_type: exSchoolType.value,
+    interested_major: exMajor.value,
+    facebook_link: document.getElementById('ex_facebook').value.trim() || null,
+    introduction: document.getElementById('ex_intro').value.trim(),
+  };
+  // simple validation
+  if (!payload.full_name || !payload.email || !payload.phone) {
+    alert('Vui lòng điền đầy đủ các trường bắt buộc.');
+    return;
+  }
+  try {
+    const base = (location.hostname.includes('pythonanywhere.com')) ? '' : 'https://timtruonghoc.pythonanywhere.com';
+    const res = await fetch(`${base}/api/expert-applications/`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(await res.text());
+    
+    // Hiển thị modal thành công hiện đại
+    showSuccessModal();
+  } catch (e) {
+    console.warn(e);
+    alert('Gửi thất bại, vui lòng thử lại.');
+  }
+}
+
+document.getElementById('ex_submit').addEventListener('click', submitExpert);
+
+// Simple AI chat mock + info collection
+const chatBody = document.getElementById('chat_body');
+const chatInput = document.getElementById('chat_input');
+const chatSend = document.getElementById('chat_send');
+const chatSuggestions = document.getElementById('chat_suggestions');
+
+// Hàm chuyển đổi Markdown thành HTML
+function formatMarkdown(text) {
+  if (!text) return '';
+  
+  let formattedText = text;
+  
+  // Chuyển đổi **text** thành <strong>text</strong>
+  formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  
+  // Chuyển đổi xuống dòng \n thành <br>
+  formattedText = formattedText.replace(/\n/g, '<br>');
+  
+  // Xử lý bullet points • thành danh sách có cấu trúc
+  // Tìm các dòng bắt đầu bằng • và nhóm chúng lại
+  const lines = formattedText.split('<br>');
+  const processedLines = [];
+  let inList = false;
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    
+    if (line.startsWith('•')) {
+      if (!inList) {
+        processedLines.push('<ul>');
+        inList = true;
+      }
+      // Loại bỏ • và thêm <li>
+      const listItem = line.replace(/^•\s*/, '');
+      processedLines.push(`<li>${listItem}</li>`);
+    } else {
+      if (inList) {
+        processedLines.push('</ul>');
+        inList = false;
+      }
+      if (line) {
+        processedLines.push(line);
+      }
+    }
+  }
+  
+  // Đóng list nếu còn mở
+  if (inList) {
+    processedLines.push('</ul>');
+  }
+  
+  // Nối lại các dòng
+  formattedText = processedLines.join('<br>');
+  
+  // Xử lý các trường hợp đặc biệt
+  formattedText = formattedText.replace(/<br><br>/g, '<br>');
+  formattedText = formattedText.replace(/<ul><br>/g, '<ul>');
+  formattedText = formattedText.replace(/<br><\/ul>/g, '</ul>');
+  
+  return formattedText;
+}
+
+function appendMessage(role, text) {
+  const wrap = document.createElement('div');
+  wrap.className = `message ${role}`;
+  
+  // Format text nếu là AI message
+  const formattedText = role === 'ai' ? formatMarkdown(text) : text;
+  
+  wrap.innerHTML = `<div class="bubble">${formattedText}</div>`;
+  chatBody.appendChild(wrap);
+  chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+// Cập nhật hàm này để gọi API backend đã được định cấu hình
+async function callGeminiAPI(history) {
+  try {
+    const base = (location.hostname.includes('pythonanywhere.com')) ? '' : 'http://127.0.0.1:5000'; // Đổi URL này cho phù hợp
+    
+    // Lấy tin nhắn cuối cùng từ lịch sử để gửi đi
+    const userMessage = history[history.length - 1].content;
+    
+    const response = await fetch(`${base}/api/gemini-chat/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        history: history.slice(0, -1), 
+        message: userMessage,
+        user_id: userId 
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data.success ? data.response : 'Xin lỗi, tôi không thể trả lời lúc này. Vui lòng thử lại sau.';
+  } catch (error) {
+    console.error('Lỗi khi gọi Gemini API:', error);
+    return 'Xin lỗi, có lỗi kết nối. Vui lòng thử lại sau.';
+  }
+}
+
+async function saveConsultation(full_name, email, phone, summary) {
+  try {
+    const base = (location.hostname.includes('pythonanywhere.com')) ? '' : 'http://127.0.0.1:5000'; // Đổi URL này cho phù hợp
+    const res = await fetch(`${base}/api/consultation-requests/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ full_name, email, phone, conversation_summary: summary })
+    });
+    if (!res.ok) throw new Error(await res.text());
+    appendMessage('ai', 'Đã tiếp nhận yêu cầu của bạn. Chúng tôi sẽ sắp xếp chuyên gia liên hệ trong thời gian sớm nhất.');
+  } catch (e) {
+    console.warn(e);
+    appendMessage('ai', 'Không thể lưu yêu cầu lúc này, vui lòng thử lại sau.');
+  }
+}
+
+let collectingInfo = false;
+let userInfo = { name: '', email: '', phone: '' };
+let conversationHistory = [];
+let isProcessing = false; // Flag để tránh duplicate
+let userId = 'user_' + Date.now(); // Tạo unique user ID
+let aiCollectedData = {}; // Dữ liệu AI đã thu thập
+
+// Hàm kiểm tra và hiển thị form tự động điền
+async function checkAndShowAutoFilledForm() {
+  try {
+    const base = (location.hostname.includes('pythonanywhere.com')) ? '' : 'http://127.0.0.1:5000';
+    const formRes = await fetch(`${base}/api/user-form-data/${userId}`);
+    if (formRes.ok) {
+      const formData = await formRes.json();
+      if (formData.success && formData.form_data) {
+        aiCollectedData = formData.form_data;
+        appendMessage('ai', `Tuyệt vời! Tôi đã thu thập thông tin của bạn. Bây giờ tôi sẽ tự động điền form đăng ký tư vấn. Bạn có muốn xác nhận và gửi không?`);
+        
+        // Hiển thị form với dữ liệu đã điền
+        showAutoFilledForm(formData.form_data);
+        return;
+      }
+    }
+  } catch (e) {
+    console.warn('Không thể lấy dữ liệu form:', e);
+  }
+  
+  // Fallback: thu thập thông tin thủ công
+  collectingInfo = true;
+  appendMessage('ai', 'Để được kết nối, vui lòng nhập Họ và tên:');
+}
+
+// Hàm hiển thị modal xác nhận thông tin
+function showConfirmationModal(collectedData) {
+  const modal = document.createElement('div');
+  modal.className = 'modal';
+  modal.innerHTML = `
+    <div class="modal-content">
+      <h3>Xác nhận thông tin đăng ký tư vấn</h3>
+      
+      <div style="margin-bottom: 1rem;">
+        <p><strong>Tên:</strong> ${collectedData.full_name || 'Chưa có'}</p>
+        <p><strong>Email:</strong> ${collectedData.email || 'Chưa có'}</p>
+        <p><strong>Số điện thoại:</strong> ${collectedData.phone || 'Chưa có'}</p>
+        <p><strong>Mục tiêu học tập:</strong> ${collectedData.introduction || 'Chưa có'}</p>
+      </div>
+      
+      <div class="form-group">
+        <label>Email: *</label>
+        <input type="email" id="confirm-email" placeholder="Nhập email của bạn" value="${collectedData.email || ''}" required>
+      </div>
+      
+      <div class="form-group">
+        <label>Số điện thoại: *</label>
+        <input type="tel" id="confirm-phone" placeholder="Nhập số điện thoại" value="${collectedData.phone || ''}" required>
+      </div>
+      
+      <div class="button-group">
+        <button onclick="confirmAndSubmitConsultation()" class="btn btn-primary">Xác nhận và gửi</button>
+        <button onclick="closeModal()" class="btn">Hủy</button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  
+  // Lưu dữ liệu để sử dụng khi submit
+  window.currentCollectedData = collectedData;
+}
+
+// Hàm xác nhận và gửi yêu cầu tư vấn
+function confirmAndSubmitConsultation() {
+  const email = document.getElementById('confirm-email').value;
+  const phone = document.getElementById('confirm-phone').value;
+  
+  if (!email || !phone) {
+    alert('Vui lòng nhập đầy đủ email và số điện thoại');
+    return;
+  }
+  
+  const collectedData = window.currentCollectedData;
+  const summary = `AI thu thập: ${collectedData.introduction || ''}. Email: ${email}, Phone: ${phone}`;
+  
+  saveConsultation(collectedData.full_name || 'Khách', email, phone, summary);
+  closeModal();
+  
+  // Thông báo thành công
+  appendMessage('ai', '**Cảm ơn bạn!** Yêu cầu tư vấn đã được gửi thành công. Chuyên gia sẽ liên hệ với bạn trong thời gian sớm nhất! 📞✨');
+}
+
+// Hàm đóng modal
+function closeModal() {
+  const modal = document.querySelector('.modal');
+  if (modal) {
+    modal.remove();
+  }
+  // Xóa dữ liệu tạm
+  delete window.currentCollectedData;
+}
+
+// Hàm hiển thị modal thành công hiện đại
+function showSuccessModal() {
+  const modal = document.createElement('div');
+  modal.className = 'success-modal';
+  modal.innerHTML = `
+    <div class="success-modal-content">
+      <div class="success-icon">
+        <svg width="60" height="60" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="10" fill="#10B981" stroke="#10B981" stroke-width="2"/>
+          <path d="M8 12L11 15L16 9" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      
+      <h2 class="success-title">🎉 Đăng ký thành công!</h2>
+      
+      <div class="success-message">
+        <p>Cảm ơn bạn đã đăng ký làm chuyên gia tư vấn tại <strong>TimTruongHoc.vn</strong></p>
+        
+        <div class="contact-info">
+          <h3>📞 Chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất để:</h3>
+          <ul>
+            <li>✅ Xác nhận thông tin</li>
+            <li>✅ Hướng dẫn quy trình tư vấn</li>
+            <li>✅ Thiết lập tài khoản chuyên gia</li>
+          </ul>
+        </div>
+        
+       
+      </div>
+      
+      <button onclick="goToHomepage()" class="success-btn">
+        <span>Quay lại trang chủ</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  
+  // Thêm animation
+  setTimeout(() => {
+    modal.classList.add('show');
+  }, 10);
+}
+
+// Hàm quay về trang chủ
+function goToHomepage() {
+  window.location.href = '/';
+}
+
+// Hàm đóng modal thành công
+function closeSuccessModal() {
+  const modal = document.querySelector('.success-modal');
+  if (modal) {
+    modal.classList.remove('show');
+    setTimeout(() => {
+      modal.remove();
+    }, 300);
+  }
+}
+
+// Hàm hiển thị form với dữ liệu đã điền (tương thích với code cũ)
+function showAutoFilledForm(formData) {
+  // Chuyển đổi dữ liệu cũ sang format mới
+  const collectedData = {
+    full_name: formData.name || '',
+    email: formData.email || '',
+    phone: formData.phone || '',
+    introduction: formData.message || formData.career_goals || ''
+  };
+  
+  // Hiển thị modal xác nhận
+  showConfirmationModal(collectedData);
+}
+
+function handleUserInput() {
+  const text = chatInput.value.trim();
+  if (!text || isProcessing) return;
+  
+  isProcessing = true;
+  
+  appendMessage('user', text);
+  
+  // Đảm bảo xóa hoàn toàn input - sử dụng nhiều cách
+  chatInput.value = '';
+  chatInput.textContent = '';
+  chatInput.innerHTML = '';
+  chatInput.focus(); // Giữ focus vào input
+  
+  // Đảm bảo xóa hoàn toàn sau một chút
+  setTimeout(() => {
+    chatInput.value = '';
+    chatInput.focus();
+  }, 10);
+  
+  if (collectingInfo) {
+    if (!userInfo.name) {
+      userInfo.name = text;
+      appendMessage('ai', 'Cảm ơn bạn. Tiếp theo, vui lòng cung cấp Email.');
+      isProcessing = false;
+      return;
+    }
+    if (!userInfo.email) {
+      if (!text.includes('@')) {
+        appendMessage('ai', 'Email không hợp lệ. Vui lòng nhập lại.');
+        isProcessing = false;
+        return;
+      }
+      userInfo.email = text;
+      appendMessage('ai', 'Tuyệt vời! Cuối cùng, cho mình xin Số điện thoại.');
+      isProcessing = false;
+      return;
+    }
+    if (!userInfo.phone) {
+      userInfo.phone = text;
+      const summary = `Thu thập qua chat AI. Lịch sử: ${conversationHistory.map(msg => `${msg.role}: ${msg.content}`).join(' | ')}`;
+      saveConsultation(userInfo.name, userInfo.email, userInfo.phone, summary);
+      
+      collectingInfo = false;
+      userInfo = { name: '', email: '', phone: '' };
+      conversationHistory = [];
+      isProcessing = false;
+      return;
+    }
+  }
+
+  conversationHistory.push({ role: 'user', content: text });
+
+  const loadingDiv = document.createElement('div');
+  loadingDiv.className = 'message ai';
+  loadingDiv.innerHTML = '<div class="bubble">Đang suy nghĩ...</div>';
+  chatBody.appendChild(loadingDiv);
+  chatBody.scrollTop = chatBody.scrollHeight;
+
+  callGeminiAPI(conversationHistory).then(reply => {
+    chatBody.removeChild(loadingDiv);
+    appendMessage('ai', reply);
+    
+    conversationHistory.push({ role: 'model', content: reply });
+    
+    // Kiểm tra nếu AI đề xuất liên hệ chuyên gia
+    if (reply.toLowerCase().includes('liên hệ chuyên gia') || reply.toLowerCase().includes('tư vấn trực tiếp')) {
+      // Lấy dữ liệu AI đã thu thập
+      checkAndShowAutoFilledForm();
+    }
+    
+    // Kiểm tra nếu AI đã thu thập đủ thông tin và muốn hiển thị modal
+    if (reply.includes('[FORM_DATA]') && reply.includes('[/FORM_DATA]')) {
+      // Trích xuất dữ liệu từ response
+      const formDataMatch = reply.match(/\[FORM_DATA\]\s*([\s\S]*?)\s*\[\/FORM_DATA\]/);
+      if (formDataMatch) {
+        const formDataLines = formDataMatch[1].trim().split('\n');
+        const collectedData = {
+          full_name: formDataLines[0] || '',
+          email: formDataLines[1] || '',
+          phone: formDataLines[2] || '',
+          introduction: formDataLines[3] || ''
+        };
+        
+        // Hiển thị modal xác nhận
+        showConfirmationModal(collectedData);
+      }
+    }
+  }).catch(error => {
+    chatBody.removeChild(loadingDiv);
+    appendMessage('ai', 'Xin lỗi, có lỗi xảy ra. Vui lòng thử lại sau.');
+  }).finally(() => {
+    isProcessing = false;
+  });
+}
+
+chatSend.addEventListener('click', handleUserInput);
+chatInput.addEventListener('keydown', (e) => { 
+  if (e.key === 'Enter') {
+    e.preventDefault(); // Ngăn chặn hành vi mặc định
+    handleUserInput(); 
+  }
+});
+
+chatSuggestions.addEventListener('click', (e) => {
+  const btn = e.target.closest('.chip');
+  if (!btn) return;
+  chatInput.value = btn.dataset.text || '';
+  handleUserInput();
+});
+
+// Hiệu ứng thông minh và sinh động
+document.addEventListener('DOMContentLoaded', function() {
+  // Hiệu ứng typing indicator cho AI
+  function showTypingIndicator() {
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'message ai typing-indicator';
+    typingDiv.innerHTML = `
+      <div class="bubble">
+        <div class="typing-dots">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+      </div>
+    `;
+    chatBody.appendChild(typingDiv);
+    chatBody.scrollTop = chatBody.scrollHeight;
+    return typingDiv;
+  }
+
+  // Hiệu ứng form validation thông minh
+  function validateField(field) {
+    const input = field.querySelector('.input, .textarea');
+    const value = input.value.trim();
+    
+    field.classList.remove('error', 'success', 'has-content');
+    
+    if (value.length > 0) {
+      field.classList.add('has-content');
+      
+      // Validation logic
+      if (input.type === 'email' && !isValidEmail(value)) {
+        field.classList.add('error');
+        showNotification('Email không hợp lệ', 'error');
+      } else if (input.id === 'ex_phone' && !isValidPhone(value)) {
+        field.classList.add('error');
+        showNotification('Số điện thoại không hợp lệ', 'error');
+      } else {
+        field.classList.add('success');
+      }
+    }
+  }
+
+  // Hiệu ứng progress bar
+  function updateProgressBar() {
+    const requiredFields = ['ex_full_name', 'ex_email', 'ex_phone'];
+    const filledFields = requiredFields.filter(id => {
+      const field = document.getElementById(id);
+      return field && field.value.trim().length > 0;
+    });
+    
+    const progress = (filledFields.length / requiredFields.length) * 100;
+    
+    // Tạo progress bar nếu chưa có
+    let progressBar = document.querySelector('.progress-bar');
+    if (!progressBar) {
+      progressBar = document.createElement('div');
+      progressBar.className = 'progress-bar';
+      progressBar.innerHTML = `
+        <div class="progress-label">Tiến độ điền form: <span class="progress-text">0%</span></div>
+        <div class="progress-bar-container">
+          <div class="progress-fill"></div>
+        </div>
+      `;
+      
+      // Thêm vào đầu section thay vì form-grid
+      const section = document.querySelector('.section.card');
+      if (section) {
+        section.insertBefore(progressBar, section.firstChild);
+      }
+    }
+    
+    const progressFill = progressBar.querySelector('.progress-fill');
+    const progressText = progressBar.querySelector('.progress-text');
+    
+    progressFill.style.width = progress + '%';
+    if (progressText) {
+      progressText.textContent = Math.round(progress) + '%';
+    }
+  }
+
+  // Hiệu ứng notification
+  function showNotification(message, type = 'success') {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.classList.add('show');
+    }, 100);
+    
+    setTimeout(() => {
+      notification.classList.remove('show');
+      setTimeout(() => {
+        notification.remove();
+      }, 300);
+    }, 3000);
+  }
+
+  // Hiệu ứng loading overlay
+  function showLoadingOverlay() {
+    const overlay = document.createElement('div');
+    overlay.className = 'loading-overlay';
+    overlay.innerHTML = '<div class="loading-spinner"></div>';
+    document.body.appendChild(overlay);
+    
+    setTimeout(() => {
+      overlay.classList.add('show');
+    }, 10);
+    
+    return overlay;
+  }
+
+  // Hiệu ứng form submission
+  function addFormSubmissionEffects() {
+    const form = document.querySelector('.section.card');
+    const submitBtn = document.getElementById('ex_submit');
+    
+    submitBtn.addEventListener('click', function() {
+      form.classList.add('form-submitting');
+      const overlay = showLoadingOverlay();
+      
+      // Simulate loading time
+      setTimeout(() => {
+        form.classList.remove('form-submitting');
+        overlay.classList.remove('show');
+        setTimeout(() => {
+          overlay.remove();
+        }, 300);
+      }, 2000);
+    });
+  }
+
+  // Hiệu ứng cho chat suggestions
+  function addChatSuggestionEffects() {
+    const chips = document.querySelectorAll('.chat-suggestions .chip');
+    chips.forEach((chip, index) => {
+      chip.style.animationDelay = `${index * 0.1}s`;
+      chip.addEventListener('click', function() {
+        this.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+          this.style.transform = '';
+        }, 150);
+      });
+    });
+  }
+
+  // Hiệu ứng cho form fields
+  function addFormFieldEffects() {
+    const fields = document.querySelectorAll('.field');
+    fields.forEach(field => {
+      const input = field.querySelector('.input, .textarea');
+      if (input) {
+        input.addEventListener('input', () => {
+          validateField(field);
+          updateProgressBar();
+        });
+        
+        input.addEventListener('focus', () => {
+          field.style.transform = 'translateY(-2px)';
+        });
+        
+        input.addEventListener('blur', () => {
+          field.style.transform = '';
+        });
+      }
+    });
+  }
+
+  // Hiệu ứng parallax cho page hero
+  function addParallaxEffect() {
+    const hero = document.querySelector('.page-hero');
+    if (hero) {
+      window.addEventListener('scroll', () => {
+        const scrolled = window.pageYOffset;
+        const rate = scrolled * -0.5;
+        hero.style.transform = `translateY(${rate}px)`;
+      });
+    }
+  }
+
+  // Hiệu ứng floating elements
+  function addFloatingElements() {
+    const cards = document.querySelectorAll('.card');
+    cards.forEach((card, index) => {
+      card.style.animationDelay = `${index * 0.2}s`;
+    });
+  }
+
+  // Hiệu ứng cho success modal
+  function enhanceSuccessModal() {
+    const originalShowSuccessModal = window.showSuccessModal;
+    window.showSuccessModal = function() {
+      const modal = originalShowSuccessModal();
+      
+      // Thêm confetti effect
+      createConfetti();
+      
+      return modal;
+    };
+  }
+
+  // Hiệu ứng confetti
+  function createConfetti() {
+    for (let i = 0; i < 50; i++) {
+      const confetti = document.createElement('div');
+      confetti.style.position = 'fixed';
+      confetti.style.left = Math.random() * 100 + 'vw';
+      confetti.style.top = '-10px';
+      confetti.style.width = '10px';
+      confetti.style.height = '10px';
+      confetti.style.background = ['#6366f1', '#8b5cf6', '#10b981', '#f59e0b'][Math.floor(Math.random() * 4)];
+      confetti.style.borderRadius = '50%';
+      confetti.style.pointerEvents = 'none';
+      confetti.style.zIndex = '9998';
+      confetti.style.animation = `fall ${Math.random() * 3 + 2}s linear forwards`;
+      
+      document.body.appendChild(confetti);
+      
+      setTimeout(() => {
+        confetti.remove();
+      }, 5000);
+    }
+  }
+
+  // CSS animation cho confetti
+  const confettiStyle = document.createElement('style');
+  confettiStyle.textContent = `
+    @keyframes fall {
+      to {
+        transform: translateY(100vh) rotate(360deg);
+      }
+    }
+  `;
+  document.head.appendChild(confettiStyle);
+
+  // Utility functions
+  function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  function isValidPhone(phone) {
+    return /^[0-9]{10,11}$/.test(phone.replace(/\s/g, ''));
+  }
+
+  // Khởi tạo tất cả hiệu ứng
+  addFormFieldEffects();
+  addFormSubmissionEffects();
+  addChatSuggestionEffects();
+  addParallaxEffect();
+  addFloatingElements();
+  enhanceSuccessModal();
+  
+  // Hiển thị welcome message với animation
+  setTimeout(() => {
+    appendMessage('ai', '**Xin chào! 👋** Tôi là trợ lý AI tư vấn tuyển sinh. Tôi có thể giúp bạn:\n\n• Tư vấn chọn ngành phù hợp\n• Thông tin về trường đại học\n• Xu hướng việc làm 2025\n• Kết nối chuyên gia tư vấn\n\nHãy hỏi tôi bất cứ điều gì! 😊');
+  }, 1000);
+});
+
+// Cập nhật hàm appendMessage để có hiệu ứng typing
+const originalAppendMessage = window.appendMessage;
+window.appendMessage = function(role, text) {
+  if (role === 'ai') {
+    const typingIndicator = showTypingIndicator();
+    
+    setTimeout(() => {
+      if (typingIndicator && typingIndicator.parentNode) {
+        typingIndicator.remove();
+      }
+      originalAppendMessage(role, text);
+    }, 1000 + Math.min(text.length * 30, 2000)); // Giới hạn thời gian typing
+  } else {
+    originalAppendMessage(role, text);
+  }
+};
+
+// Định nghĩa hàm showTypingIndicator ở global scope
+function showTypingIndicator() {
+  // Xóa typing indicator cũ nếu có
+  const existingTyping = document.querySelector('.typing-indicator');
+  if (existingTyping) {
+    existingTyping.remove();
+  }
+  
+  const typingDiv = document.createElement('div');
+  typingDiv.className = 'message ai typing-indicator';
+  typingDiv.innerHTML = `
+    <div class="bubble">
+      <div class="typing-dots">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>
+    </div>
+  `;
+  chatBody.appendChild(typingDiv);
+  chatBody.scrollTop = chatBody.scrollHeight;
+  return typingDiv;
+}
+
+// Hàm hiển thị modal thành công hiện đại
+</script>
+{% endblock %}

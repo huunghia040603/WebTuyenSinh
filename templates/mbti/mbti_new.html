@@ -11,18 +11,23 @@
       --shadow: 0 8px 32px rgba(10,65,145,0.08);
     }
     body { font-family: 'Montserrat', Arial, sans-serif; margin: 0; background: var(--gray-bg); color: #1a2a3a; }
+    .page-container { max-width: 1350px; margin: 0 auto; padding: 2rem; }
     .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; margin-bottom: 36px; }
     /* ... giữ nguyên toàn bộ style cũ, chỉ bỏ header/footer ... */
     .hero { 
         background: linear-gradient(135deg, #04007c 0%, #1a2cb8 25%, #1d21d3 50%, #3a7bd8 75%, #4a8be8 100%); 
         color: #fff; 
         text-align: center; 
-        padding: 160px 0 140px 0; 
+        padding: 80px 0 60px 0; 
         position: relative; 
         overflow: hidden;
-        min-height: 60vh;
+        min-height: 40vh;
         display: flex;
         align-items: center;
+        border-radius: 24px;
+        margin: 24px;
+        box-shadow: 0 12px 32px rgba(2,6,23,0.06);
+        border: 1px solid #e5e7eb;
     }
 
     .hero::before {
@@ -225,25 +230,25 @@
         display: flex; 
         gap: 24px; 
         justify-content: center; 
-        margin-top: 60px; 
+        margin-top: 40px; 
         flex-wrap: wrap;
         position: relative;
         z-index: 10;
     }
 
     .hero-card { 
-        background: rgba(255,255,255,0.1);
+        background: linear-gradient(180deg,#ffffff, #f8fafc);
         backdrop-filter: blur(15px);
-        color: #fff; 
-        border-radius: 20px; 
-        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        color: #1e293b; 
+        border-radius: 16px; 
+        box-shadow: 0 12px 32px rgba(2,6,23,0.06);
         padding: 30px 25px; 
         min-width: 220px; 
         max-width: 260px; 
         display: flex; 
         flex-direction: column; 
         align-items: center;
-        border: 1px solid rgba(255,255,255,0.2);
+        border: 1px solid #e5e7eb;
         transition: all 0.3s ease;
         position: relative;
         overflow: hidden;
@@ -289,12 +294,12 @@
         font-weight: 800; 
         font-size: 1.2rem; 
         margin-bottom: 10px;
-        text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        color: #0f172a;
     }
 
     .hero-card-desc { 
         font-size: 1rem; 
-        color: rgba(255,255,255,0.9);
+        color: #64748b;
         line-height: 1.5;
         text-align: center;
     }
@@ -385,6 +390,7 @@
   </style>
 {% endblock %}
 {% block content %}
+<div class="page-container">
   <!-- Hero Section -->
   <section class="hero">
     <div class="hero-content">
@@ -676,6 +682,7 @@
       <a href="/mbtinew"><button class="quote-btn">Làm bài test MBTI</button></a>
     </div>
   </section>
+</div>
 {% endblock %}
 {% block scripts %}
   <script>

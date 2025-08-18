@@ -1,0 +1,15 @@
+# Production Dependencies
+# Include all core dependencies
+-r requirements.txt
+
+# Production WSGI Server
+gunicorn==21.2.0
+
+# Environment Variables
+python-dotenv==1.0.0
+
+# Security
+cryptography==41.0.4
+
+# Monitoring (optional)
+# sentry-sdk[flask]==1.28.1 

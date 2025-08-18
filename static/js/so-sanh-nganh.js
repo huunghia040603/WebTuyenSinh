@@ -162,59 +162,81 @@ function initializeComparison() {
 async function loadAllMajors() {
     try {
         console.log('📚 Loading all majors for comparison...');
-        console.log('🌐 Fetching from: https://timtruonghoc.pythonanywhere.com/all_major_has_pagi/');
         
-        // Load all majors without pagination
-        const response = await fetch('https://timtruonghoc.pythonanywhere.com/all_major_has_pagi/?page_size=1000');
-        console.log('📡 Response status:', response.status);
-        console.log('📡 Response ok:', response.ok);
+        // Thử nhiều API khác nhau để lấy dữ liệu
+        const apis = [
+            'https://timtruonghoc.pythonanywhere.com/all_major/all_for_comparison/',
+            'https://timtruonghoc.pythonanywhere.com/all_major/',
+            'https://timtruonghoc.pythonanywhere.com/all_major_has_pagi/?page_size=1000',
+            'https://timtruonghoc.pythonanywhere.com/all_major_has_pagi/'
+        ];
         
-        if (response.ok) {
-            const data = await response.json();
-            console.log('📦 Raw response data:', data);
+        let success = false;
+        
+        for (let i = 0; i < apis.length; i++) {
+            const apiUrl = apis[i];
+            console.log(`🌐 Trying API ${i + 1}: ${apiUrl}`);
             
-            allMajors = data.results || [];
-            console.log(`✅ Loaded ${allMajors.length} majors for comparison`);
-            
-            // Log first few majors for debugging
-            if (allMajors.length > 0) {
-                console.log('📋 Sample majors:');
-                allMajors.slice(0, 5).forEach((major, index) => {
-                    console.log(`  ${index + 1}. ${major.name} (${major.all_major_id})`);
-                });
-            }
-            
-            // Test search functionality
-            console.log('🧪 Testing search functionality...');
-            if (allMajors.length > 0) {
-                const testQuery = 'công nghệ';
-                const testFiltered = allMajors.filter(major => 
-                    major.name.toLowerCase().includes(testQuery.toLowerCase()) ||
-                    major.all_major_id.includes(testQuery)
-                );
-                console.log(`🧪 Test search for "${testQuery}": ${testFiltered.length} results`);
+            try {
+                const response = await fetch(apiUrl);
+                console.log(`📡 Response status for API ${i + 1}:`, response.status);
                 
-                const testQuery2 = 'quan';
-                const testFiltered2 = allMajors.filter(major => 
-                    major.name.toLowerCase().includes(testQuery2.toLowerCase()) ||
-                    major.all_major_id.includes(testQuery2)
-                );
-                console.log(`🧪 Test search for "${testQuery2}": ${testFiltered2.length} results`);
-            }
-            
-        } else {
-            console.error('❌ Failed to load majors:', response.status);
-            console.error('❌ Response text:', await response.text());
-            
-            // Fallback: try without pagination
-            console.log('🔄 Trying fallback API...');
-            const fallbackResponse = await fetch('https://timtruonghoc.pythonanywhere.com/all_major/');
-            if (fallbackResponse.ok) {
-                const fallbackData = await fallbackResponse.json();
-                allMajors = fallbackData.results || fallbackData || [];
-                console.log(`✅ Fallback loaded ${allMajors.length} majors`);
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log(`📦 Raw response data from API ${i + 1}:`, data);
+                    
+                    // Xử lý các format khác nhau
+                    if (data.results && Array.isArray(data.results)) {
+                        allMajors = data.results;
+                        console.log(`✅ API ${i + 1} loaded ${allMajors.length} majors (results format)`);
+                    } else if (Array.isArray(data)) {
+                        allMajors = data;
+                        console.log(`✅ API ${i + 1} loaded ${allMajors.length} majors (array format)`);
+                    } else {
+                        console.log(`⚠️ API ${i + 1} returned unexpected format:`, typeof data);
+                        continue;
+                    }
+                    
+                    success = true;
+                    break;
+                } else {
+                    console.error(`❌ API ${i + 1} failed:`, response.status);
+                }
+            } catch (error) {
+                console.error(`❌ Error with API ${i + 1}:`, error);
             }
         }
+        
+        if (!success) {
+            throw new Error('All APIs failed');
+        }
+        
+        // Log first few majors for debugging
+        if (allMajors.length > 0) {
+            console.log('📋 Sample majors:');
+            allMajors.slice(0, 5).forEach((major, index) => {
+                console.log(`  ${index + 1}. ${major.name} (${major.all_major_id})`);
+            });
+        }
+        
+        // Test search functionality
+        console.log('🧪 Testing search functionality...');
+        if (allMajors.length > 0) {
+            const testQuery = 'công nghệ';
+            const testFiltered = allMajors.filter(major => 
+                major.name.toLowerCase().includes(testQuery.toLowerCase()) ||
+                major.all_major_id.includes(testQuery)
+            );
+            console.log(`🧪 Test search for "${testQuery}": ${testFiltered.length} results`);
+            
+            const testQuery2 = 'quan';
+            const testFiltered2 = allMajors.filter(major => 
+                major.name.toLowerCase().includes(testQuery2.toLowerCase()) ||
+                major.all_major_id.includes(testQuery2)
+            );
+            console.log(`🧪 Test search for "${testQuery2}": ${testFiltered2.length} results`);
+        }
+        
     } catch (error) {
         console.error('❌ Error loading majors:', error);
         console.error('❌ Error details:', error.message);
@@ -245,6 +267,22 @@ async function loadAllMajors() {
                 training_duration: '6 năm',
                 salary: '20-50+ triệu',
                 tuition_fee_per_year: '25-40 triệu'
+            },
+            {
+                all_major_id: '7220201',
+                name: 'Kỹ thuật xây dựng',
+                opportunities: 80,
+                training_duration: '4 năm',
+                salary: '12-25 triệu',
+                tuition_fee_per_year: '12-20 triệu'
+            },
+            {
+                all_major_id: '7340301',
+                name: 'Kế toán',
+                opportunities: 90,
+                training_duration: '4 năm',
+                salary: '10-25 triệu',
+                tuition_fee_per_year: '10-18 triệu'
             }
         ];
         console.log('✅ Sample data loaded as fallback');
@@ -301,12 +339,12 @@ function displaySearchResults(results) {
         return `
             <div class="search-result-item" onclick="selectMajor(${index})">
                 <div class="search-result-logo">
-                    ${major.name.substring(0, 2).toUpperCase()}
+                    ${(major.name || '').substring(0, 2).toUpperCase()}
                 </div>
                 <div class="search-result-info">
-                    <div class="search-result-name">${major.name}</div>
+                    <div class="search-result-name">${major.name || ''}</div>
                     <div class="search-result-details">
-                        <div>Mã: ${major.all_major_id}  -  Lĩnh vực: ${fieldName}</div>
+                        <div>Mã: ${major.all_major_id || ''}  -  Lĩnh vực: ${fieldName || ''}</div>
                     </div>
                 </div>
             </div>
@@ -404,12 +442,12 @@ function updateSlots() {
                     </button>
                     <div class="major-card-header">
                         <img src="${major.cover || '/static/images/nganh/anh01.png'}" 
-                             alt="${major.name}" 
+                             alt="${major.name || ''}" 
                              class="major-logo"
                              onerror="this.src='/static/images/nganh/anh01.png'">
                         <div class="major-info">
-                            <h4>${major.name}</h4>
-                            <div class="major-code">${major.all_major_id}</div>
+                            <h4>${major.name || ''}</h4>
+                            <div class="major-code">${major.all_major_id || ''}</div>
                         </div>
                     </div>
                 </div>
@@ -478,7 +516,7 @@ function generateQuickStats() {
         opportunities.forEach(item => {
             statsHTML += `
                 <div class="stat-item">
-                    <span class="stat-label">${item.name}</span>
+                    <span class="stat-label">${item.name || ''}</span>
                     <span class="stat-value">${item.value}/100</span>
                 </div>
             `;
@@ -505,7 +543,7 @@ function generateQuickStats() {
             const duration = getNestedValue(major, 'training_duration') || 'N/A';
             statsHTML += `
                 <div class="stat-item">
-                    <span class="stat-label">${major.name}</span>
+                    <span class="stat-label">${major.name || ''}</span>
                     <span class="stat-value">${duration} năm</span>
                 </div>
             `;
@@ -521,7 +559,7 @@ function generateQuickStats() {
             const salary = getNestedValue(major, 'salary') || 'N/A';
             statsHTML += `
                 <div class="stat-item">
-                    <span class="stat-label">${major.name}</span>
+                    <span class="stat-label">${major.name || ''}</span>
                     <span class="stat-value">${salary}</span>
                 </div>
             `;
@@ -537,7 +575,7 @@ function generateQuickStats() {
             const tuition = getNestedValue(major, 'tuition_fee_per_year') || 'N/A';
             statsHTML += `
                 <div class="stat-item">
-                    <span class="stat-label">${major.name}</span>
+                    <span class="stat-label">${major.name || ''}</span>
                     <span class="stat-value">${tuition}</span>
                 </div>
             `;
@@ -564,13 +602,13 @@ function generateOverviewComparison() {
     
     // Update headers
     if (major1Header && selectedMajors[0]) {
-        major1Header.textContent = selectedMajors[0].name;
+        major1Header.textContent = selectedMajors[0].name || '';
     }
     if (major2Header && selectedMajors[1]) {
-        major2Header.textContent = selectedMajors[1].name;
+        major2Header.textContent = selectedMajors[1].name || '';
     }
     if (major3Header && selectedMajors[2]) {
-        major3Header.textContent = selectedMajors[2].name;
+        major3Header.textContent = selectedMajors[2].name || '';
         major3Header.style.display = 'block';
     } else if (major3Header) {
         major3Header.style.display = 'none';
@@ -587,6 +625,23 @@ function generateOverviewComparison() {
         { label: 'Học phí', key: 'tuition_fee_per_year' }
     ];
     
+    // Utility function để decode HTML entities và loại bỏ HTML tags
+    function cleanHtmlText(text) {
+        if (!text) return '';
+        
+        // Tạo một element tạm để decode HTML entities
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = text;
+        
+        // Lấy text content (loại bỏ HTML tags)
+        let cleanText = tempDiv.textContent || tempDiv.innerText || '';
+        
+        // Loại bỏ các ký tự xuống dòng và khoảng trắng thừa
+        cleanText = cleanText.replace(/\s+/g, ' ').trim();
+        
+        return cleanText;
+    }
+
     let tableHTML = '';
     
     overviewData.forEach(item => {
@@ -595,6 +650,12 @@ function generateOverviewComparison() {
         
         selectedMajors.forEach(major => {
             let value = getNestedValue(major, item.key);
+            
+            // Clean HTML text for short_description
+            if (item.key === 'short_description') {
+                value = cleanHtmlText(value);
+            }
+            
             if (item.suffix) value += item.suffix;
             if (!value || value === 'undefined' || value === 'null') value = 'N/A';
             
@@ -631,7 +692,7 @@ function generateCareerComparison() {
         
         careerHTML += `
             <div class="career-card">
-                <h3>${major.name}</h3>
+                <h3>${major.name || ''}</h3>
                 <div class="career-opportunities">
                     ${opportunities.split(/[,;]/).map(opp => 
                         `<div class="career-opportunity">${opp.trim()}</div>`
@@ -683,7 +744,7 @@ function generateCurriculumComparison() {
         
         curriculumHTML += `
             <div class="curriculum-card">
-                <h3>${major.name}</h3>
+                <h3>${major.name || ''}</h3>
                 <div class="curriculum-content">
                     ${curriculum}
                 </div>
@@ -711,11 +772,21 @@ async function generateSchoolsComparison() {
         try {
             const schools = await loadSchoolsForMajor(major.all_major_id);
             
+            // Sắp xếp: trường outstanding trước, sau đó theo tên
+            const sortedSchools = schools.sort((a, b) => {
+                // Ưu tiên trường outstanding
+                if (a.tag === 'outstanding' && b.tag !== 'outstanding') return -1;
+                if (a.tag !== 'outstanding' && b.tag === 'outstanding') return 1;
+                
+                // Sau đó theo tên trường
+                return a.name.localeCompare(b.name);
+            });
+            
             schoolsHTML += `
                 <div class="schools-card">
-                    <h3>${major.name}</h3>
-                    <div class="schools-list" id="schools-list-${major.all_major_id}">
-                        ${schools.slice(0, 5).map(school => {
+                    <h3>${major.name || ''}</h3>
+                    <div class="schools-list" id="schools-list-${major.all_major_id || ''}">
+                        ${sortedSchools.slice(0, 5).map(school => {
                             // Format học phí
                             const formatTuition = (min, max) => {
                                 if (!min && !max) return 'N/A';
@@ -730,17 +801,17 @@ async function generateSchoolsComparison() {
                             };
                             
                             return `
-                                <div class="school-item" onclick="goToSchoolMajor('${school.short_code}', '${major.all_major_id}')" style="cursor: pointer;">
+                                <div class="school-item ${school.tag === 'outstanding' ? 'outstanding' : ''}" onclick="goToSchoolMajor('${school.short_code || ''}', '${major.all_major_id || ''}')" style="cursor: pointer;">
                                     <div class="school-logo">
                                         ${school.logo ? 
-                                            `<img src="${school.logo}" alt="${school.name}" onerror="this.parentElement.innerHTML='${school.short_code ? school.short_code.substring(0, 2).toUpperCase() : 'TR'}'">` :
+                                            `<img src="${school.logo}" alt="${school.name || ''}" onerror="this.parentElement.innerHTML='${school.short_code ? school.short_code.substring(0, 2).toUpperCase() : 'TR'}'">` :
                                             `${school.short_code ? school.short_code.substring(0, 2).toUpperCase() : 'TR'}`
                                         }
                                     </div>
                                     <div class="school-info">
-                                        <div class="school-name">${school.name}</div>
+                                        <div class="school-name">${school.name || ''}</div>
                                         <div class="school-details">
-                                            Mã: ${school.short_code} | Học phí: ${formatTuition(school.tuition_min, school.tuition_max)}
+                                            Mã: ${school.short_code || ''} | Học phí: ${formatTuition(school.tuition_min, school.tuition_max)}
                                         </div>
                                     </div>
                                 </div>
@@ -748,10 +819,10 @@ async function generateSchoolsComparison() {
                         }).join('')}
                     </div>
                     
-                    ${schools.length > 5 ? `
+                    ${sortedSchools.length > 5 ? `
                         <div class="schools-controls">
-                            <div class="more-schools" onclick="toggleAllSchools('${major.all_major_id}', ${JSON.stringify(schools).replace(/"/g, '&quot;')})">
-                                Và ${schools.length - 5} trường khác...
+                            <div class="more-schools" onclick="toggleAllSchools('${major.all_major_id || ''}', ${JSON.stringify(sortedSchools).replace(/"/g, '&quot;')})">
+                                Và ${sortedSchools.length - 5} trường khác...
                             </div>
                             <div class="less-schools" onclick="toggleLessSchools('${major.all_major_id}')" style="display: none;">
                                 Thu gọn danh sách
@@ -761,10 +832,10 @@ async function generateSchoolsComparison() {
                 </div>
             `;
         } catch (error) {
-            console.error('Error loading schools for major:', major.name, error);
+            console.error('Error loading schools for major:', major.name || '', error);
             schoolsHTML += `
                 <div class="schools-card">
-                    <h3>${major.name}</h3>
+                    <h3>${major.name || ''}</h3>
                     <p>Không thể tải thông tin trường đào tạo</p>
                 </div>
             `;
@@ -800,17 +871,17 @@ function toggleAllSchools(majorId, allSchools) {
     
     // Hiển thị tất cả trường
     const allSchoolsHTML = allSchools.map(school => `
-        <div class="school-item" onclick="goToSchoolMajor('${school.short_code}', '${majorId}')" style="cursor: pointer;">
+        <div class="school-item ${school.tag === 'outstanding' ? 'outstanding' : ''}" onclick="goToSchoolMajor('${school.short_code || ''}', '${majorId || ''}')" style="cursor: pointer;">
             <div class="school-logo">
                 ${school.logo ? 
-                    `<img src="${school.logo}" alt="${school.name}" onerror="this.parentElement.innerHTML='${school.short_code ? school.short_code.substring(0, 2).toUpperCase() : 'TR'}'">` :
+                    `<img src="${school.logo}" alt="${school.name || ''}" onerror="this.parentElement.innerHTML='${school.short_code ? school.short_code.substring(0, 2).toUpperCase() : 'TR'}'">` :
                     `${school.short_code ? school.short_code.substring(0, 2).toUpperCase() : 'TR'}`
                 }
             </div>
             <div class="school-info">
-                <div class="school-name">${school.name}</div>
+                <div class="school-name">${school.name || ''}</div>
                 <div class="school-details">
-                    Mã: ${school.short_code} | Học phí: ${formatTuition(school.tuition_min, school.tuition_max)}
+                    Mã: ${school.short_code || ''} | Học phí: ${formatTuition(school.tuition_min, school.tuition_max)}
                 </div>
             </div>
         </div>
@@ -851,17 +922,17 @@ function toggleLessSchools(majorId) {
         
         // Hiển thị lại 5 trường đầu
         const first5SchoolsHTML = schools.slice(0, 5).map(school => `
-            <div class="school-item" onclick="goToSchoolMajor('${school.short_code}', '${majorId}')" style="cursor: pointer;">
+            <div class="school-item" onclick="goToSchoolMajor('${school.short_code || ''}', '${majorId || ''}')" style="cursor: pointer;">
                 <div class="school-logo">
                     ${school.logo ? 
-                        `<img src="${school.logo}" alt="${school.name}" onerror="this.parentElement.innerHTML='${school.short_code ? school.short_code.substring(0, 2).toUpperCase() : 'TR'}'">` :
+                        `<img src="${school.logo}" alt="${school.name || ''}" onerror="this.parentElement.innerHTML='${school.short_code ? school.short_code.substring(0, 2).toUpperCase() : 'TR'}'">` :
                         `${school.short_code ? school.short_code.substring(0, 2).toUpperCase() : 'TR'}`
                     }
                 </div>
                 <div class="school-info">
-                    <div class="school-name">${school.name}</div>
+                    <div class="school-name">${school.name || ''}</div>
                     <div class="school-details">
-                        Mã: ${school.short_code} | Học phí: ${formatTuition(school.tuition_min, school.tuition_max)}
+                        Mã: ${school.short_code || ''} | Học phí: ${formatTuition(school.tuition_min, school.tuition_max)}
                     </div>
                 </div>
             </div>
@@ -901,17 +972,45 @@ function goToSchoolMajor(schoolShortCode, majorId) {
 // Load schools for a specific major
 async function loadSchoolsForMajor(majorId) {
     try {
-        const response = await fetch(`https://timtruonghoc.pythonanywhere.com/all_major/schools_by_major_id/?all_major_id=${majorId}`);
+        console.log('Loading schools for major:', majorId);
         
-        if (response.ok) {
-            const data = await response.json();
-            return data.schools || [];
+        // Sử dụng API hiện có: schools_teaching_major
+        const apiUrl = `https://timtruonghoc.pythonanywhere.com/all_major/${majorId}/schools_teaching_major/`;
+        console.log('API URL for schools:', apiUrl);
+        
+        const response = await fetch(apiUrl);
+        console.log('Response status:', response.status);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('API response:', data);
+        
+        if (data.schools && data.schools.length > 0) {
+            const suggestedSchools = data.schools.map(school => ({
+                id: school.id,
+                name: school.name,
+                short_code: school.short_code,
+                logo: school.logo,
+                school_type: school.school_type,
+                country: school.country,
+                tag: school.tag || 'none',
+                admission_score: school.admission_score,
+                score_year: school.score_year,
+                tuition_min: school.tuition_min,
+                tuition_max: school.tuition_max
+            }));
+            
+            console.log('Suggested schools:', suggestedSchools);
+            return suggestedSchools;
         } else {
-            console.error('Failed to load schools for major:', majorId);
+            console.log('No schools found teaching this major');
             return [];
         }
     } catch (error) {
-        console.error('Error loading schools for major:', majorId, error);
+        console.error('Error loading schools:', error);
         return [];
     }
 }
@@ -1119,7 +1218,11 @@ function testPlaceholder() {
         console.log('✅ majorSearchInput element found');
         console.log('📝 Placeholder attribute:', majorSearchInput.getAttribute('placeholder'));
         console.log('📝 Current value:', majorSearchInput.value);
-        console.log('📝 Computed placeholder color:', getComputedStyle(majorSearchInput, '::placeholder').color);
+        try {
+            console.log('📝 Computed placeholder color:', getComputedStyle(majorSearchInput, '::placeholder').color);
+        } catch (error) {
+            console.log('📝 Could not get placeholder color:', error.message);
+        }
     } else {
         console.error('❌ majorSearchInput element not found');
     }

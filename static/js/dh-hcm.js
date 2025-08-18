@@ -706,11 +706,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Thêm nút refresh cache (cho admin/developer)
     const refreshButton = document.createElement('button');
-    refreshButton.innerHTML = '<i class="fas fa-sync-alt"></i> Làm mới dữ liệu';
+    refreshButton.innerHTML = '<i class="fa-solid fa-spinner"></i>';
     refreshButton.style.cssText = `
         position: fixed;
-        bottom: 20px;
-        right: 20px;
+        bottom: 15px;
+        right: 13px;
         background: #0a4191;
         color: white;
         border: none;
@@ -733,9 +733,9 @@ document.addEventListener('DOMContentLoaded', function () {
     refreshButton.addEventListener('click', () => {
         localStorage.removeItem(CACHE_KEY);
         fetchAllUniversities();
-        refreshButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tải dữ liệu...';
+        refreshButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>  Đang tải';
         setTimeout(() => {
-            refreshButton.innerHTML = '<i class="fas fa-sync-alt"></i> Làm mới dữ liệu';
+            refreshButton.innerHTML = '<i class="fa-solid fa-spinner"></i>';
         }, 2000);
     });
     document.body.appendChild(refreshButton);

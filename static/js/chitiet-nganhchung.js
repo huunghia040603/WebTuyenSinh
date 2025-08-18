@@ -176,8 +176,37 @@ window.addEventListener('load', function () {
         }
     }
 
+    // Utility function để decode HTML entities và loại bỏ HTML tags
+    function cleanHtmlText(text) {
+        if (!text) return '';
+        
+        // Tạo một element tạm để decode HTML entities
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = text;
+        
+        // Lấy text content (loại bỏ HTML tags)
+        let cleanText = tempDiv.textContent || tempDiv.innerText || '';
+        
+        // Loại bỏ các ký tự xuống dòng và khoảng trắng thừa
+        cleanText = cleanText.replace(/\s+/g, ' ').trim();
+        
+        return cleanText;
+    }
+
     function updateMajorDescription(major) {
-        setInnerHTMLOrText('majorDescription', major.short_description, 'Không có thông tin mô tả');
+        console.log('🔍 Original short_description:', major.short_description);
+        const cleanDescription = cleanHtmlText(major.short_description);
+        console.log('✨ Cleaned short_description:', cleanDescription);
+        
+        // Sử dụng textContent thay vì innerHTML để tránh render HTML
+        const element = document.getElementById('majorDescription');
+        if (element) {
+            if (cleanDescription) {
+                element.textContent = cleanDescription;
+            } else {
+                element.textContent = 'Không có thông tin mô tả';
+            }
+        }
     }
 
     function updateMajorSuitable(major) {
@@ -238,14 +267,32 @@ window.addEventListener('load', function () {
         const majorJobs = document.getElementById('majorJobs');
         if (majorJobs) {
             if (major.job) {
-                // Tách dữ liệu theo dấu phẩy và dấu chấm phẩy, tạo các ô
-                const jobs = major.job.split(/[,;]/).map(item => item.trim()).filter(item => item);
+                console.log('🔍 Raw job data:', major.job);
+                
+                // Clean HTML text trước khi phân ô
+                let jobText = cleanHtmlText(major.job);
+                console.log('✨ Cleaned job text:', jobText);
+                
+                // Thay thế các dấu phân cách khác bằng dấu phẩy
+                jobText = jobText.replace(/[.;]/g, ',');
+                
+                // Xử lý trường hợp có "và" hoặc "and"
+                jobText = jobText.replace(/\s+và\s+/gi, ',');
+                jobText = jobText.replace(/\s+and\s+/gi, ',');
+                
+                // Tách dữ liệu theo dấu phẩy, tạo các ô
+                const jobs = jobText.split(',').map(item => item.trim()).filter(item => item && item.length > 2);
+                
+                console.log('📋 Parsed jobs:', jobs);
                 
                 if (jobs.length > 0) {
                     let html = '<div class="chitiet-jobs">';
                     jobs.forEach(job => {
+                        // Loại bỏ các ký tự đặc biệt không cần thiết
+                        let cleanJob = job.replace(/[()]/g, '').trim();
+                        
                         // Viết hoa chữ cái đầu của từ đầu tiên
-                        const words = job.split(' ');
+                        const words = cleanJob.split(' ');
                         const capitalizedJob = words.map((word, index) => {
                             if (index === 0) {
                                 // Từ đầu tiên: viết hoa chữ cái đầu
@@ -255,15 +302,22 @@ window.addEventListener('load', function () {
                                 return word;
                             }
                         }).join(' ');
-                        html += `<div class="chitiet-job-item">${capitalizedJob}</div>`;
+                        
+                        // Chỉ hiển thị nếu job có ý nghĩa
+                        if (capitalizedJob.length > 3) {
+                            html += `<div class="chitiet-job-item">${capitalizedJob}</div>`;
+                        }
                     });
                     html += '</div>';
                     majorJobs.innerHTML = html;
+                    console.log('✅ Jobs HTML generated:', html);
                 } else {
                     majorJobs.textContent = 'Không có thông tin việc làm';
+                    console.log('❌ No jobs found after parsing');
                 }
             } else {
                 majorJobs.textContent = 'Không có thông tin việc làm';
+                console.log('❌ No job data available');
             }
         }
     }
@@ -316,6 +370,7 @@ window.addEventListener('load', function () {
         }
         
         // Load danh sách trường có dạy ngành này
+        console.log('Calling loadSchoolsTeachingMajor with major ID:', major.all_major_id);
         loadSchoolsTeachingMajor(major.all_major_id);
     }
 
@@ -376,13 +431,27 @@ window.addEventListener('load', function () {
 
     // Sửa lại updateSuggestedSchools để phân trang
     function updateSuggestedSchools(schools) {
+        console.log('updateSuggestedSchools called with:', schools);
+        
+        if (!schools || schools.length === 0) {
+            console.log('No schools provided to updateSuggestedSchools');
+            showNoSchoolsMessage();
+            return;
+        }
+        
         // Sắp xếp outstanding lên đầu
         const outstanding = schools.filter(s => s.tag === 'outstanding');
         const normal = schools.filter(s => s.tag !== 'outstanding');
         const sortedSchools = outstanding.concat(normal);
         allSuggestedSchools = sortedSchools;
+        
+        console.log('Sorted schools:', sortedSchools);
+        
         const suggestedSchoolsContainer = document.getElementById('suggestedSchools');
-        if (!suggestedSchoolsContainer) return;
+        if (!suggestedSchoolsContainer) {
+            console.error('suggestedSchools container not found');
+            return;
+        }
         // Phân trang
         const totalSchools = sortedSchools.length;
         const totalPages = Math.ceil(totalSchools / schoolsPerPage);
@@ -531,18 +600,22 @@ window.addEventListener('load', function () {
         currentSchoolPage = 1;
         try {
             console.log('Loading schools teaching major:', majorId);
-            // Sử dụng API mới: so khớp all_major_id với major_id trong bảng Major
-            const apiUrl = `https://timtruonghoc.pythonanywhere.com/all_major/schools_by_major_id/?all_major_id=${majorId}`;
+            
+            // Sử dụng API hiện có: schools_teaching_major
+            const apiUrl = `https://timtruonghoc.pythonanywhere.com/all_major/${majorId}/schools_teaching_major/`;
             console.log('API URL for schools:', apiUrl);
+            
             const response = await fetch(apiUrl);
             console.log('Response status:', response.status);
+            
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
+            
             const data = await response.json();
-            console.log('Schools data:', data);
+            console.log('API response:', data);
+            
             if (data.schools && data.schools.length > 0) {
-                console.log('Found schools:', data.schools);
                 const suggestedSchools = data.schools.map(school => ({
                     id: school.id,
                     name: school.name,
@@ -550,16 +623,17 @@ window.addEventListener('load', function () {
                     logo: school.logo,
                     school_type: school.school_type,
                     country: school.country,
-                    tag: school.tag,
+                    tag: school.tag || 'none',
                     admission_score: school.admission_score,
                     score_year: school.score_year,
                     tuition_min: school.tuition_min,
                     tuition_max: school.tuition_max
                 }));
+                
                 console.log('Suggested schools:', suggestedSchools);
                 updateSuggestedSchools(suggestedSchools);
             } else {
-                console.log('No schools found');
+                console.log('No schools found teaching this major');
                 showNoSchoolsMessage();
             }
         } catch (error) {

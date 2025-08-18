@@ -1,0 +1,407 @@
+{% extends "base.html" %}
+{% block title %}Chat Demo{% endblock %}
+
+{% block content %}
+<div style="padding: 20px; max-width: 1000px; margin: 0 auto;">
+    <h1>💬 Chat Demo - Giao diện mới</h1>
+    
+    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px; margin-top: 20px;">
+        <!-- Chat Rooms List -->
+        <div style="background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden;">
+            <div style="padding: 15px; border-bottom: 1px solid #e5e7eb; background: #f8fafc;">
+                <h3 style="margin: 0; color: #0a4191;">💬 Cuộc trò chuyện</h3>
+            </div>
+            <div style="padding: 15px;">
+                <input type="text" placeholder="Tìm kiếm..." style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; margin-bottom: 15px;">
+                <div id="demoRoomsList">
+                    <!-- Demo rooms will be added here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chat Messages -->
+        <div style="background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden; height: 600px; display: flex; flex-direction: column;">
+            <div style="padding: 15px; border-bottom: 1px solid #e5e7eb; background: #f8fafc;">
+                <h3 style="margin: 0; color: #0a4191;">Test User</h3>
+                <small style="color: #6b7280;">test2@example.com</small>
+            </div>
+            
+            <div id="demoMessages" style="flex: 1; padding: 20px; overflow-y: auto; background: linear-gradient(135deg, #f8fafc, #f1f5f9); display: flex; flex-direction: column; gap: 8px;">
+                <!-- Demo messages will be added here -->
+            </div>
+            
+            <div style="padding: 15px; border-top: 1px solid #e5e7eb; background: white;">
+                <form style="display: flex; gap: 10px; align-items: flex-end;">
+                    <textarea id="demoInput" placeholder="Nhập tin nhắn..." style="flex: 1; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 24px; font-size: 14px; outline: none; resize: none; min-height: 44px; max-height: 120px; transition: all 0.3s ease; background: white; font-family: inherit;"></textarea>
+                    <button type="submit" style="background: linear-gradient(135deg, #0a4191, #1e40af); color: white; border: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div style="margin-top: 20px; background: #f8f9fa; padding: 20px; border-radius: 10px;">
+        <h3>📝 Hướng dẫn test:</h3>
+        <ol>
+            <li>Nhập tin nhắn vào ô input</li>
+            <li>Nhấn Enter hoặc nút gửi</li>
+            <li>Xem tin nhắn của mình hiển thị bên phải (màu xanh)</li>
+            <li>Tin nhắn của người khác hiển thị bên trái (màu xám)</li>
+        </ol>
+    </div>
+</div>
+
+<style>
+/* Chat message styles */
+.chat-message {
+    display: flex;
+    gap: 10px;
+    max-width: 80%;
+    margin: 8px 0;
+}
+
+.chat-message.own {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+    margin-left: auto;
+}
+
+.chat-message:not(.own) {
+    align-self: flex-start;
+    margin-right: auto;
+}
+
+.chat-message-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #667eea;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 12px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.chat-message.own .chat-message-avatar {
+    background: linear-gradient(135deg, #0a4191, #1e40af);
+    order: 2;
+}
+
+.chat-message:not(.own) .chat-message-avatar {
+    background: linear-gradient(135deg, #6b7280, #9ca3af);
+    order: 1;
+}
+
+.chat-message-content {
+    background: white;
+    padding: 12px 16px;
+    border-radius: 18px;
+    border: 1px solid #e2e8f0;
+    position: relative;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    max-width: calc(100% - 42px);
+    transition: all 0.2s ease;
+}
+
+.chat-message-content:hover {
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transform: translateY(-1px);
+}
+
+.chat-message.own .chat-message-content {
+    background: linear-gradient(135deg, #0a4191, #1e40af);
+    color: white;
+    border-color: #0a4191;
+    border-bottom-right-radius: 6px;
+}
+
+.chat-message:not(.own) .chat-message-content {
+    background: #f8f9fa;
+    color: #333;
+    border-color: #e9ecef;
+    border-bottom-left-radius: 6px;
+}
+
+.chat-message-text {
+    font-size: 14px;
+    line-height: 1.4;
+    margin: 0;
+    word-wrap: break-word;
+}
+
+.chat-message-time {
+    font-size: 11px;
+    color: #9ca3af;
+    margin-top: 4px;
+    text-align: left;
+}
+
+.chat-message.own .chat-message-time {
+    color: rgba(255, 255, 255, 0.8);
+    text-align: right;
+}
+
+.chat-message-sender {
+    font-size: 11px;
+    color: #6b7280;
+    margin-bottom: 2px;
+    font-weight: 500;
+}
+
+.chat-message.own .chat-message-sender {
+    display: none;
+}
+
+/* Scrollbar styles */
+#demoMessages::-webkit-scrollbar {
+    width: 6px;
+}
+
+#demoMessages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#demoMessages::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+#demoMessages::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Room item styles */
+.room-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-bottom: 5px;
+}
+
+.room-item:hover {
+    background-color: #f1f5f9;
+}
+
+.room-item.active {
+    background-color: #e0e7ff;
+    border-left: 3px solid #0a4191;
+}
+
+.room-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6b7280, #9ca3af);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.room-info {
+    flex: 1;
+}
+
+.room-name {
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 2px;
+}
+
+.room-email {
+    font-size: 12px;
+    color: #6b7280;
+}
+</style>
+
+<script>
+// Demo data
+const demoMessages = [
+    {
+        id: 1,
+        content: "Xin chào! Bạn có thể tư vấn cho mình về ngành học không?",
+        sender: 7,
+        sender_name: "Test2 User2",
+        sender_email: "test2@example.com",
+        created_at: new Date(Date.now() - 300000).toISOString()
+    },
+    {
+        id: 2,
+        content: "Chào bạn! Mình rất sẵn lòng tư vấn. Bạn quan tâm đến ngành nào?",
+        sender: 6,
+        sender_name: "Test User",
+        sender_email: "test@example.com",
+        created_at: new Date(Date.now() - 240000).toISOString()
+    },
+    {
+        id: 3,
+        content: "Mình đang phân vân giữa ngành Công nghệ thông tin và Kinh tế. Bạn có thể cho mình lời khuyên không?",
+        sender: 7,
+        sender_name: "Test2 User2",
+        sender_email: "test2@example.com",
+        created_at: new Date(Date.now() - 180000).toISOString()
+    },
+    {
+        id: 4,
+        content: "Cả hai ngành đều rất tốt! CNTT phù hợp nếu bạn thích lập trình, còn Kinh tế phù hợp nếu bạn thích kinh doanh. Bạn có sở thích gì?",
+        sender: 6,
+        sender_name: "Test User",
+        sender_email: "test@example.com",
+        created_at: new Date(Date.now() - 120000).toISOString()
+    },
+    {
+        id: 5,
+        content: "Mình thích làm việc với máy tính và giải quyết vấn đề. Vậy CNTT có phù hợp không?",
+        sender: 7,
+        sender_name: "Test2 User2",
+        sender_email: "test2@example.com",
+        created_at: new Date(Date.now() - 60000).toISOString()
+    }
+];
+
+const demoRooms = [
+    {
+        id: 1,
+        name: "Test2 User2",
+        email: "test2@example.com",
+        last_message: "Mình thích làm việc với máy tính...",
+        unread_count: 0
+    },
+    {
+        id: 2,
+        name: "Admin Support",
+        email: "admin@example.com",
+        last_message: "Cảm ơn bạn đã liên hệ!",
+        unread_count: 2
+    }
+];
+
+// Initialize demo
+document.addEventListener('DOMContentLoaded', function() {
+    displayDemoMessages();
+    displayDemoRooms();
+    
+    // Handle form submission
+    document.querySelector('form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const input = document.getElementById('demoInput');
+        const content = input.value.trim();
+        
+        if (content) {
+            addDemoMessage(content);
+            input.value = '';
+            input.style.height = 'auto';
+        }
+    });
+    
+    // Auto-resize textarea
+    document.getElementById('demoInput').addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+    });
+});
+
+function displayDemoMessages() {
+    const messagesContainer = document.getElementById('demoMessages');
+    const currentUserId = 6; // Demo current user ID
+    
+    messagesContainer.innerHTML = demoMessages.map(message => {
+        const isOwn = message.sender === currentUserId;
+        const avatar = getAvatarInitials(message.sender_name || message.sender_email);
+        const time = formatMessageTime(message.created_at);
+        const senderName = message.sender_name || message.sender_email;
+        
+        return `
+            <div class="chat-message ${isOwn ? 'own' : ''}">
+                <div class="chat-message-avatar" style="background: ${getAvatarColor(message.sender_email)}">
+                    ${avatar}
+                </div>
+                <div class="chat-message-content">
+                    ${!isOwn ? `<div class="chat-message-sender">${escapeHtml(senderName)}</div>` : ''}
+                    <p class="chat-message-text">${escapeHtml(message.content)}</p>
+                    <div class="chat-message-time">${time}</div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function displayDemoRooms() {
+    const roomsContainer = document.getElementById('demoRoomsList');
+    
+    roomsContainer.innerHTML = demoRooms.map(room => {
+        const avatar = getAvatarInitials(room.name);
+        const unreadBadge = room.unread_count > 0 ? 
+            `<span style="background: #ef4444; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold;">${room.unread_count}</span>` : '';
+        
+        return `
+            <div class="room-item ${room.id === 1 ? 'active' : ''}">
+                <div class="room-avatar">
+                    ${avatar}
+                </div>
+                <div class="room-info">
+                    <div class="room-name">${room.name}</div>
+                    <div class="room-email">${room.email}</div>
+                </div>
+                ${unreadBadge}
+            </div>
+        `;
+    }).join('');
+}
+
+function addDemoMessage(content) {
+    const newMessage = {
+        id: demoMessages.length + 1,
+        content: content,
+        sender: 6, // Current user
+        sender_name: "Test User",
+        sender_email: "test@example.com",
+        created_at: new Date().toISOString()
+    };
+    
+    demoMessages.push(newMessage);
+    displayDemoMessages();
+}
+
+// Helper functions
+function getAvatarInitials(name) {
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+}
+
+function getAvatarColor(email) {
+    const colors = ['#667eea', '#f093fb', '#4facfe', '#43e97b', '#fa709a', '#fee140', '#a8edea', '#fed6e3'];
+    const index = email.length % colors.length;
+    return colors[index];
+}
+
+function formatMessageTime(dateString) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diff = now - date;
+    
+    if (diff < 60000) return 'Vừa xong';
+    if (diff < 3600000) return `${Math.floor(diff / 60000)} phút trước`;
+    if (diff < 86400000) return `${Math.floor(diff / 3600000)} giờ trước`;
+    return date.toLocaleDateString('vi-VN');
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+</script>
+{% endblock %} 

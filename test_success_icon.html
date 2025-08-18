@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Success Icon</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 2rem;
+            background: #f8fafc;
+        }
+
+        .test-button {
+            padding: 1rem 2rem;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 1rem;
+        }
+
+        /* Modal thành công */
+        .success-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+
+        .success-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .success-modal-content {
+            background: #fff;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .success-icon {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: successIconAppear 1s ease-out 0.5s both;
+        }
+
+        .success-icon svg {
+            filter: drop-shadow(0 4px 8px rgba(16, 185, 129, 0.3));
+        }
+
+        .success-title {
+            color: #0f172a;
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            animation: fadeInUp 0.6s ease-out 0.3s both;
+        }
+
+        .success-message {
+            text-align: left;
+            margin-bottom: 25px;
+            color: #475569;
+            animation: fadeInUp 0.6s ease-out 0.6s both;
+        }
+
+        .success-message h3 {
+            color: #0f172a;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .success-message ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 10px;
+        }
+
+        .success-message li {
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            color: #475569;
+        }
+
+        .success-btn {
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.3s ease;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+            animation: fadeInUp 0.6s ease-out 0.9s both;
+        }
+
+        .success-btn:hover {
+            background: linear-gradient(90deg, #8b5cf6, #6366f1);
+            transform: translateY(-2px);
+        }
+
+        .success-btn svg {
+            fill: currentColor;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes successIconAppear {
+            0% {
+                opacity: 0;
+                transform: scale(0.5) rotate(-180deg);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.2) rotate(0deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Success Icon</h1>
+    <button class="test-button" onclick="showSuccessModal()">Test Success Modal với Icon Tick</button>
+
+    <script>
+        function showSuccessModal() {
+            const modal = document.createElement('div');
+            modal.className = 'success-modal';
+            modal.innerHTML = `
+                <div class="success-modal-content">
+                    <div class="success-icon">
+                        <svg width="60" height="60" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" fill="#10B981" stroke="#10B981" stroke-width="2"/>
+                            <path d="M8 12L11 15L16 9" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    
+                    <h2 class="success-title">🎉 Đăng ký thành công!</h2>
+                    
+                    <div class="success-message">
+                        <p>Cảm ơn bạn đã đăng ký làm chuyên gia tư vấn tại <strong>TimTruongHoc.vn</strong></p>
+                        
+                        <div class="contact-info">
+                            <h3>📞 Chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất để:</h3>
+                            <ul>
+                                <li>✅ Xác nhận thông tin</li>
+                                <li>✅ Hướng dẫn quy trình tư vấn</li>
+                                <li>✅ Thiết lập tài khoản chuyên gia</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <button onclick="closeModal()" class="success-btn">
+                        <span>Quay lại trang chủ</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            setTimeout(() => {
+                modal.classList.add('show');
+            }, 10);
+        }
+
+        function closeModal() {
+            const modal = document.querySelector('.success-modal');
+            if (modal) {
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.remove();
+                }, 300);
+            }
+        }
+    </script>
+</body>
+</html> 

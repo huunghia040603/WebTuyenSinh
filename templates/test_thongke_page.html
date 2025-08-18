@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Thống Kê</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #5a67d8;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+        }
+        .success {
+            border-left-color: #10b981;
+        }
+        .error {
+            border-left-color: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Test Trang Thống Kê</h1>
+        <p>Kiểm tra các API endpoints và trang thống kê</p>
+        
+        <h3>Test API Endpoints:</h3>
+        <button class="test-button" onclick="testStatistics()">Test Statistics API</button>
+        <button class="test-button" onclick="testTopSchools()">Test Top Schools API</button>
+        <button class="test-button" onclick="testTopMajors()">Test Top Majors API</button>
+        <button class="test-button" onclick="testIncrementSchool()">Test Increment School</button>
+        <button class="test-button" onclick="testIncrementMajor()">Test Increment Major</button>
+        
+        <h3>Test Trang Thống Kê:</h3>
+        <button class="test-button" onclick="openThongkePage()">Mở Trang Thống Kê</button>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5000';
+        
+        function addResult(message, isSuccess = true) {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `result ${isSuccess ? 'success' : 'error'}`;
+            div.innerHTML = `<strong>${isSuccess ? '✅' : '❌'}</strong> ${message}`;
+            results.appendChild(div);
+        }
+        
+        async function testStatistics() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/tracking/statistics/`);
+                const data = await response.json();
+                addResult(`Statistics API: ${response.status} - Total views: ${data.total_views}`);
+            } catch (error) {
+                addResult(`Statistics API Error: ${error.message}`, false);
+            }
+        }
+        
+        async function testTopSchools() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/tracking/top-schools/?limit=3`);
+                const data = await response.json();
+                addResult(`Top Schools API: ${response.status} - Found ${data.total} schools`);
+            } catch (error) {
+                addResult(`Top Schools API Error: ${error.message}`, false);
+            }
+        }
+        
+        async function testTopMajors() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/tracking/top-majors/?limit=3`);
+                const data = await response.json();
+                addResult(`Top Majors API: ${response.status} - Found ${data.total} majors`);
+            } catch (error) {
+                addResult(`Top Majors API Error: ${error.message}`, false);
+            }
+        }
+        
+        async function testIncrementSchool() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/tracking/increment-school-view/`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({school_id: 1})
+                });
+                const data = await response.json();
+                addResult(`Increment School: ${response.status} - View count: ${data.view_count}`);
+            } catch (error) {
+                addResult(`Increment School Error: ${error.message}`, false);
+            }
+        }
+        
+        async function testIncrementMajor() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/tracking/increment-major-view/`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({major_id: 1})
+                });
+                const data = await response.json();
+                addResult(`Increment Major: ${response.status} - View count: ${data.view_count}`);
+            } catch (error) {
+                addResult(`Increment Major Error: ${error.message}`, false);
+            }
+        }
+        
+        function openThongkePage() {
+            window.open(`${API_BASE_URL}/thongke`, '_blank');
+            addResult('Đã mở trang thống kê trong tab mới');
+        }
+        
+        // Auto-test on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                testStatistics();
+                testTopSchools();
+                testTopMajors();
+            }, 1000);
+        });
+    </script>
+</body>
+</html> 

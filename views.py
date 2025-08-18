@@ -22,9 +22,35 @@ from .filter import SchoolMajorsFilter
 from django.db.models import Q # Import Q for OR queries
 from django.core.cache import cache
 from django.db.models import Q, Prefetch
+from rest_framework.decorators import action
+from rest_framework import status
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.views.decorators.vary import vary_on_cookie
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+from django.utils import timezone
+from datetime import timedelta
+from django.db.models import Sum
+import os
+from django.conf import settings
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+
+class ExpertApplicationViewSet(viewsets.ModelViewSet):
+    queryset = ExpertApplication.objects.all()
+    serializer_class = ExpertApplicationSerializer
+    permission_classes = [AllowAny]
+
+
+class ConsultationRequestViewSet(viewsets.ModelViewSet):
+    queryset = ConsultationRequest.objects.all()
+    serializer_class = ConsultationRequestSerializer
+    permission_classes = [AllowAny]
+
 
 
 
@@ -52,10 +78,53 @@ class GoogleSocialAuthView(GenericAPIView):
         # Lấy toàn bộ dictionary đã được validate, chứa token.
         data = serializer.validated_data
 
-        # In ra log để kiểm tra cấu trúc dữ liệu trước khi trả về
-        print(f"Data to be returned: {data}")
+        # Debug: In ra log để kiểm tra cấu trúc dữ liệu trước khi trả về
+        print(f"🔍 [DEBUG] serializer.validated_data: {data}")
+        print(f"🔍 [DEBUG] Type of data: {type(data)}")
+        print(f"🔍 [DEBUG] Keys in data: {list(data.keys()) if isinstance(data, dict) else 'Not a dict'}")
 
         return Response(data, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def registration_view(request):
+    """
+    Registration endpoint cho phép tạo user mới mà không cần authentication.
+    """
+    try:
+        # Debug logging
+        print(f"Registration request data: {request.data}")
+
+        # Thêm default date_of_birth nếu không có
+        data = request.data.copy()
+        if 'date_of_birth' not in data or not data['date_of_birth']:
+            data['date_of_birth'] = '2000-01-01'
+
+        print(f"Data after processing: {data}")
+
+        serializer = UserSerializer(data=data)
+        if serializer.is_valid():
+            print("Serializer is valid, creating user...")
+            user = serializer.save()
+            print(f"User created successfully: {user.email}")
+            return Response({
+                'id': user.id,
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'message': 'User created successfully'
+            }, status=status.HTTP_201_CREATED)
+        else:
+            print(f"Serializer errors: {serializer.errors}")
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        print(f"Exception in registration_view: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return Response({
+            'error': 'Internal server error',
+            'detail': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # ---
 ## User ViewSet
@@ -115,6 +184,14 @@ class UserViewSet(viewsets.ModelViewSet):
 
         # Đối với các action khác, bạn có thể thiết lập quyền khác
         return [AllowAny()]
+
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def me(self, request):
+        """
+        Get current user profile
+        """
+        serializer = self.get_serializer(request.user)
+        return Response(serializer.data)
 
 
 # ---
@@ -365,29 +442,29 @@ class SchoolViewSet(viewsets.ModelViewSet):
         Lấy danh sách ngành của trường cụ thể với phân trang và tối ưu hóa.
         """
         school = self.get_object()
-        
+
         # Tối ưu hóa query với select_related và prefetch_related
         majors = school.school_major.select_related('school').prefetch_related(
             'admission_scores'
         ).all()
-        
+
         # Áp dụng search filter nếu có
         search = request.query_params.get('search', None)
         if search:
             majors = majors.filter(
-                Q(name__icontains=search) | 
+                Q(name__icontains=search) |
                 Q(major_id__icontains=search)
             )
-        
+
         # Áp dụng ordering
         ordering = request.query_params.get('ordering', 'name')
         if ordering in ['name', '-name', 'major_id', '-major_id']:
             majors = majors.order_by(ordering)
-        
+
         # Tạm thời thay đổi pagination class cho action này
         original_pagination = self.pagination_class
         self.pagination_class = MajorPagination
-        
+
         # Áp dụng phân trang
         page = self.paginate_queryset(majors)
         if page is not None:
@@ -405,10 +482,10 @@ class SchoolViewSet(viewsets.ModelViewSet):
             except ImportError:
                 serializer = MajorSerializer(majors, many=True)
             response = Response(serializer.data)
-        
+
         # Khôi phục pagination class gốc
         self.pagination_class = original_pagination
-        
+
         return response
 
     @action(detail=True, methods=['get'])
@@ -425,27 +502,27 @@ class SchoolViewSet(viewsets.ModelViewSet):
         API tối ưu cho majors - chỉ trả về dữ liệu cần thiết.
         """
         school = self.get_object()
-        
+
         # Tối ưu hóa query
         majors = school.school_major.select_related('school').all()
-        
+
         # Áp dụng search filter nếu có
         search = request.query_params.get('search', None)
         if search:
             majors = majors.filter(
-                Q(name__icontains=search) | 
+                Q(name__icontains=search) |
                 Q(major_id__icontains=search)
             )
-        
+
         # Áp dụng ordering
         ordering = request.query_params.get('ordering', 'name')
         if ordering in ['name', '-name', 'major_id', '-major_id']:
             majors = majors.order_by(ordering)
-        
+
         # Sử dụng serializer tối ưu
         from .serializers import MajorOptimizedSerializer
         serializer = MajorOptimizedSerializer(majors, many=True)
-        
+
         return Response(serializer.data)
 
     @action(detail=False, methods=['get'], url_path='by_short_code/(?P<short_code>[^/.]+)')
@@ -456,24 +533,24 @@ class SchoolViewSet(viewsets.ModelViewSet):
         """
         try:
             from django.shortcuts import get_object_or_404
-            
+
             # Tối ưu query: chỉ lấy trường cần thiết
             school = get_object_or_404(
                 School.objects.only(
-                    'id', 'name_vn', 'name_en', 'short_code', 'admission_code', 
+                    'id', 'name_vn', 'name_en', 'short_code', 'admission_code',
                     'logo', 'cover_photo', 'established_year', 'school_type',
-                    'website_url', 'quota_per_year', 'introduction', 'phone_number', 
-                    'email', 'map_link', 'start', 'end', 'scholarships', 
-                    'school_level', 'country', 'registration', 'benchmark_min', 
+                    'website_url', 'quota_per_year', 'introduction', 'phone_number',
+                    'email', 'map_link', 'start', 'end', 'scholarships',
+                    'school_level', 'country', 'registration', 'benchmark_min',
                     'benchmark_max', 'tag', 'address', 'socialmedialink'
                 ),
                 short_code__iexact=short_code
             )
-            
+
             # Sử dụng serializer tối ưu (không có majors_data)
             serializer = SchoolOptimizedSerializer(school)
             return Response(serializer.data)
-            
+
         except Exception as e:
             print(f"Error in by_short_code: {str(e)}")
             return Response({
@@ -609,60 +686,212 @@ class AllMajorViewByField(viewsets.ModelViewSet, generics.ListAPIView):
     def schools_teaching_major(self, request, pk=None):
         """
         API tối ưu để lấy danh sách trường có dạy ngành cụ thể.
+        Tìm kiếm theo mã ngành gốc (all_major_id) trong bảng Major.
         """
         try:
-            # Lấy ngành từ pk
-            major = self.get_object()
-            major_id = major.all_major_id
+            # Lấy ngành từ pk (pk có thể là id hoặc all_major_id)
+            from .models import AllMajorOfAllSchool, School, Major
             
-            # Tối ưu hóa query để lấy trường có dạy ngành này
-            from django.db.models import Q
-            from .models import School, Major
+            try:
+                # Thử tìm theo all_major_id trước
+                major = AllMajorOfAllSchool.objects.get(all_major_id=pk)
+                all_major_id = pk
+                print(f"✅ Found major by all_major_id: {pk}")
+            except AllMajorOfAllSchool.DoesNotExist:
+                try:
+                    # Nếu không tìm được, thử tìm theo id
+                    major = AllMajorOfAllSchool.objects.get(id=pk)
+                    all_major_id = major.all_major_id
+                    print(f"✅ Found major by id: {pk}, all_major_id: {all_major_id}")
+                except AllMajorOfAllSchool.DoesNotExist:
+                    print(f"❌ Cannot find major with pk: {pk}")
+                    return Response({
+                        'error': f'Không tìm thấy ngành với mã: {pk}',
+                        'detail': 'Major not found'
+                    }, status=404)
+
+            print(f"🔍 Searching for schools teaching major with all_major_id: {all_major_id}")
+
+            # Bước 1: Tìm các major có major_id chứa all_major_id
+            print(f"🔍 Searching for majors with major_id containing: {all_major_id}")
             
-            # Lọc trường có ngành tương ứng
-            schools = School.objects.filter(
-                school_major__major_id__icontains=major_id
-            ).select_related().prefetch_related(
-                'school_major'
-            ).distinct()
+            # Debug: In ra một số major để kiểm tra
+            sample_majors = Major.objects.all()[:5]
+            print(f"Sample majors: {[(m.major_id, m.name) for m in sample_majors]}")
             
-            # Serialize dữ liệu tối thiểu
+            majors = Major.objects.filter(
+                major_id__icontains=all_major_id
+            ).select_related('school').prefetch_related('admission_scores')
+
+            print(f"Found {majors.count()} majors with major_id containing {all_major_id}")
+            
+            # Debug: In ra các major tìm được
+            for m in majors[:3]:
+                print(f"  - Major: {m.major_id} | {m.name} | School: {m.school.name_vn if m.school else 'No school'}")
+
+            # Bước 2: Lấy danh sách trường từ các major tìm được
             schools_data = []
-            for school in schools:
-                # Lấy điểm chuẩn của ngành tại trường này
-                major_at_school = school.school_major.filter(
-                    major_id__icontains=major_id
-                ).first()
-                
-                # Lấy điểm chuẩn gần nhất
-                latest_score = None
-                if major_at_school:
-                    latest_score = major_at_school.admission_scores.order_by('-year').first()
-                
-                schools_data.append({
-                    'id': school.id,
-                    'name': school.name_vn,
-                    'short_code': school.short_code,
-                    'logo': school.logo,
-                    'school_type': school.school_type,
-                    'country': school.country,
-                    'admission_score': latest_score.score if latest_score else None,
-                    'score_year': latest_score.year if latest_score else None,
-                    'major_id_at_school': major_at_school.major_id if major_at_school else None,
-                    'tuition_min': major_at_school.min_tuition_fee_per_year if major_at_school else school.start,
-                    'tuition_max': major_at_school.max_tuition_fee_per_year if major_at_school else school.end,
-                })
-            
+            seen_school_ids = set()
+
+            for major_obj in majors:
+                try:
+                    school = major_obj.school
+                    
+                    # Kiểm tra trường có tồn tại không
+                    if not school:
+                        continue
+
+                    # Tránh trùng lặp trường
+                    if school.id in seen_school_ids:
+                        continue
+                    seen_school_ids.add(school.id)
+
+                    # Lấy điểm chuẩn gần nhất của ngành tại trường này
+                    latest_score = None
+                    try:
+                        latest_score = major_obj.admission_scores.order_by('-year').first()
+                    except Exception as score_error:
+                        print(f"Error getting admission score for major {major_obj.id}: {score_error}")
+
+                    # Xử lý học phí
+                    tuition_min = None
+                    tuition_max = None
+                    
+                    if major_obj.min_tuition_fee_per_year:
+                        tuition_min = major_obj.min_tuition_fee_per_year
+                    elif school.start:
+                        tuition_min = school.start
+                        
+                    if major_obj.max_tuition_fee_per_year:
+                        tuition_max = major_obj.max_tuition_fee_per_year
+                    elif school.end:
+                        tuition_max = school.end
+
+                    schools_data.append({
+                        'id': school.id,
+                        'name': school.name_vn or school.name_en or 'Unknown',
+                        'short_code': school.short_code or '',
+                        'logo': school.logo or '',
+                        'school_type': school.school_type or '',
+                        'country': school.country or '',
+                        'tag': school.tag or 'none',
+                        'admission_score': latest_score.score if latest_score else None,
+                        'score_year': latest_score.year if latest_score else None,
+                        'major_id_at_school': major_obj.major_id or '',
+                        'tuition_min': tuition_min,
+                        'tuition_max': tuition_max,
+                    })
+                    
+                except Exception as major_error:
+                    print(f"Error processing major {major_obj.id}: {major_error}")
+                    continue
+
             # Sắp xếp theo điểm chuẩn (cao nhất trước)
             schools_data.sort(key=lambda x: (x['admission_score'] or 0), reverse=True)
+
+            print(f"Returning {len(schools_data)} schools for major {all_major_id}")
+
+            # Nếu không tìm thấy trường nào, trả về thông báo
+            if len(schools_data) == 0:
+                print(f"⚠️ No schools found for major {all_major_id}")
+                return Response({
+                    'all_major_id': all_major_id,
+                    'major_name': major.name,
+                    'schools': [],
+                    'message': f'Chưa có trường nào đào tạo ngành {major.name}',
+                    'debug_info': {
+                        'searched_all_major_id': all_major_id,
+                        'total_majors_in_db': Major.objects.count(),
+                        'sample_major_ids': list(Major.objects.values_list('major_id', flat=True)[:5])
+                    }
+                })
+
+            return Response({
+                'all_major_id': all_major_id,
+                'major_name': major.name,
+                'schools': schools_data  # Bỏ giới hạn, hiển thị tất cả
+            })
+
+        except Exception as e:
+            print(f"Error in schools_teaching_major: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return Response({
+                'error': str(e),
+                'detail': 'Internal server error occurred'
+            }, status=500)
+
+    @action(detail=False, methods=['get'])
+    def test_data(self, request):
+        """
+        API test để kiểm tra dữ liệu
+        """
+        from .models import AllMajorOfAllSchool, Major, School
+        
+        try:
+            # Lấy một số dữ liệu mẫu
+            all_majors_sample = AllMajorOfAllSchool.objects.all()[:5]
+            majors_sample = Major.objects.all()[:5]
+            schools_sample = School.objects.all()[:5]
             
             return Response({
-                'major_id': major_id,
-                'major_name': major.name,
-                'schools': schools_data[:20]  # Giới hạn 20 trường đầu
+                'all_majors_sample': [
+                    {'id': m.id, 'all_major_id': m.all_major_id, 'name': m.name} 
+                    for m in all_majors_sample
+                ],
+                'majors_sample': [
+                    {'id': m.id, 'major_id': m.major_id, 'name': m.name, 'school': m.school.name_vn if m.school else 'No school'} 
+                    for m in majors_sample
+                ],
+                'schools_sample': [
+                    {'id': s.id, 'name': s.name_vn, 'short_code': s.short_code} 
+                    for s in schools_sample
+                ],
+                'counts': {
+                    'all_majors': AllMajorOfAllSchool.objects.count(),
+                    'majors': Major.objects.count(),
+                    'schools': School.objects.count()
+                }
+            })
+        except Exception as e:
+            return Response({
+                'error': str(e)
+            }, status=500)
+
+    @action(detail=False, methods=['get'])
+    def all_for_comparison(self, request):
+        """
+        API để lấy tất cả ngành cho trang so sánh (không có pagination)
+        """
+        from .models import AllMajorOfAllSchool
+        
+        try:
+            # Lấy tất cả ngành, sắp xếp theo opportunities giảm dần
+            majors = AllMajorOfAllSchool.objects.all().order_by('-opportunities', 'name')
+            
+            # Serialize với dữ liệu cần thiết cho so sánh
+            majors_data = []
+            for major in majors:
+                majors_data.append({
+                    'id': major.id,
+                    'all_major_id': major.all_major_id,
+                    'name': major.name,
+                    'opportunities': major.opportunities,
+                    'training_duration': major.training_duration,
+                    'salary': major.salary,
+                    'tuition_fee_per_year': major.tuition_fee_per_year,
+                    'tag': major.tag,
+                    'field_name': major.field.name if major.field else None
+                })
+            
+            return Response({
+                'results': majors_data,
+                'count': len(majors_data),
+                'message': 'Tất cả ngành cho so sánh'
             })
             
         except Exception as e:
+            print(f"Error in all_for_comparison: {str(e)}")
             return Response({
                 'error': str(e)
             }, status=500)
@@ -674,37 +903,157 @@ class AllMajorViewByField(viewsets.ModelViewSet, generics.ListAPIView):
         So khớp all_major_id với major_id trong bảng Major để lấy trường có dạy ngành.
         """
         all_major_id = request.query_params.get('all_major_id', None)
+
+# ---
+## Xu Hướng Ngành Nghề API
+# ---
+class XuHuongNgheViewSet(viewsets.ModelViewSet):
+    serializer_class = AllMajorOfAllSchoolSerializer
+    permission_classes = [AllowAny]
+    queryset = AllMajorOfAllSchool.objects.all()
+
+    def list(self, request, *args, **kwargs):
+        """
+        API để lấy dữ liệu cho trang xu hướng ngành nghề
+        """
+        # Lấy tất cả ngành nghề từ database
+        queryset = AllMajorOfAllSchool.objects.all()
+
+        # Lọc theo tag nếu có
+        tag = request.query_params.get('tag')
+        if tag:
+            queryset = queryset.filter(tag=tag)
+
+        # Sắp xếp theo opportunities (cơ hội việc làm) giảm dần
+        # Chỉ lấy những ngành có opportunities > 0
+        queryset = queryset.filter(opportunities__gt=0).order_by('-opportunities')
+
+        # Giới hạn số lượng kết quả
+        limit = request.query_params.get('limit', 20)
+        queryset = queryset[:int(limit)]
+
+        # Prefetch related để tối ưu performance
+        queryset = queryset.select_related('field')
+
+        serializer = self.get_serializer(queryset, many=True)
+
+        # Thêm thống kê tổng quan
+        total_majors = AllMajorOfAllSchool.objects.count()
+        hot_majors = AllMajorOfAllSchool.objects.filter(tag='hot').count()
+        find_majors = AllMajorOfAllSchool.objects.filter(tag='find').count()
+        grown_majors = AllMajorOfAllSchool.objects.filter(tag='grown').count()
+        push_majors = AllMajorOfAllSchool.objects.filter(tag='push').count()
+
+        return Response({
+            'results': serializer.data,
+            'statistics': {
+                'total_majors': total_majors,
+                'hot_majors': hot_majors,
+                'find_majors': find_majors,
+                'grown_majors': grown_majors,
+                'push_majors': push_majors
+            }
+        })
+
+    @action(detail=False, methods=['get'])
+    def trending(self, request):
+        """
+        API lấy các ngành nghề đang trending (hot, find, grown)
+        """
+        trending_majors = AllMajorOfAllSchool.objects.filter(
+            tag__in=['hot', 'find', 'grown']
+        ).order_by('-opportunities')[:10]
+
+        serializer = self.get_serializer(trending_majors, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'])
+    def top_opportunities(self, request):
+        """
+        API lấy top 6 ngành có cơ hội việc làm cao nhất từ AllMajorOfAllSchool
+        """
+        # Lấy top 6 ngành có opportunities cao nhất từ ngành chung
+        top_majors = AllMajorOfAllSchool.objects.filter(
+            opportunities__gt=0
+        ).order_by('-opportunities')[:6]
+
+        # Prefetch related để tối ưu performance
+        top_majors = top_majors.select_related('field')
+
+        # Serialize với đầy đủ thông tin
+        serializer = self.get_serializer(top_majors, many=True)
+
+        return Response({
+            'results': serializer.data,
+            'count': len(serializer.data),
+            'message': 'Top 6 ngành có cơ hội việc làm cao nhất từ ngành chung',
+            'source': 'AllMajorOfAllSchool'
+        })
+
+    @action(detail=False, methods=['get'])
+    def statistics(self, request):
+        """
+        API lấy thống kê tổng quan về thị trường lao động
+        """
+        # Thống kê theo tag
+        tag_stats = {}
+        for tag, _ in AllMajorOfAllSchool.TAG_CHOICES:
+            count = AllMajorOfAllSchool.objects.filter(tag=tag).count()
+            tag_stats[tag] = count
+
+        # Thống kê theo field
+        field_stats = {}
+        fields = FieldGroup.objects.all()
+        for field in fields:
+            count = AllMajorOfAllSchool.objects.filter(field=field).count()
+            if count > 0:
+                field_stats[field.name] = count
+
+        # Mức lương trung bình (giả định)
+        salary_ranges = {
+            '0-10M': 0,
+            '10-20M': 0,
+            '20-30M': 0,
+            '30M+': 0
+        }
+
+        return Response({
+            'tag_statistics': tag_stats,
+            'field_statistics': field_stats,
+            'salary_ranges': salary_ranges,
+            'total_majors': AllMajorOfAllSchool.objects.count()
+        })
         if not all_major_id:
             return Response({'error': 'Missing all_major_id parameter'}, status=400)
-        
+
         try:
             from django.db.models import Q
             from .models import School, Major
-            
+
             # Bước 1: Tìm các major có major_id chứa all_major_id
             majors = Major.objects.filter(
                 major_id__icontains=all_major_id
             ).select_related('school').prefetch_related(
                 'admission_scores'
             )
-            
+
             print(f"Found {majors.count()} majors with major_id containing {all_major_id}")
-            
+
             # Bước 2: Lấy danh sách trường từ các major tìm được
             schools_data = []
             seen_school_ids = set()
-            
+
             for major in majors:
                 school = major.school
-                
+
                 # Tránh trùng lặp trường
                 if school.id in seen_school_ids:
                     continue
                 seen_school_ids.add(school.id)
-                
+
                 # Lấy điểm chuẩn gần nhất của ngành tại trường này
                 latest_score = major.admission_scores.order_by('-year').first()
-                
+
                 schools_data.append({
                     'id': school.id,
                     'name': school.name_vn,
@@ -719,17 +1068,17 @@ class AllMajorViewByField(viewsets.ModelViewSet, generics.ListAPIView):
                     'tuition_min': major.min_tuition_fee_per_year if major.min_tuition_fee_per_year else school.start,
                     'tuition_max': major.max_tuition_fee_per_year if major.max_tuition_fee_per_year else school.end,
                 })
-            
+
             # Sắp xếp theo điểm chuẩn (cao nhất trước)
             schools_data.sort(key=lambda x: (x['admission_score'] or 0), reverse=True)
-            
+
             print(f"Returning {len(schools_data)} schools for major {all_major_id}")
-            
+
             return Response({
                 'all_major_id': all_major_id,
                 'schools': schools_data  # Bỏ giới hạn, hiển thị tất cả
             })
-            
+
         except Exception as e:
             print(f"Error in schools_by_major_id: {str(e)}")
             return Response({
@@ -848,11 +1197,11 @@ class SchoolOptimizedViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         # Lấy queryset ban đầu
         queryset = School.objects.all()
-        
+
         # Tối ưu hóa với select_related nếu cần
         if self.action == 'list':
             queryset = queryset.select_related('album')
-        
+
         # Áp dụng ordering mặc định
         ordering = self.request.query_params.get('ordering', None)
         if not ordering:
@@ -860,7 +1209,7 @@ class SchoolOptimizedViewSet(viewsets.ReadOnlyModelViewSet):
             queryset = queryset.extra(
                 select={'tag_order': "CASE WHEN tag = 'outstanding' THEN 0 ELSE 1 END"}
             ).order_by('tag_order', 'name_vn')
-        
+
         return queryset
 
     @method_decorator(cache_page(60 * 15))  # Cache 15 phút
@@ -878,15 +1227,15 @@ class SchoolOptimizedViewSet(viewsets.ReadOnlyModelViewSet):
         """
         # Sử dụng cache key
         cache_key = f"schools_fast_list_{request.query_params}"
-        
+
         # Thử lấy từ cache trước
         cached_data = cache.get(cache_key)
         if cached_data:
             return Response(cached_data)
-        
+
         # Nếu không có cache, query database
         schools = self.get_queryset()
-        
+
         # Serialize với dữ liệu tối thiểu
         data = []
         for school in schools:
@@ -903,10 +1252,10 @@ class SchoolOptimizedViewSet(viewsets.ReadOnlyModelViewSet):
                 'benchmark_min': school.benchmark_min,
                 'benchmark_max': school.benchmark_max,
             })
-        
+
         # Lưu vào cache 10 phút
         cache.set(cache_key, data, 60 * 10)
-        
+
         return Response(data)
 
 
@@ -922,7 +1271,7 @@ class SchoolMajorsViewSet(viewsets.ReadOnlyModelViewSet):
 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_class = SchoolMajorsFilter
-    
+
     # Các trường có thể tìm kiếm
     search_fields = [
         'school_major__name',          # Tìm kiếm theo tên ngành
@@ -943,15 +1292,15 @@ class SchoolMajorsViewSet(viewsets.ReadOnlyModelViewSet):
         Tùy chỉnh queryset để chỉ lấy trường và ngành của trường đó.
         """
         queryset = super().get_queryset()
-        
+
         # Lấy school_id từ query parameters
         school_id = self.request.query_params.get('school_id')
         if school_id:
             queryset = queryset.filter(id=school_id)
-        
+
         # Prefetch majors để tối ưu performance
         queryset = queryset.prefetch_related('school_major')
-        
+
         return queryset
 
     @action(detail=True, methods=['get'])
@@ -962,15 +1311,657 @@ class SchoolMajorsViewSet(viewsets.ReadOnlyModelViewSet):
         """
         school = self.get_object()
         majors = school.school_major.all()
-        
+
         # Áp dụng phân trang
         page = self.paginate_queryset(majors)
         if page is not None:
             serializer = MajorSerializer(page, many=True)
             return self.get_paginated_response(serializer.data)
-        
+
         serializer = MajorSerializer(majors, many=True)
         return Response(serializer.data)
+
+
+# ---
+## Chat ViewSets
+# ---
+class ChatRoomViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for ChatRoom model
+    """
+    serializer_class = ChatRoomSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = StandardResultsSetPagination
+
+    def get_queryset(self):
+        """
+        Return chat rooms where current user is a participant
+        """
+        return ChatRoom.objects.filter(
+            participants=self.request.user,
+            is_active=True
+        ).prefetch_related('participants', 'messages').distinct()
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return ChatRoomCreateSerializer
+        return ChatRoomSerializer
+
+    def perform_create(self, serializer):
+        """
+        Create a new chat room and add current user as participant
+        """
+        room = serializer.save()
+        room.participants.add(self.request.user)
+        return room
+
+    @action(detail=False, methods=['post'])
+    def create_or_get_private_room(self, request):
+        """
+        Create or get existing private chat room with another user
+        """
+        other_user_id = request.data.get('user_id')
+        if not other_user_id:
+            return Response({'error': 'user_id is required'}, status=400)
+
+        try:
+            other_user = User.objects.get(id=other_user_id)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=404)
+
+        if other_user == request.user:
+            return Response({'error': 'Cannot create room with yourself'}, status=400)
+
+        # Check if private room already exists
+        existing_room = ChatRoom.objects.filter(
+            room_type='private',
+            participants=request.user
+        ).filter(
+            participants=other_user
+        ).first()
+
+        if existing_room:
+            serializer = ChatRoomSerializer(existing_room, context={'request': request})
+            return Response(serializer.data)
+
+        # Create new private room
+        room = ChatRoom.objects.create(room_type='private')
+        room.participants.add(request.user, other_user)
+
+        serializer = ChatRoomSerializer(room, context={'request': request})
+        return Response(serializer.data, status=201)
+
+    @action(detail=True, methods=['post'])
+    def mark_messages_read(self, request, pk=None):
+        """
+        Mark all messages in room as read for current user
+        """
+        room = self.get_object()
+        updated_count = room.messages.filter(
+            is_read=False
+        ).exclude(sender=request.user).update(is_read=True)
+
+        return Response({'marked_read': updated_count})
+
+    def destroy(self, request, *args, **kwargs):
+        """
+        Delete chat room - only participants can delete
+        """
+        room = self.get_object()
+
+        # Check if user is a participant
+        if request.user not in room.participants.all():
+            return Response({'error': 'Bạn không có quyền xóa cuộc trò chuyện này'}, status=403)
+
+        # Soft delete - mark as inactive instead of hard delete
+        room.is_active = False
+        room.save()
+
+        return Response({'message': 'Cuộc trò chuyện đã được xóa thành công'}, status=200)
+
+
+class MessageViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for Message model
+    """
+    serializer_class = MessageSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = StandardResultsSetPagination
+
+    def get_queryset(self):
+        """
+        Return messages from rooms where current user is a participant
+        Exclude messages that are deleted for the current user
+        """
+        room_id = self.request.query_params.get('room_id')
+        queryset = Message.objects.filter(
+            room__participants=self.request.user,
+            is_deleted=False
+        ).exclude(
+            deleted_for_users=self.request.user
+        ).select_related('sender', 'room').prefetch_related('reactions')
+
+        if room_id:
+            queryset = queryset.filter(room_id=room_id)
+
+        return queryset.order_by('-created_at')
+
+    def perform_create(self, serializer):
+        """
+        Create a new message and set sender to current user
+        """
+        room = serializer.validated_data['room']
+        reply_to_id = self.request.data.get('reply_to')
+        reply_to = None
+        if reply_to_id:
+            try:
+                reply_to = Message.objects.filter(room=room).get(id=reply_to_id)
+            except Message.DoesNotExist:
+                reply_to = None
+
+        # Check if user is participant of the room
+        if not room.participants.filter(id=self.request.user.id).exists():
+            raise PermissionDenied("You are not a participant of this room")
+
+        serializer.save(sender=self.request.user, reply_to=reply_to)
+
+        # Update room's updated_at timestamp
+        room.save(update_fields=['updated_at'])
+
+    @action(detail=True, methods=['post'])
+    def mark_read(self, request, pk=None):
+        """
+        Mark a specific message as read
+        """
+        message = self.get_object()
+        if message.sender != request.user:
+            message.mark_as_read()
+        return Response({'status': 'marked_read'})
+
+    @action(detail=True, methods=['post'])
+    def react(self, request, pk=None):
+        """Add or toggle a reaction for a message"""
+        message = self.get_object()
+        reaction = request.data.get('reaction')
+        if reaction not in ['like', 'love', 'haha']:
+            return Response({'detail': 'Invalid reaction'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Toggle: if same reaction exists, remove; else set/update
+        existing = MessageReaction.objects.filter(message=message, user=request.user).first()
+        if existing and existing.reaction == reaction:
+            existing.delete()
+            action_status = 'removed'
+        else:
+            MessageReaction.objects.update_or_create(
+                message=message, user=request.user,
+                defaults={'reaction': reaction}
+            )
+            action_status = 'set'
+
+        # Return updated counts
+        counts = {}
+        for r in message.reactions.all():
+            counts[r.reaction] = counts.get(r.reaction, 0) + 1
+
+        return Response({'status': action_status, 'reactions': counts})
+
+    @action(detail=True, methods=['post'])
+    def delete_for_me(self, request, pk=None):
+        """
+        Delete message for current user only (delete for me)
+        """
+        message = self.get_object()
+
+        # Check if user is participant of the room
+        if not message.room.participants.filter(id=request.user.id).exists():
+            raise PermissionDenied("You are not a participant of this room")
+
+        # Delete message for current user
+        message.delete_for_user(request.user)
+
+        return Response({
+            'status': 'deleted_for_me',
+            'message': 'Message deleted for you only'
+        })
+
+    @action(detail=True, methods=['post'])
+    def restore_for_me(self, request, pk=None):
+        """
+        Restore message for current user (undo delete for me)
+        """
+        message = self.get_object()
+
+        # Check if user is participant of the room
+        if not message.room.participants.filter(id=request.user.id).exists():
+            raise PermissionDenied("You are not a participant of this room")
+
+        # Restore message for current user
+        message.restore_for_user(request.user)
+
+        return Response({
+            'status': 'restored_for_me',
+            'message': 'Message restored for you'
+        })
+
+
+class ChatUserStatusViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for ChatUserStatus model
+    """
+    serializer_class = ChatUserStatusSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """
+        Return status of users that have chatted with current user
+        """
+        # Get users who are in same chat rooms as current user
+        room_participants = User.objects.filter(
+            chat_rooms__participants=self.request.user
+        ).exclude(id=self.request.user.id).distinct()
+
+        return ChatUserStatus.objects.filter(user__in=room_participants)
+
+    @action(detail=False, methods=['post'])
+    def update_status(self, request):
+        """
+        Update current user's chat status
+        """
+        status = request.data.get('status', 'online')
+        user_status, created = ChatUserStatus.objects.get_or_create(
+            user=request.user,
+            defaults={'status': status}
+        )
+
+        if not created:
+            user_status.status = status
+            user_status.save()
+
+        serializer = ChatUserStatusSerializer(user_status)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['post'])
+    def set_typing(self, request):
+        """
+        Set user as typing in a specific room
+        """
+        room_id = request.data.get('room_id')
+        is_typing = request.data.get('is_typing', True)
+
+        if not room_id:
+            return Response({'error': 'room_id is required'}, status=400)
+
+        try:
+            room = ChatRoom.objects.get(id=room_id, participants=request.user)
+        except ChatRoom.DoesNotExist:
+            return Response({'error': 'Room not found'}, status=404)
+
+        user_status, created = ChatUserStatus.objects.get_or_create(
+            user=request.user,
+            defaults={'status': 'online'}
+        )
+
+        if is_typing:
+            user_status.is_typing_in_room = room
+        else:
+            user_status.is_typing_in_room = None
+
+        user_status.save()
+
+        return Response({'status': 'updated'})
+
+
+class OnlineUsersViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    ViewSet to get list of online users for chat
+    """
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = StandardResultsSetPagination
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['email', 'first_name', 'last_name']
+
+    def get_queryset(self):
+        """
+        Return active users excluding current user
+        """
+        return User.objects.filter(
+            is_active_user=True
+        ).exclude(id=self.request.user.id).select_related('chat_status')
+
+
+# --- Views cho đăng ký/đăng nhập đơn giản ---
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def simple_registration_view(request):
+    """
+    Đăng ký tài khoản đơn giản với email, họ tên, password
+    """
+    serializer = SimpleRegistrationSerializer(data=request.data)
+    if serializer.is_valid():
+        try:
+            user = serializer.save()
+            # Tạo token cho user mới
+            tokens = get_tokens_for_user(user)
+
+            return Response({
+                'message': 'Đăng ký thành công!',
+                'user': {
+                    'id': user.id,
+                    'email': user.email,
+                    'first_name': user.first_name,
+                    'last_name': user.last_name,
+                },
+                'tokens': tokens
+            }, status=201)
+        except Exception as e:
+            return Response({
+                'error': 'Có lỗi xảy ra khi tạo tài khoản',
+                'detail': str(e)
+            }, status=400)
+    else:
+        return Response({
+            'error': 'Dữ liệu không hợp lệ',
+            'details': serializer.errors
+        }, status=400)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def simple_login_view(request):
+    """
+    Đăng nhập đơn giản với email và password
+    """
+    serializer = SimpleLoginSerializer(data=request.data)
+    if serializer.is_valid():
+        user = serializer.validated_data['user']
+        tokens = get_tokens_for_user(user)
+
+        return Response({
+            'message': 'Đăng nhập thành công!',
+            'user': {
+                'id': user.id,
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'role': user.role,
+            },
+            'tokens': tokens
+        })
+    else:
+        return Response({
+            'error': 'Thông tin đăng nhập không đúng',
+            'details': serializer.errors
+        }, status=400)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def search_users_by_email(request):
+    """
+    Tìm kiếm người dùng theo email để chat
+    """
+    email = request.GET.get('email', '').strip()
+
+    if not email:
+        return Response({
+            'error': 'Email không được để trống'
+        }, status=400)
+
+    try:
+        # Tìm kiếm người dùng theo email (không phân biệt hoa thường)
+        users = User.objects.filter(
+            email__icontains=email,
+            is_active_user=True
+        ).exclude(id=request.user.id)  # Loại trừ chính mình
+
+        # Giới hạn kết quả tìm kiếm
+        users = users[:10]
+
+        # Serialize kết quả
+        user_data = []
+        for user in users:
+            user_data.append({
+                'id': user.id,
+                'email': user.email,
+                'first_name': user.first_name or '',
+                'last_name': user.last_name or '',
+                'full_name': f"{user.first_name or ''} {user.last_name or ''}".strip() or user.email,
+                'user_photo': user.user_photo or '',
+                'is_online': hasattr(user, 'chat_status') and user.chat_status.status == 'online'
+            })
+
+        return Response({
+            'users': user_data,
+            'count': len(user_data)
+        })
+
+    except Exception as e:
+        return Response({
+            'error': 'Có lỗi xảy ra khi tìm kiếm',
+            'detail': str(e)
+        }, status=500)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def me_view(request):
+    """
+    Lấy thông tin user hiện tại
+    """
+    try:
+        user = request.user
+        return Response({
+            'id': user.id,
+            'email': user.email,
+            'first_name': user.first_name or '',
+            'last_name': user.last_name or '',
+            'full_name': f"{user.first_name or ''} {user.last_name or ''}".strip() or user.email,
+            'role': user.role,
+            'user_photo': user.user_photo or '',
+            'is_active': user.is_active_user,
+            'date_of_birth': str(user.date_of_birth) if user.date_of_birth else None,
+            'living_place': user.living_place or '',
+            'sex': user.sex or ''
+        })
+    except Exception as e:
+        return Response({
+            'error': 'Có lỗi xảy ra khi lấy thông tin user',
+            'detail': str(e)
+        }, status=500)
+
+
+# --- ViewSets cho tracking lượt xem ---
+class SchoolViewCountViewSet(viewsets.ModelViewSet):
+    queryset = SchoolViewCount.objects.all().order_by('-view_count')
+    serializer_class = SchoolViewCountSerializer
+    permission_classes = [AllowAny]
+
+class MajorViewCountViewSet(viewsets.ModelViewSet):
+    queryset = MajorViewCount.objects.all().order_by('-view_count')
+    serializer_class = MajorViewCountSerializer
+    permission_classes = [AllowAny]
+
+class DailyViewStatsViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = DailyViewStats.objects.all().order_by('-date')
+    serializer_class = DailyViewStatsSerializer
+    permission_classes = [AllowAny]
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def increment_school_view(request):
+    """
+    Tăng lượt xem cho trường
+    """
+    school_id = request.data.get('school_id')
+    if not school_id:
+        return Response({'error': 'school_id là bắt buộc'}, status=400)
+
+    try:
+        school = School.objects.get(id=school_id)
+        view_count, created = SchoolViewCount.objects.get_or_create(
+            school=school,
+            defaults={'view_count': 1}
+        )
+
+        if not created:
+            view_count.view_count += 1
+            view_count.save()
+
+        # Cập nhật thống kê theo ngày
+        today = timezone.now().date()
+        daily_stats, created = DailyViewStats.objects.get_or_create(
+            date=today,
+            defaults={'total_school_views': 1}
+        )
+
+        if not created:
+            daily_stats.total_school_views += 1
+            daily_stats.save()
+
+        return Response({
+            'success': True,
+            'view_count': view_count.view_count,
+            'message': f'Đã tăng lượt xem cho trường {school.name_vn}'
+        })
+
+    except School.DoesNotExist:
+        return Response({'error': 'Không tìm thấy trường'}, status=404)
+    except Exception as e:
+        return Response({'error': f'Có lỗi xảy ra: {str(e)}'}, status=500)
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def increment_major_view(request):
+    """
+    Tăng lượt xem cho ngành
+    """
+    major_id = request.data.get('major_id')
+    if not major_id:
+        return Response({'error': 'major_id là bắt buộc'}, status=400)
+
+    try:
+        major = Major.objects.get(id=major_id)
+        view_count, created = MajorViewCount.objects.get_or_create(
+            major=major,
+            defaults={'view_count': 1}
+        )
+
+        if not created:
+            view_count.view_count += 1
+            view_count.save()
+
+        # Cập nhật thống kê theo ngày
+        today = timezone.now().date()
+        daily_stats, created = DailyViewStats.objects.get_or_create(
+            date=today,
+            defaults={'total_major_views': 1}
+        )
+
+        if not created:
+            daily_stats.total_major_views += 1
+            daily_stats.save()
+
+        return Response({
+            'success': True,
+            'view_count': view_count.view_count,
+            'message': f'Đã tăng lượt xem cho ngành {major.name}'
+        })
+
+    except Major.DoesNotExist:
+        return Response({'error': 'Không tìm thấy ngành'}, status=404)
+    except Exception as e:
+        return Response({'error': f'Có lỗi xảy ra: {str(e)}'}, status=500)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def top_schools(request):
+    """
+    Lấy danh sách top trường được xem nhiều nhất
+    """
+    limit = int(request.GET.get('limit', 10))
+
+    # Lấy top trường theo lượt xem
+    top_schools = SchoolViewCount.objects.select_related('school').order_by('-view_count')[:limit]
+
+    # Thêm rank cho mỗi trường
+    result = []
+    for i, school_view in enumerate(top_schools, 1):
+        school_data = TopSchoolsSerializer(school_view.school).data
+        school_data['view_count'] = school_view.view_count
+        school_data['rank'] = i
+        result.append(school_data)
+
+    return Response({
+        'top_schools': result,
+        'total': len(result)
+    })
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def top_majors(request):
+    """
+    Lấy danh sách top ngành được xem nhiều nhất
+    """
+    limit = int(request.GET.get('limit', 10))
+
+    # Lấy top ngành theo lượt xem
+    top_majors = MajorViewCount.objects.select_related('major', 'major__school').order_by('-view_count')[:limit]
+
+    # Thêm rank cho mỗi ngành
+    result = []
+    for i, major_view in enumerate(top_majors, 1):
+        major_data = TopMajorsSerializer(major_view.major).data
+        major_data['view_count'] = major_view.view_count
+        major_data['rank'] = i
+        result.append(major_data)
+
+    return Response({
+        'top_majors': result,
+        'total': len(result)
+    })
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def view_statistics(request):
+    """
+    Lấy thống kê tổng quan về lượt xem
+    """
+    # Tổng lượt xem trường
+    total_school_views = SchoolViewCount.objects.aggregate(
+        total=Sum('view_count')
+    )['total'] or 0
+
+    # Tổng lượt xem ngành
+    total_major_views = MajorViewCount.objects.aggregate(
+        total=Sum('view_count')
+    )['total'] or 0
+
+    # Thống kê 7 ngày gần nhất
+    seven_days_ago = timezone.now().date() - timedelta(days=7)
+    recent_stats = DailyViewStats.objects.filter(
+        date__gte=seven_days_ago
+    ).order_by('date')
+
+    # Thống kê theo ngày
+    daily_data = []
+    for stat in recent_stats:
+        daily_data.append({
+            'date': stat.date.strftime('%Y-%m-%d'),
+            'school_views': stat.total_school_views,
+            'major_views': stat.total_major_views,
+            'total_views': stat.total_school_views + stat.total_major_views
+        })
+
+    return Response({
+        'total_school_views': total_school_views,
+        'total_major_views': total_major_views,
+        'total_views': total_school_views + total_major_views,
+        'daily_stats': daily_data,
+        'last_7_days': len(daily_data)
+    })
+
+
 
 
 

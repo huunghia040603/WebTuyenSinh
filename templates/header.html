@@ -589,7 +589,7 @@
                         <a href="#" id="logout-btn" class="auth-btn auth-btn-logout">Đăng xuất</a>
                     </div>
                 </div>
-                <a href="#" class="auth-btn auth-btn-post">Đăng tin tuyển sinh</a>
+                <a href="/hop-tac" class="auth-btn auth-btn-post">Đăng tin tuyển sinh</a>
 
             </div>
         </div>
@@ -623,8 +623,9 @@
                         <li><a href="/mbti-new">Bài test MBTI</a></li>
                         <li><a href="/thansohoc">Thần Số Học</a></li>
                         <li><a href="/cunghoangdao">Cung hoàng đạo</a></li>
-                        <li><a href="#">Xu hướng việc làm</a></li>
-                        <li><a href="#">Thuật ngữ ngành học</a></li>
+                        <li><a href="/xu-huong-nghe">Xu hướng việc làm</a></li>
+                        <li><a href="/dang-ky-tu-van">Đăng ký tư vấn</a></li>
+                        <li><a href="/thuatngu">Thuật ngữ ngành học</a></li>
                     </ul>
                 </li>
                 <li><a href="#">Đại học</a>
@@ -634,6 +635,7 @@
                         <li><a href="#">Miền Bắc</a></li>
                         <li><a href="#">Miền Trung</a></li>
                         <li><a href="#">Miền Nam</a></li>
+                        <li><a href="/thongke">Thống kê tìm trường</a></li>
                     </ul>
                 </li>
                 <li><a href="#">Cao đẳng</a>
@@ -664,16 +666,11 @@
                         <li><a href="#">Tin học</a></li>
                     </ul>
                 </li>
-                <li><a href="#">So sánh</a>
-                    <ul class="submenu">
-                        <li><a href="/so-sanh-nganh">So sánh ngành học</a></li>
-                        <li><a href="/so-sanh-truong">So sánh trường học</a></li>
-                    </ul>
-                </li>
                 <li><a href="#">Liên hệ</a>
                     <ul class="submenu">
                         <li><a href="#">Quảng Cáo</a></li>
                         <li><a href="#">Chúng tôi</a></li>
+                        <li><a href="/thongke">📊 Thống kê</a></li>
                     </ul>
                 </li>
             </ul>
@@ -731,15 +728,11 @@
                 <a href="#">Tiếng Anh</a>
                 <a href="#">Tin học</a>
             </div>
-            <button class="mobile-menu-item" data-menu="sosanh">So sánh <span>&#9654;</span></button>
-            <div class="mobile-submenu" id="submenu-sosanh">
-                <a href="/so-sanh-nganh">So sánh ngành học</a>
-                <a href="/so-sanh-truong">So sánh trường học</a>
-            </div>
             <button class="mobile-menu-item" data-menu="lienhe">Liên hệ <span>&#9654;</span></button>
             <div class="mobile-submenu" id="submenu-lienhe">
                 <a href="#">Quảng Cáo</a>
                 <a href="#">Chúng tôi</a>
+                <a href="/thongke">📊 Thống kê</a>
             </div>
         </div>
         <div class="mobile-menu-overlay" id="mobile-menu-overlay"></div>
@@ -762,36 +755,87 @@
 
         // Hàm giả định để lấy dữ liệu người dùng
         const AuthManager = {
-            getUserData: () => JSON.parse(localStorage.getItem('userData')),
+            getUserData: () => {
+                // Thử lấy từ nhiều nguồn khác nhau
+                let userData = JSON.parse(localStorage.getItem('userData'));
+                if (!userData) {
+                    userData = JSON.parse(localStorage.getItem('user_data'));
+                }
+                if (!userData) {
+                    userData = JSON.parse(localStorage.getItem('access_token'));
+                }
+                return userData;
+            },
             clearUserData: () => {
-            localStorage.removeItem('userData');
-            localStorage.removeItem('accessToken'); // Xóa cả accessToken nếu bạn lưu riêng
-        }
+                localStorage.removeItem('userData');
+                localStorage.removeItem('user_data');
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('refresh_token');
+                localStorage.removeItem('accessToken');
+            }
         };
         
-        const userData = AuthManager.getUserData();
-
-        if (userData) {
-            // Người dùng đã đăng nhập
-            const { auth_token } = userData;
-
-            userProfileActions.style.display = 'flex';
-          
-
-            loginBtn.style.display = 'none';
-            registerBtn.style.display = 'none';
-
-            logoutBtn.addEventListener('click', () => {
+        // Hàm cập nhật UI dựa trên trạng thái đăng nhập
+        function updateAuthUI() {
+            const userData = AuthManager.getUserData();
+            
+            if (userData) {
+                // Người dùng đã đăng nhập
+                userProfileActions.style.display = 'flex';
+                loginBtn.style.display = 'none';
+                registerBtn.style.display = 'none';
+                
+                // Cập nhật thông tin người dùng nếu có
+                if (userData.first_name || userData.email) {
+                    const userNameElement = document.querySelector('.user-name');
+                    if (userNameElement) {
+                        userNameElement.textContent = userData.first_name || userData.email;
+                    }
+                }
+            } else {
+                // Người dùng chưa đăng nhập
+                userProfileActions.style.display = 'none';
+                loginBtn.style.display = 'block';
+                registerBtn.style.display = 'block';
+            }
+        }
+        
+        // Cập nhật UI lần đầu
+        updateAuthUI();
+        
+        // Thêm event listener cho logout
+        logoutBtn.addEventListener('click', () => {
+            // Sử dụng AutoLogin.logout() để có logic chuyển hướng đúng
+            if (window.AutoLogin && typeof window.AutoLogin.logout === 'function') {
+                window.AutoLogin.logout();
+            } else {
+                // Fallback nếu AutoLogin không có sẵn
                 AuthManager.clearUserData();
-                window.location.reload(); // Hoặc chuyển hướng đến trang chủ
-            });
-
-        } else {
-            // Người dùng chưa đăng nhập
-            loginBtn.style.display = 'block';
-            registerBtn.style.display = 'block';
-            userProfileActions.style.display = 'none';
-        }})
+                
+                // Reset chat state before reload
+                if (window.AutoLogin && typeof window.AutoLogin.resetChatState === 'function') {
+                    window.AutoLogin.resetChatState();
+                } else if (typeof resetChatState === 'function') {
+                    resetChatState();
+                }
+                
+                // Cập nhật UI ngay lập tức
+                updateAuthUI();
+                
+                // Nếu đang ở trang /account thì chuyển về trang chủ
+                if (window.location.pathname === '/account') {
+                    window.location.href = '/';
+                } else {
+                    window.location.reload();
+                }
+            }
+        });
+        
+        // Export hàm để có thể gọi từ bên ngoài
+        window.updateAuthUI = updateAuthUI;
+        window.AuthManager = AuthManager;
+        });
+        
         const mobileMenuBtn = document.getElementById('mobile-menu-button');
         const mobileMenu = document.getElementById('mobile-menu');
         const mobileOverlay = document.getElementById('mobile-menu-overlay');

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Modal</title>
+    <style>
+        /* Modal styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-content h3 {
+            margin: 0 0 1rem 0;
+            color: #0f172a;
+            font-weight: 700;
+        }
+
+        .modal-content p {
+            margin: 0.5rem 0;
+            color: #334155;
+        }
+
+        .form-group {
+            margin: 1rem 0;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .button-group .btn {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .button-group .btn-primary {
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            color: white;
+        }
+
+        .button-group .btn-primary:hover {
+            filter: brightness(0.95);
+        }
+
+        .button-group .btn:not(.btn-primary) {
+            background: #f1f5f9;
+            color: #334155;
+        }
+
+        .button-group .btn:not(.btn-primary):hover {
+            background: #e2e8f0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            padding: 2rem;
+        }
+
+        .test-button {
+            padding: 1rem 2rem;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Modal Xác nhận</h1>
+    <button class="test-button" onclick="testModal()">Test Modal</button>
+
+    <script>
+        // Hàm hiển thị modal xác nhận thông tin
+        function showConfirmationModal(collectedData) {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h3>Xác nhận thông tin đăng ký tư vấn</h3>
+                    
+                    <div style="margin-bottom: 1rem;">
+                        <p><strong>Tên:</strong> ${collectedData.full_name || 'Chưa có'}</p>
+                        <p><strong>Email:</strong> ${collectedData.email || 'Chưa có'}</p>
+                        <p><strong>Số điện thoại:</strong> ${collectedData.phone || 'Chưa có'}</p>
+                        <p><strong>Mục tiêu học tập:</strong> ${collectedData.introduction || 'Chưa có'}</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Email: *</label>
+                        <input type="email" id="confirm-email" placeholder="Nhập email của bạn" value="${collectedData.email || ''}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Số điện thoại: *</label>
+                        <input type="tel" id="confirm-phone" placeholder="Nhập số điện thoại" value="${collectedData.phone || ''}" required>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button onclick="confirmAndSubmitConsultation()" class="btn btn-primary">Xác nhận và gửi</button>
+                        <button onclick="closeModal()" class="btn">Hủy</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Lưu dữ liệu để sử dụng khi submit
+            window.currentCollectedData = collectedData;
+        }
+
+        // Hàm xác nhận và gửi yêu cầu tư vấn
+        function confirmAndSubmitConsultation() {
+            const email = document.getElementById('confirm-email').value;
+            const phone = document.getElementById('confirm-phone').value;
+            
+            if (!email || !phone) {
+                alert('Vui lòng nhập đầy đủ email và số điện thoại');
+                return;
+            }
+            
+            const collectedData = window.currentCollectedData;
+            console.log('Gửi yêu cầu tư vấn:', {
+                full_name: collectedData.full_name,
+                email: email,
+                phone: phone,
+                introduction: collectedData.introduction
+            });
+            
+            closeModal();
+            alert('Yêu cầu tư vấn đã được gửi thành công!');
+        }
+
+        // Hàm đóng modal
+        function closeModal() {
+            const modal = document.querySelector('.modal');
+            if (modal) {
+                modal.remove();
+            }
+            // Xóa dữ liệu tạm
+            delete window.currentCollectedData;
+        }
+
+        // Hàm test modal
+        function testModal() {
+            const testData = {
+                full_name: 'Nguyễn Văn A',
+                email: 'test@example.com',
+                phone: '0123456789',
+                introduction: 'Muốn tư vấn về ngành CNTT'
+            };
+            
+            showConfirmationModal(testData);
+        }
+    </script>
+</body>
+</html> 

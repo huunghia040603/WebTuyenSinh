@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo - Hệ Thống Thuật Ngữ Thông Minh</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background: linear-gradient(135deg, #0a4191 0%, #1e40af 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .demo-header {
+            background: linear-gradient(135deg, #0a4191 0%, #1e40af 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .demo-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .demo-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .demo-content {
+            padding: 2rem;
+        }
+
+        .search-section {
+            background: #f8fafc;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: #0a4191;
+            box-shadow: 0 0 0 3px rgba(10, 65, 145, 0.1);
+        }
+
+        .search-filters {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            justify-content: center;
+        }
+
+        .filter-select {
+            padding: 0.5rem 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: white;
+            color: #4a5568;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .demo-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .feature-card h3 {
+            color: #0a4191;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .feature-card p {
+            color: #4a5568;
+            line-height: 1.6;
+        }
+
+        .demo-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #0a4191, #1e40af);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .demo-examples {
+            background: #f8fafc;
+            padding: 2rem;
+            border-radius: 12px;
+        }
+
+        .example-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .example-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #0a4191;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .example-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .example-term {
+            font-weight: bold;
+            color: #0a4191;
+            margin-bottom: 0.5rem;
+        }
+
+        .example-category {
+            font-size: 0.8rem;
+            color: #6b7280;
+            background: #f3f4f6;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .demo-footer {
+            background: #1f2937;
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .demo-footer h3 {
+            margin-bottom: 1rem;
+        }
+
+        .demo-footer p {
+            opacity: 0.8;
+            margin-bottom: 1rem;
+        }
+
+        .demo-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .demo-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #0a4191;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1e40af;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-secondary:hover {
+            background: white;
+            color: #1f2937;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .demo-header h1 {
+                font-size: 2rem;
+            }
+
+            .search-filters {
+                flex-direction: column;
+            }
+
+            .demo-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="demo-header">
+            <h1>🎓 Hệ Thống Thuật Ngữ Thông Minh</h1>
+            <p>Sử dụng dữ liệu thật từ 2,617 thuật ngữ chuyên ngành</p>
+        </div>
+
+        <div class="demo-content">
+            <div class="search-section">
+                <h2 style="text-align: center; margin-bottom: 1rem; color: #0a4191;">
+                    🔍 Tìm Kiếm Thông Minh
+                </h2>
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="Thử tìm kiếm: Thuật toán, Huyết áp, GDP, Hiến pháp...">
+                    <div class="search-filters">
+                        <select class="filter-select">
+                            <option value="">Tất cả ngành học</option>
+                            <option value="cntt">Công nghệ thông tin</option>
+                            <option value="y-hoc">Y học</option>
+                            <option value="kinh-te">Kinh tế</option>
+                            <option value="luat">Luật</option>
+                            <option value="kien-truc">Kiến trúc</option>
+                        </select>
+                        <select class="filter-select">
+                            <option value="">Tất cả mức độ</option>
+                            <option value="beginner">Cơ bản</option>
+                            <option value="intermediate">Trung cấp</option>
+                            <option value="advanced">Nâng cao</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="demo-stats">
+                <div class="stat-card">
+                    <div class="stat-number">2,617</div>
+                    <div class="stat-label">Thuật Ngữ</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">50+</div>
+                    <div class="stat-label">Chuyên Ngành</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">831</div>
+                    <div class="stat-label">CNTT</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">65</div>
+                    <div class="stat-label">Y Học</div>
+                </div>
+            </div>
+
+            <div class="demo-features">
+                <div class="feature-card">
+                    <h3><i class="fas fa-brain"></i> AI Gợi Ý Thông Minh</h3>
+                    <p>Hệ thống sử dụng thuật toán AI để gợi ý thuật ngữ phù hợp dựa trên từ khóa tìm kiếm và lịch sử người dùng.</p>
+                </div>
+                <div class="feature-card">
+                    <h3><i class="fas fa-link"></i> Thuật Ngữ Liên Quan</h3>
+                    <p>Tự động hiển thị các thuật ngữ có mối quan hệ với thuật ngữ đang tìm kiếm, giúp mở rộng kiến thức.</p>
+                </div>
+                <div class="feature-card">
+                    <h3><i class="fas fa-history"></i> Lịch Sử Thông Minh</h3>
+                    <p>Ghi nhớ và gợi ý lại các thuật ngữ đã tìm kiếm trước đó, tối ưu hóa trải nghiệm người dùng.</p>
+                </div>
+                <div class="feature-card">
+                    <h3><i class="fas fa-filter"></i> Lọc Đa Chiều</h3>
+                    <p>Cho phép lọc theo ngành học, mức độ khó, và các tiêu chí khác để tìm kiếm chính xác hơn.</p>
+                </div>
+            </div>
+
+            <div class="demo-examples">
+                <h2 style="color: #0a4191; margin-bottom: 1rem;">
+                    📚 Ví Dụ Thuật Ngữ Nổi Bật
+                </h2>
+                <div class="example-list">
+                    <div class="example-item" onclick="searchTerm('Thuật toán')">
+                        <div class="example-term">Thuật toán</div>
+                        <div class="example-category">Công nghệ thông tin</div>
+                    </div>
+                    <div class="example-item" onclick="searchTerm('Huyết áp')">
+                        <div class="example-term">Huyết áp</div>
+                        <div class="example-category">Y học</div>
+                    </div>
+                    <div class="example-item" onclick="searchTerm('GDP')">
+                        <div class="example-term">GDP</div>
+                        <div class="example-category">Kinh tế</div>
+                    </div>
+                    <div class="example-item" onclick="searchTerm('Hiến pháp')">
+                        <div class="example-term">Hiến pháp</div>
+                        <div class="example-category">Luật</div>
+                    </div>
+                    <div class="example-item" onclick="searchTerm('Thiết kế')">
+                        <div class="example-term">Thiết kế</div>
+                        <div class="example-category">Kiến trúc</div>
+                    </div>
+                    <div class="example-item" onclick="searchTerm('Lập trình')">
+                        <div class="example-term">Lập trình</div>
+                        <div class="example-category">Công nghệ thông tin</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-footer">
+            <h3>🚀 Sẵn Sàng Trải Nghiệm?</h3>
+            <p>Hệ thống thuật ngữ thông minh với dữ liệu thật từ 2,617 thuật ngữ chuyên ngành</p>
+            <div class="demo-buttons">
+                <a href="/thuatngu" class="demo-btn btn-primary">
+                    <i class="fas fa-rocket"></i> Truy Cập Hệ Thống
+                </a>
+                <a href="#" class="demo-btn btn-secondary" onclick="showDemo()">
+                    <i class="fas fa-play"></i> Xem Demo
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function searchTerm(term) {
+            // Mô phỏng tìm kiếm
+            alert(`Đang tìm kiếm: "${term}"\n\nHệ thống sẽ hiển thị:\n- Định nghĩa chi tiết\n- Ngữ cảnh sử dụng\n- Ví dụ thực tế\n- Thuật ngữ liên quan`);
+        }
+
+        function showDemo() {
+            alert('🎬 Demo Hệ Thống Thuật Ngữ Thông Minh\n\n✨ Tính năng nổi bật:\n• Tìm kiếm thông minh với AI\n• Gợi ý dựa trên lịch sử\n• Thuật ngữ liên quan\n• Lọc đa chiều\n• Dữ liệu thật 2,617 thuật ngữ');
+        }
+
+        // Thêm hiệu ứng cho search input
+        const searchInput = document.querySelector('.search-input');
+        searchInput.addEventListener('focus', function() {
+            this.style.transform = 'scale(1.02)';
+        });
+
+        searchInput.addEventListener('blur', function() {
+            this.style.transform = 'scale(1)';
+        });
+
+        // Thêm hiệu ứng cho example items
+        const exampleItems = document.querySelectorAll('.example-item');
+        exampleItems.forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                this.style.borderLeftColor = '#1e40af';
+            });
+
+            item.addEventListener('mouseleave', function() {
+                this.style.borderLeftColor = '#0a4191';
+            });
+        });
+
+        // Thêm hiệu ứng cho filter selects
+        const filterSelects = document.querySelectorAll('.filter-select');
+        filterSelects.forEach(select => {
+            select.addEventListener('change', function() {
+                this.style.borderColor = '#0a4191';
+                setTimeout(() => {
+                    this.style.borderColor = '#e5e7eb';
+                }, 1000);
+            });
+        });
+    </script>
+</body>
+</html> 

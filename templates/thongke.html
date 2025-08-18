@@ -1,0 +1,994 @@
+{% extends 'base.html' %}
+
+{% block title %}Thống kê trường và ngành được quan tâm nhất{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .stats-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .stats-header {
+        text-align: center;
+        margin-bottom: 40px;
+        background: linear-gradient(135deg, #001b96 0%, #0960de 100%);        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .stats-header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
+    
+    .stats-header p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+    
+    .overview-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+    
+    .overview-card {
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        text-align: center;
+        transition: transform 0.3s ease;
+    }
+    
+    .overview-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .overview-card .number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #667eea;
+        margin-bottom: 10px;
+    }
+    
+    .overview-card .label {
+        font-size: 1.1rem;
+        color: #666;
+        font-weight: 500;
+    }
+    
+    .stats-section {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        margin-bottom: 30px;
+        overflow: hidden;
+    }
+    
+    .section-header {
+        background: linear-gradient(135deg, #001b96 0%, #0960de 100%);       
+         color: white;
+        padding: 20px 25px;
+        font-size: 1.3rem;
+        font-weight: 600;
+    }
+    
+    .top-list {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+    }
+    
+    .top-item {
+        display: flex;
+        align-items: center;
+        padding: 20px 25px;
+        border-bottom: 1px solid #f0f0f0;
+        transition: background-color 0.2s ease;
+    }
+    
+    .top-item:hover {
+        background-color: #f8f9ff;
+    }
+    
+    .top-item:last-child {
+        border-bottom: none;
+    }
+    
+    .rank {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-right: 20px;
+        flex-shrink: 0;
+    }
+    
+    .rank.gold {
+        background: linear-gradient(135deg, #ffd700, #ffed4e);
+        color: #8b6914;
+    }
+    
+    .rank.silver {
+        background: linear-gradient(135deg, #c0c0c0, #e5e5e5);
+        color: #666;
+    }
+    
+    .rank.bronze {
+        background: linear-gradient(135deg, #cd7f32, #daa520);
+        color: white;
+    }
+    
+    .rank.other {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+    }
+    
+    .item-info {
+        flex: 1;
+        display: flex;
+        align-items: center;
+    }
+    
+    .item-logo {
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+        object-fit: contain;
+        background: #f8f9ff;
+        border: 1px solid #e9ecef;
+        margin-right: 15px;
+        flex-shrink: 0;
+        padding: 5px;
+    }
+    
+    .item-details {
+        flex: 1;
+    }
+    
+    .item-name {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 5px;
+    }
+    
+    .clickable {
+        cursor: pointer;
+        transition: color 0.2s ease;
+    }
+    
+    .clickable:hover {
+        color: #667eea !important;
+        /* text-decoration: underline; */
+    }
+    
+    .item-school {
+        font-size: 0.9rem;
+        color: #666;
+    }
+    
+    .item-views {
+        text-align: right;
+        margin-left: 20px;
+    }
+    
+    .views-number {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #667eea;
+    }
+    
+    .views-label {
+        font-size: 0.8rem;
+        color: #999;
+        text-transform: uppercase;
+    }
+    
+    /* Outstanding school styles */
+    .outstanding-school {
+        border: 2px solid #ffd700 !important;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #fffbf0 0%, #fff8dc 100%);
+        position: relative;
+    }
+    
+    .outstanding-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #ffd700, #ffed4e);
+        color: #8b6914;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 12px;
+        margin-left: 8px;
+        border: 1px solid #ffd700;
+        box-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
+    }
+    
+    .outstanding-school .item-name {
+        color: #8b6914;
+        font-weight: 700;
+    }
+    
+    .outstanding-school:hover {
+        background: linear-gradient(135deg, #fff8dc 0%, #fffbf0 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(255, 215, 0, 0.2);
+    }
+    
+    /* Pro major styles */
+    .pro-school {
+        border: 2px solid #28a745 !important;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #f0fff4 0%, #dcffe4 100%);
+        position: relative;
+    }
+    
+    .pro-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #28a745, #20c997);
+        color: #ffffff;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 12px;
+        margin-left: 8px;
+        border: 1px solid #28a745;
+        box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+    }
+    
+    .pro-school .item-name {
+        color: #155724;
+        font-weight: 700;
+    }
+    
+    .pro-school:hover {
+        background: linear-gradient(135deg, #dcffe4 0%, #d4f5d4 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(40, 167, 69, 0.2);
+    }
+    
+    .chart-container {
+        padding: 20px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        margin-bottom: 30px;
+        max-width: 1300px;
+        margin-left: auto;
+        margin-right: auto;
+        height: 580px;
+        overflow: hidden;
+    }
+    
+    .chart-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    
+    .chart-canvas {
+        width: 100% !important;
+        height: 500px !important;
+        max-width: 1200px;
+        margin: 0 auto;
+        display: block !important;
+    }
+    
+    .loading {
+        text-align: center;
+        padding: 40px;
+        color: #666;
+    }
+    
+    .loading i {
+        font-size: 2rem;
+        color: #667eea;
+        margin-bottom: 15px;
+    }
+    
+    .error {
+        text-align: center;
+        padding: 40px;
+        color: #dc3545;
+    }
+    
+    .error i {
+        font-size: 2rem;
+        margin-bottom: 15px;
+    }
+    
+    @media (max-width: 768px) {
+        .stats-container {
+            padding: 15px;
+        }
+        
+        .stats-header h1 {
+            font-size: 2rem;
+        }
+        
+        .overview-cards {
+            grid-template-columns: 1fr;
+        }
+        
+        .top-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        
+        .item-views {
+            align-self: flex-end;
+            margin-left: 0;
+        }
+        
+        .chart-container {
+            padding: 15px;
+            margin: 20px 10px;
+            height: 220px;
+            max-width: 100%;
+        }
+        
+        .chart-canvas {
+            height: 150px !important;
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+        
+        .chart-title {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="stats-container">
+    <div class="stats-header">
+        <h1>📊 Thống kê trường và ngành được quan tâm</h1>
+        <p>Dữ liệu thống kê lượt xem trường và ngành học được cập nhật theo thời gian thực</p>
+    </div>
+    
+    <!-- Overview Cards -->
+    <div class="overview-cards">
+        <div class="overview-card">
+            <div class="number" id="total-school-views">-</div>
+            <div class="label">Tổng lượt xem trường</div>
+        </div>
+        <div class="overview-card">
+            <div class="number" id="total-major-views">-</div>
+            <div class="label">Tổng lượt xem ngành</div>
+        </div>
+        <div class="overview-card">
+            <div class="number" id="total-views">-</div>
+            <div class="label">Tổng lượt xem</div>
+        </div>
+        <div class="overview-card">
+            <div class="number" id="last-7-days">-</div>
+            <div class="label">Ngày có dữ liệu</div>
+        </div>
+    </div>
+    
+    <!-- Top Schools Section -->
+    <div class="stats-section">
+        <div class="section-header">
+            🏆 Top trường được quan tâm nhất
+        </div>
+        <div id="top-schools-container">
+            <div class="loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Đang tải dữ liệu...</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Top Majors Section -->
+    <div class="stats-section">
+        <div class="section-header">
+            🎓 Top ngành được quan tâm nhất
+        </div>
+        <div id="top-majors-container">
+            <div class="loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Đang tải dữ liệu...</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Chart Section -->
+    <div class="chart-container">
+        <div class="chart-title">📈 Biểu đồ lượt xem 7 ngày gần nhất</div>
+        <div id="chart-loading" class="loading">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Đang tải biểu đồ...</p>
+        </div>
+        <div style="width: 100%; height: 200px; position: relative; max-width: 1200px; margin: 0 auto;">
+            <canvas id="viewsChart" class="chart-canvas" style="display: none;"></canvas>
+        </div>
+    </div>
+    
+    <!-- Debug Section (only in development) -->
+    <!-- <div id="debug-section" style="display: none; margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+        <h3>🔧 Debug Tools</h3>
+        <button onclick="testTrackingFromStats()" style="margin: 5px; padding: 10px 15px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
+            🧪 Test Tracking
+        </button>
+        <button onclick="refreshStatistics()" style="margin: 5px; padding: 10px 15px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">
+            🔄 Refresh Stats
+        </button>
+    </div> -->
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="/debug_tracking.js"></script>
+<script>
+// Check if Chart.js loaded successfully
+if (typeof Chart === 'undefined') {
+    console.error('Chart.js not loaded');
+    const chartContainer = document.querySelector('.chart-container');
+    if (chartContainer) {
+        chartContainer.innerHTML = `
+            <div class="chart-title">📈 Biểu đồ lượt xem 7 ngày gần nhất</div>
+            <div class="error">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>Không thể tải biểu đồ. Vui lòng thử lại sau.</p>
+            </div>
+        `;
+    }
+}
+</script>
+<script>
+const API_BASE_URL = 'https://timtruonghoc.pythonanywhere.com'; // Kết nối với PythonAnywhere backend thật
+
+// Load overview statistics
+async function loadOverviewStats() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/tracking/statistics/`);
+        const data = await response.json();
+        
+        // Update overview cards
+        const totalSchoolViews = document.getElementById('total-school-views');
+        const totalMajorViews = document.getElementById('total-major-views');
+        const totalViews = document.getElementById('total-views');
+        const last7Days = document.getElementById('last-7-days');
+        
+        if (totalSchoolViews) totalSchoolViews.textContent = data.total_school_views.toLocaleString();
+        if (totalMajorViews) totalMajorViews.textContent = data.total_major_views.toLocaleString();
+        if (totalViews) totalViews.textContent = data.total_views.toLocaleString();
+        if (last7Days) last7Days.textContent = data.last_7_days;
+        
+        // Create chart only if we have data and chart doesn't exist
+        if (data.daily_stats && data.daily_stats.length > 0) {
+                    // Create chart immediately without setTimeout
+        createViewsChart(data.daily_stats);
+        }
+        
+    } catch (error) {
+        console.error('Error loading overview stats:', error);
+        showError('overview', 'Không thể tải dữ liệu tổng quan');
+    }
+}
+
+// Refresh statistics after tracking
+async function refreshStatistics() {
+    console.log('🔄 Refreshing statistics...');
+    await loadOverviewStats();
+    await loadTopMajors();
+}
+
+// Load top schools
+async function loadTopSchools() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/tracking/top-schools/?limit=10`);
+        const data = await response.json();
+        
+        const container = document.getElementById('top-schools-container');
+        container.innerHTML = '';
+        
+        if (data.top_schools.length === 0) {
+            container.innerHTML = '<div class="loading"><p>Chưa có dữ liệu</p></div>';
+            return;
+        }
+        
+        const ul = document.createElement('ul');
+        ul.className = 'top-list';
+        
+        data.top_schools.forEach((school, index) => {
+            const li = document.createElement('li');
+            li.className = 'top-item';
+            
+            const rankClass = index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : 'other';
+            
+            // Kiểm tra xem trường có tag outstanding không
+            const isOutstanding = school.tag === 'outstanding';
+            const outstandingClass = isOutstanding ? 'outstanding-school' : '';
+            const outstandingBadge = isOutstanding ? '<span class="outstanding-badge">⭐ Nổi bật</span>' : '';
+            
+            li.innerHTML = `
+                <div class="rank ${rankClass}">${school.rank}</div>
+                <div class="item-info ${outstandingClass}">
+                    <img src="${school.logo || '/static/images/logo/0.jpg'}" alt="${school.name_vn}" class="item-logo">
+                    <div class="item-details">
+                        <div class="item-name clickable" data-school-id="${school.id}" data-school-name="${school.name_vn}" data-school-short-code="${school.short_code || ''}">
+                            ${school.name_vn}
+                            ${outstandingBadge}
+                        </div>
+                        <div class="item-school">${school.school_type === 'public' ? 'Công lập' : 'Ngoài công lập'} • ${school.country || 'Việt Nam'}</div>
+                    </div>
+                </div>
+                <div class="item-views">
+                    <div class="views-number">${school.view_count.toLocaleString()}</div>
+                    <div class="views-label">lượt xem</div>
+                </div>
+            `;
+            
+            ul.appendChild(li);
+        });
+        
+        container.appendChild(ul);
+        
+        // Thêm event listeners cho các tên trường clickable
+        const schoolNames = container.querySelectorAll('.item-name.clickable');
+        schoolNames.forEach(element => {
+            element.addEventListener('click', function() {
+                const schoolId = this.getAttribute('data-school-id');
+                const schoolName = this.getAttribute('data-school-name');
+                const schoolShortCode = this.getAttribute('data-school-short-code');
+                console.log('🖱️ Click vào trường:', schoolName, 'ID:', schoolId, 'Short Code:', schoolShortCode);
+                
+                if (schoolShortCode) {
+                    // Chuyển đến trang chi tiết trường sử dụng short code
+                    window.location.href = `/${schoolShortCode}`;
+                } else if (schoolId) {
+                    // Fallback: sử dụng ID nếu không có short code
+                    window.location.href = `/chitiet-dh?id=${schoolId}`;
+                } else {
+                    console.warn('⚠️ Không có ID hoặc short code trường để chuyển hướng');
+                }
+            });
+        });
+        
+    } catch (error) {
+        console.error('Error loading top schools:', error);
+        showError('top-schools', 'Không thể tải dữ liệu top trường');
+    }
+}
+
+// Load top majors
+async function loadTopMajors() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/tracking/top-majors/?limit=10`);
+        const data = await response.json();
+        
+        const container = document.getElementById('top-majors-container');
+        container.innerHTML = '';
+        
+        if (data.top_majors.length === 0) {
+            container.innerHTML = '<div class="loading"><p>Chưa có dữ liệu</p></div>';
+            return;
+        }
+        
+        const ul = document.createElement('ul');
+        ul.className = 'top-list';
+        
+        data.top_majors.forEach((major, index) => {
+            const li = document.createElement('li');
+            li.className = 'top-item';
+            
+            const rankClass = index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : 'other';
+            
+            // Kiểm tra xem ngành có tag outstanding hoặc pro không
+            const isOutstanding = major.tags === 'outstanding';
+            const isPro = major.tags === 'pro';
+            
+            // Tạo class và badge dựa trên tag
+            let itemClass = '';
+            let badgeHtml = '';
+            
+            if (isOutstanding) {
+                itemClass = 'outstanding-school';
+                badgeHtml = '<span class="outstanding-badge">⭐ Nổi bật</span>';
+            } else if (isPro) {
+                itemClass = 'pro-school';
+                badgeHtml = '<span class="pro-badge">💼 Chuyên nghiệp</span>';
+            }
+            
+            li.innerHTML = `
+                <div class="rank ${rankClass}">${major.rank}</div>
+                <div class="item-info ${itemClass}">
+                    <img src="${major.school_logo || '/static/images/logo/0.jpg'}" alt="${major.school_name}" class="item-logo">
+                    <div class="item-details">
+                        <div class="item-name clickable" data-major-id="${major.major_id}" data-major-db-id="${major.id}" data-major-name="${major.name}" data-school-name="${major.school_name}" data-school-short-code="${major.school_short_code || ''}" data-school-id="${major.school_id || ''}">
+                            ${major.name}
+                            ${badgeHtml}
+                        </div>
+                        <div class="item-school clickable" data-school-id="${major.school_id || ''}" data-school-name="${major.school_name}" data-school-short-code="${major.school_short_code || ''}">
+                            ${major.school_name} • Mã: ${major.major_id}
+                        </div>
+                    </div>
+                </div>
+                <div class="item-views">
+                    <div class="views-number">${major.view_count.toLocaleString()}</div>
+                    <div class="views-label">lượt xem</div>
+                </div>
+            `;
+            
+            ul.appendChild(li);
+        });
+        
+        container.appendChild(ul);
+        
+        // Thêm event listeners cho các tên ngành và tên trường clickable
+        const majorNames = container.querySelectorAll('.item-name.clickable');
+        const schoolNames = container.querySelectorAll('.item-school.clickable');
+        
+        majorNames.forEach(element => {
+            element.addEventListener('click', function() {
+                const majorId = this.getAttribute('data-major-id');
+                const majorDbId = this.getAttribute('data-major-db-id');
+                const majorName = this.getAttribute('data-major-name');
+                const schoolShortCode = this.getAttribute('data-school-short-code');
+                const schoolId = this.getAttribute('data-school-id');
+                console.log('🖱️ Click vào ngành:', majorName, 'Major ID:', majorId, 'Major DB ID:', majorDbId, 'School Short Code:', schoolShortCode, 'School ID:', schoolId);
+                
+                // Track click trước khi chuyển hướng - sử dụng database ID để tracking chính xác
+                if (majorDbId) {
+                    trackMajorClickByDbId(majorDbId, majorName);
+                } else if (majorId) {
+                    trackMajorClick(majorId, majorName);
+                }
+                
+                if (majorId && schoolShortCode) {
+                    // Chuyển đến trang chi tiết ngành sử dụng major_id và school_short_code
+                    window.location.href = `/chitiet-nganh-rieng?major_id=${majorId}&school_short_code=${schoolShortCode}`;
+                } else if (majorId) {
+                    // Fallback: chỉ sử dụng major_id
+                    window.location.href = `/chitiet-nganh-rieng?major_id=${majorId}`;
+                } else {
+                    console.warn('⚠️ Không có major_id hoặc school_short_code để chuyển hướng');
+                }
+            });
+        });
+        
+        schoolNames.forEach(element => {
+            element.addEventListener('click', function() {
+                const schoolId = this.getAttribute('data-school-id');
+                const schoolName = this.getAttribute('data-school-name');
+                const schoolShortCode = this.getAttribute('data-school-short-code');
+                console.log('🖱️ Click vào tên trường trong ngành:', schoolName, 'ID:', schoolId, 'Short Code:', schoolShortCode);
+                
+                if (schoolShortCode) {
+                    // Chuyển đến trang chi tiết trường sử dụng short code
+                    window.location.href = `/${schoolShortCode}`;
+                } else if (schoolId) {
+                    // Fallback: sử dụng ID nếu không có short code
+                    window.location.href = `/chitiet-dh?id=${schoolId}`;
+                } else {
+                    console.warn('⚠️ Không có ID hoặc short code trường để chuyển hướng');
+                }
+            });
+        });
+        
+    } catch (error) {
+        console.error('Error loading top majors:', error);
+        showError('top-majors', 'Không thể tải dữ liệu top ngành');
+    }
+}
+
+// Track major click from statistics page
+async function trackMajorClick(majorId, majorName) {
+    try {
+        console.log('📊 Tracking major click from stats page:', majorId, majorName);
+        
+        const response = await fetch(`${API_BASE_URL}/tracking/increment-major-view/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                major_id: majorId
+            })
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            console.log('✅ Major click tracked successfully:', result);
+            
+            // Refresh statistics after successful tracking
+            setTimeout(() => {
+                refreshStatistics();
+            }, 1000); // Wait 1 second before refreshing
+            
+        } else {
+            const errorText = await response.text();
+            console.error('❌ Failed to track major click. Status:', response.status, 'Response:', errorText);
+        }
+    } catch (error) {
+        console.error('❌ Error tracking major click:', error);
+    }
+}
+
+// Track major click with school ID for more accurate tracking
+async function trackMajorClickWithSchool(majorId, schoolId, majorName) {
+    try {
+        console.log('📊 Tracking major click with school from stats page:', majorId, schoolId, majorName);
+        
+        const response = await fetch(`${API_BASE_URL}/tracking/increment-major-view/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                major_id: majorId,
+                school_id: schoolId
+            })
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            console.log('✅ Major click with school tracked successfully:', result);
+            
+            // Refresh statistics after successful tracking
+            setTimeout(() => {
+                refreshStatistics();
+            }, 1000); // Wait 1 second before refreshing
+            
+        } else {
+            const errorText = await response.text();
+            console.error('❌ Failed to track major click with school. Status:', response.status, 'Response:', errorText);
+        }
+    } catch (error) {
+        console.error('❌ Error tracking major click with school:', error);
+    }
+}
+
+// Track major click by database ID for precise tracking
+async function trackMajorClickByDbId(majorDbId, majorName) {
+    try {
+        console.log('📊 Tracking major click by database ID from stats page:', majorDbId, majorName);
+        
+        const response = await fetch(`${API_BASE_URL}/tracking/increment-major-view/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                major_id: majorDbId  // Sử dụng database ID thay vì major_id field
+            })
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            console.log('✅ Major click by database ID tracked successfully:', result);
+            
+            // Refresh statistics after successful tracking
+            setTimeout(() => {
+                refreshStatistics();
+            }, 1000); // Wait 1 second before refreshing
+            
+        } else {
+            const errorText = await response.text();
+            console.error('❌ Failed to track major click by database ID. Status:', response.status, 'Response:', errorText);
+        }
+    } catch (error) {
+        console.error('❌ Error tracking major click by database ID:', error);
+    }
+}
+
+// Create views chart
+function createViewsChart(dailyStats) {
+    try {
+        // Check if Chart.js is available
+        if (typeof Chart === 'undefined') {
+            console.error('Chart.js not available');
+            return;
+        }
+        
+        const canvas = document.getElementById('viewsChart');
+        if (!canvas) {
+            console.error('Canvas element not found');
+            return;
+        }
+        
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+            console.error('Could not get canvas context');
+            return;
+        }
+        
+        // Only destroy if chart exists and data is different
+        if (window.viewsChartInstance && window.lastChartData !== JSON.stringify(dailyStats)) {
+            window.viewsChartInstance.destroy();
+            window.viewsChartInstance = null;
+        }
+        
+        // Skip if chart already exists with same data
+        if (window.viewsChartInstance && window.lastChartData === JSON.stringify(dailyStats)) {
+            return;
+        }
+        
+        // Validate data
+        if (!Array.isArray(dailyStats) || dailyStats.length === 0) {
+            console.log('No daily stats data available');
+            canvas.style.display = 'none';
+            return;
+        }
+        
+        const labels = dailyStats.map(stat => {
+            try {
+                const date = new Date(stat.date);
+                return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+            } catch (error) {
+                console.error('Error parsing date:', stat.date);
+                return stat.date || 'N/A';
+            }
+        });
+        
+        const schoolViews = dailyStats.map(stat => parseInt(stat.school_views) || 0);
+        const majorViews = dailyStats.map(stat => parseInt(stat.major_views) || 0);
+        const totalViews = dailyStats.map(stat => parseInt(stat.total_views) || 0);
+        
+        // Hide loading and show canvas
+        const chartLoading = document.getElementById('chart-loading');
+        if (chartLoading) {
+            chartLoading.style.display = 'none';
+        }
+        canvas.style.display = 'block';
+        
+        // Create simple chart with fixed dimensions
+        window.viewsChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Tổng lượt xem',
+                        data: totalViews,
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.1,
+                        fill: true,
+                        borderWidth: 3
+                    }
+                ]
+            },
+            options: {
+                responsive: false,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 300
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            font: {
+                                size: 10
+                            }
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            font: {
+                                size: 10
+                            }
+                        }
+                    }
+                },
+                elements: {
+                    point: {
+                        radius: 3
+                    }
+                }
+            }
+        });
+        
+        // Store current data for comparison
+        window.lastChartData = JSON.stringify(dailyStats);
+        console.log('✅ Chart created successfully');
+        
+    } catch (error) {
+        console.error('❌ Error creating chart:', error);
+        const canvas = document.getElementById('viewsChart');
+        if (canvas) {
+            canvas.style.display = 'none';
+        }
+    }
+}
+
+// Show error message
+function showError(containerId, message) {
+    const container = document.getElementById(containerId + '-container');
+    if (container) {
+        container.innerHTML = `
+            <div class="error">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>${message}</p>
+            </div>
+        `;
+    } else {
+        console.error(`Container ${containerId}-container not found`);
+    }
+}
+
+// Initialize page
+let isInitialized = false;
+
+document.addEventListener('DOMContentLoaded', function() {
+    if (isInitialized) return;
+    isInitialized = true;
+    
+    // Avoid conflicts with other scripts
+    if (typeof deleteChatRoom === 'undefined') {
+        window.deleteChatRoom = function() {
+            console.log('deleteChatRoom function not implemented');
+        };
+    }
+    
+    // Load data with delay to avoid blocking
+    setTimeout(() => {
+        loadOverviewStats();
+        loadTopSchools();
+        loadTopMajors();
+    }, 200);
+    
+    // Refresh data every 5 minutes (only if page is still active)
+    let refreshInterval;
+    const startRefreshInterval = () => {
+        refreshInterval = setInterval(() => {
+            // Only refresh if page is visible
+            if (!document.hidden) {
+                loadOverviewStats();
+                loadTopSchools();
+                loadTopMajors();
+            }
+        }, 5 * 60 * 1000);
+    };
+    
+    // Start refresh interval
+    startRefreshInterval();
+    
+    // Pause refresh when page is hidden, resume when visible
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            clearInterval(refreshInterval);
+        } else {
+            startRefreshInterval();
+        }
+    });
+    
+    // Show debug section in development
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        document.getElementById('debug-section').style.display = 'block';
+    }
+});
+
+// Test tracking from stats page
+async function testTrackingFromStats() {
+    console.log('🧪 Testing tracking from stats page...');
+    // Test với Fulbright Computer Science (ID: 1683)
+    await trackMajorClickByDbId(1683, 'Khoa học Máy tính (Fulbright)');
+}
+</script>
+{% endblock %} 

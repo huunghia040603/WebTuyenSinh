@@ -1,7 +1,33 @@
-from flask import Flask, app
-from flask import render_template, request, redirect, jsonify, session, json
+from flask import Flask, render_template, request, redirect, jsonify, session, json
+from flask_cors import CORS
+import requests
+import sys
+import os
+
+# Import Django models
+try:
+    import django
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings')
+    django.setup()
+    from models import ExpertApplication, ConsultationRequest
+    DJANGO_AVAILABLE = True
+except ImportError as e:
+    print(f"Không thể import Django models: {e}")
+    DJANGO_AVAILABLE = False
+
+# Thêm đường dẫn để import AI advisor
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+# Import AI advisor
+try:
+    from ai_advisor_new import ai_advisor
+    AI_AVAILABLE = True
+except ImportError as e:
+    print(f"Không thể import AI advisor: {e}")
+    AI_AVAILABLE = False
 
 app = Flask(__name__)
+CORS(app, origins=['http://localhost:5000', 'http://127.0.0.1:5000'])
 
 @app.route("/")
 def index():
@@ -87,9 +113,340 @@ def thansohoc():
 def so_sanh_nganh():
     return render_template('so-sanh-nganh.html')
 
-@app.route('/so-sanh-truong')
-def so_sanh_truong():
-    return render_template('so-sanh-truong.html')
+@app.route('/chat-test')
+def chat_test():
+    return render_template('chat_test.html')
+
+@app.route('/debug-auth')
+def debug_auth():
+    return render_template('debug_auth.html')
+
+@app.route('/thuatngu')
+def thuatngu():
+    return render_template('thuatngu.html')
+
+@app.route('/demo-smart-terms')
+def demo_smart_terms():
+    return render_template('demo_smart_terms.html')
+
+@app.route('/test-chat-flow')
+def test_chat_flow():
+    return render_template('test_chat_flow.html')
+
+@app.route('/chat-demo')
+def chat_demo():
+    return render_template('chat_demo.html')
+
+@app.route('/chat-notification-test')
+def chat_notification_test():
+    return render_template('chat_notification_test.html')
+
+@app.route('/test-chat-notification')
+def test_chat_notification():
+    return render_template('test_chat_notification.html')
+
+@app.route('/sticker-demo')
+def sticker_demo():
+    return render_template('sticker_demo.html')
+
+@app.route('/thongke')
+def thongke():
+    return render_template('thongke.html')
+
+@app.route('/test-thongke')
+def test_thongke():
+    return render_template('test_thongke_page.html')
+
+# Mock data cho testing với dữ liệu mặc định
+mock_school_views = {
+    '1': 500,  # Đại học Bách khoa TP.HCM
+    '2': 500,  # Đại học Kinh tế TP.HCM
+    '3': 500,  # Đại học Sư phạm TP.HCM
+    '4': 500,  # Đại học Y Dược TP.HCM
+    '5': 500,  # Đại học Công nghệ Thông tin
+    '6': 500,  # Đại học Khoa học Tự nhiên
+    '7': 500,  # Đại học Khoa học Xã hội & Nhân văn
+    '8': 500,  # Đại học Nông Lâm TP.HCM
+    '9': 500,  # Đại học Tài chính - Marketing
+    '10': 500  # Đại học Mở TP.HCM
+}
+
+mock_major_views = {
+    '1': 500,  # Công nghệ thông tin
+    '2': 500,  # Kinh tế
+    '3': 500,  # Y khoa
+    '4': 500,  # Sư phạm
+    '5': 500,  # Kỹ thuật
+    '6': 500,  # Luật
+    '7': 500,  # Ngoại ngữ
+    '8': 500,  # Kiến trúc
+    '9': 500,  # Quản trị kinh doanh
+    '10': 500  # Tài chính - Ngân hàng
+}
+
+mock_daily_stats = {}
+
+# API endpoints cho tracking
+@app.route('/tracking/increment-school-view/', methods=['POST'])
+def increment_school_view():
+    try:
+        data = request.get_json()
+        school_id = data.get('school_id')
+        
+        if not school_id:
+            return jsonify({'error': 'school_id là bắt buộc'}), 400
+        
+        # Tăng lượt xem local
+        if school_id not in mock_school_views:
+            mock_school_views[school_id] = 0
+        mock_school_views[school_id] += 1
+        
+        # Gửi dữ liệu lên PythonAnywhere
+        try:
+            increment_data = {
+                'school_id': school_id,
+                'increment': 1
+            }
+            response = requests.post(
+                'https://timtruonghoc.pythonanywhere.com/tracking/increment-school-view/',
+                json=increment_data,
+                timeout=10
+            )
+            if response.status_code == 200:
+                print(f"Đã gửi dữ liệu tăng lượt xem trường {school_id} lên PythonAnywhere")
+            else:
+                print(f"Lỗi khi gửi dữ liệu lên PythonAnywhere: {response.status_code}")
+        except Exception as e:
+            print(f"Lỗi khi gửi dữ liệu lên PythonAnywhere: {str(e)}")
+        
+        # Cập nhật thống kê ngày
+        from datetime import date
+        today = str(date.today())
+        if today not in mock_daily_stats:
+            mock_daily_stats[today] = {'school_views': 0, 'major_views': 0}
+        mock_daily_stats[today]['school_views'] += 1
+        
+        return jsonify({
+            'success': True,
+            'view_count': mock_school_views[school_id],
+            'message': f'Đã tăng lượt xem cho trường {school_id}'
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'Có lỗi xảy ra: {str(e)}'}), 500
+
+@app.route('/tracking/increment-major-view/', methods=['POST'])
+def increment_major_view():
+    try:
+        data = request.get_json()
+        major_id = data.get('major_id')
+        
+        if not major_id:
+            return jsonify({'error': 'major_id là bắt buộc'}), 400
+        
+        # Tăng lượt xem local
+        if major_id not in mock_major_views:
+            mock_major_views[major_id] = 0
+        mock_major_views[major_id] += 1
+        
+        # Gửi dữ liệu lên PythonAnywhere
+        try:
+            increment_data = {
+                'major_id': major_id,
+                'increment': 1
+            }
+            response = requests.post(
+                'https://timtruonghoc.pythonanywhere.com/tracking/increment-major-view/',
+                json=increment_data,
+                timeout=10
+            )
+            if response.status_code == 200:
+                print(f"Đã gửi dữ liệu tăng lượt xem ngành {major_id} lên PythonAnywhere")
+            else:
+                print(f"Lỗi khi gửi dữ liệu lên PythonAnywhere: {response.status_code}")
+        except Exception as e:
+            print(f"Lỗi khi gửi dữ liệu lên PythonAnywhere: {str(e)}")
+        
+        # Cập nhật thống kê ngày
+        from datetime import date
+        today = str(date.today())
+        if today not in mock_daily_stats:
+            mock_daily_stats[today] = {'school_views': 0, 'major_views': 0}
+        mock_daily_stats[today]['major_views'] += 1
+        
+        return jsonify({
+            'success': True,
+            'view_count': mock_major_views[major_id],
+            'message': f'Đã tăng lượt xem cho ngành {major_id}'
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'Có lỗi xảy ra: {str(e)}'}), 500
+
+@app.route('/tracking/top-schools/')
+def top_schools():
+    try:
+        limit = int(request.args.get('limit', 10))
+        
+        # Lấy dữ liệu thật từ PythonAnywhere
+        try:
+            # Lấy danh sách trường từ PythonAnywhere
+            schools_response = requests.get('https://timtruonghoc.pythonanywhere.com/schools/', timeout=10)
+            if schools_response.status_code == 200:
+                schools_data = schools_response.json()
+                # PythonAnywhere trả về object với results array
+                schools = schools_data.get('results', []) if isinstance(schools_data, dict) else schools_data
+            else:
+                # Fallback to mock data nếu không lấy được
+                schools = []
+                print(f"Không thể lấy dữ liệu trường từ PythonAnywhere: {schools_response.status_code}")
+        except Exception as e:
+            print(f"Lỗi khi lấy dữ liệu trường: {str(e)}")
+            schools = []
+        
+        # Tạo top schools từ dữ liệu thật
+        top_schools_data = []
+        for school in schools[:limit]:
+            # Lấy view count từ mock data hoặc tạo mặc định
+            school_id = str(school.get('id', '1'))
+            view_count = mock_school_views.get(school_id, 500)
+            
+            top_schools_data.append({
+                'id': school.get('id', 1),
+                'name_vn': school.get('name_vn', 'Trường Đại học'),
+                'short_code': school.get('short_code', 'SCHOOL'),
+                'logo': school.get('logo', '/static/images/logo/1.jpg'),
+                'school_type': school.get('school_type', 'public'),
+                'country': school.get('country', 'Việt Nam'),
+                'view_count': view_count,
+                'rank': len(top_schools_data) + 1
+            })
+        
+        # Sắp xếp theo lượt xem giảm dần
+        top_schools_data.sort(key=lambda x: x['view_count'], reverse=True)
+        
+        # Thêm rank sau khi sort
+        for i, school in enumerate(top_schools_data):
+            school['rank'] = i + 1
+        
+        return jsonify({
+            'top_schools': top_schools_data[:limit],
+            'total': len(top_schools_data[:limit])
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'Có lỗi xảy ra: {str(e)}'}), 500
+
+@app.route('/tracking/top-majors/')
+def top_majors():
+    try:
+        limit = int(request.args.get('limit', 10))
+        
+        # Lấy dữ liệu thật từ PythonAnywhere
+        try:
+            # Lấy danh sách ngành từ PythonAnywhere
+            majors_response = requests.get('https://timtruonghoc.pythonanywhere.com/majors/', timeout=10)
+            if majors_response.status_code == 200:
+                majors_data = majors_response.json()
+                # PythonAnywhere trả về object với results array
+                majors = majors_data.get('results', []) if isinstance(majors_data, dict) else majors_data
+            else:
+                # Fallback to mock data nếu không lấy được
+                majors = []
+                print(f"Không thể lấy dữ liệu ngành từ PythonAnywhere: {majors_response.status_code}")
+        except Exception as e:
+            print(f"Lỗi khi lấy dữ liệu ngành: {str(e)}")
+            majors = []
+        
+        # Tạo top majors từ dữ liệu thật
+        top_majors_data = []
+        for major in majors[:limit]:
+            # Lấy view count từ mock data hoặc tạo mặc định
+            major_id = str(major.get('id', '1'))
+            view_count = mock_major_views.get(major_id, 500)
+            
+            # Lấy thông tin trường từ PythonAnywhere
+            school_info = major.get('school', {}) if 'school' in major else {}
+            school_name = school_info.get('name_vn', 'Trường Đại học')
+            school_short_code = school_info.get('short_code', 'SCHOOL')
+            school_logo = school_info.get('logo', '/static/images/logo/1.jpg')
+            
+            top_majors_data.append({
+                'id': major.get('id', 1),
+                'major_id': major.get('major_id', '74000001'),
+                'name': major.get('name', 'Ngành học'),
+                'school_name': school_name,
+                'school_short_code': school_short_code,
+                'school_logo': school_logo,
+                'view_count': view_count,
+                'rank': len(top_majors_data) + 1
+            })
+        
+        # Sắp xếp theo lượt xem giảm dần
+        top_majors_data.sort(key=lambda x: x['view_count'], reverse=True)
+        
+        # Thêm rank sau khi sort
+        for i, major in enumerate(top_majors_data):
+            major['rank'] = i + 1
+        
+        return jsonify({
+            'top_majors': top_majors_data[:limit],
+            'total': len(top_majors_data[:limit])
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'Có lỗi xảy ra: {str(e)}'}), 500
+
+@app.route('/tracking/statistics/')
+def view_statistics():
+    try:
+        # Tính toán từ mock data thật
+        total_school_views = sum(mock_school_views.values())
+        total_major_views = sum(mock_major_views.values())
+        total_views = total_school_views + total_major_views
+        
+        # Mock daily stats with sample data
+        from datetime import date, timedelta
+        daily_data = []
+        
+        # Tạo daily stats từ mock data thật
+        for i in range(7):
+            day = date.today() - timedelta(days=6-i)  # Start from 6 days ago
+            day_str = str(day)
+            
+            # Sử dụng dữ liệu thật nếu có, nếu không thì tạo dữ liệu mặc định
+            if day_str in mock_daily_stats:
+                daily_data.append({
+                    'date': day_str,
+                    'school_views': mock_daily_stats[day_str]['school_views'],
+                    'major_views': mock_daily_stats[day_str]['major_views'],
+                    'total_views': mock_daily_stats[day_str]['school_views'] + mock_daily_stats[day_str]['major_views']
+                })
+            else:
+                # Tạo dữ liệu mặc định dựa trên tổng số
+                avg_school_views = total_school_views // 7
+                avg_major_views = total_major_views // 7
+                # Thêm một chút random để tạo sự khác biệt
+                import random
+                school_views = avg_school_views + random.randint(-20, 20)
+                major_views = avg_major_views + random.randint(-15, 15)
+                daily_data.append({
+                    'date': day_str,
+                    'school_views': max(0, school_views),
+                    'major_views': max(0, major_views),
+                    'total_views': max(0, school_views) + max(0, major_views)
+                })
+        
+        return jsonify({
+            'total_school_views': total_school_views,
+            'total_major_views': total_major_views,
+            'total_views': total_views,
+            'daily_stats': daily_data,
+            'last_7_days': len(daily_data)
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'Có lỗi xảy ra: {str(e)}'}), 500
 
 
 zodiac_data = {
@@ -256,7 +613,7 @@ def cunghoangdao():
             pass
     return render_template('cunghoangdao/cunghoangdao.html', sign_data=sign_data)
 
-@app.route("/hoptac")
+@app.route("/hop-tac")
 def hoptac():
     return render_template('hoptac.html')
 
@@ -268,8 +625,255 @@ def dieukhoan():
 def quyche():
     return render_template('quychedaydu.html')
 
+# Temporary API endpoints để serve data thay vì PythonAnywhere
+@app.route("/api/majors-outstanding/")
+def majors_outstanding():
+    """Temporary API endpoint cho majors outstanding"""
+    # Mock data để test
+    mock_data = {
+        "count": 0,
+        "results": [],
+        "next": None,
+        "previous": None
+    }
+    return jsonify(mock_data)
 
+@app.route("/api/schools_outstanding/")
+def schools_outstanding():
+    """Temporary API endpoint cho schools outstanding"""
+    # Mock data để test
+    mock_data = {
+        "count": 0,
+        "results": [],
+        "next": None,
+        "previous": None
+    }
+    return jsonify(mock_data)
 
+@app.route("/api/fieldgroups/")
+def fieldgroups():
+    """Temporary API endpoint cho field groups"""
+    # Mock data để test
+    mock_data = {
+        "count": 0,
+        "results": [],
+        "next": None,
+        "previous": None
+    }
+    return jsonify(mock_data)
+
+@app.route("/api/all_major/")
+def all_major():
+    """Temporary API endpoint cho all major"""
+    # Mock data để test
+    mock_data = {
+        "count": 0,
+        "results": [],
+        "next": None,
+        "previous": None
+    }
+    return jsonify(mock_data)
+
+@app.route("/xu-huong-nghe")
+def xu_huong_nghe():
+    return render_template('xu-huong-nghe.html')
+
+@app.route("/test-modal")
+def test_modal():
+    return render_template('test_modal.html')
+
+@app.route("/test-success-modal")
+def test_success_modal():
+    return render_template('dang-ky-tu-van.html')
+
+@app.route("/test-success-modal-demo")
+def test_success_modal_demo():
+    return render_template('test_success_modal.html')
+
+@app.route("/test-effects")
+def test_effects():
+    return render_template('test_effects.html')
+
+@app.route("/test-chat-fix")
+def test_chat_fix():
+    return render_template('test_chat_fix.html')
+
+@app.route("/test-success-icon")
+def test_success_icon():
+    return render_template('test_success_icon.html')
+
+@app.route("/test-schools-api")
+def test_schools_api():
+    return render_template('test_schools_api.html')
+
+@app.route("/test-jobs-parsing")
+def test_jobs_parsing():
+    return render_template('test_jobs_parsing.html')
+
+@app.route("/test-schools-loading")
+def test_schools_loading():
+    return render_template('test_schools_loading.html')
+
+@app.route("/test-real-data-cleaning")
+def test_real_data_cleaning():
+    return render_template('test_real_data_cleaning.html')
+
+@app.route("/test-format")
+def test_format():
+    return render_template('test_format.html')
+
+@app.route("/dang-ky-tu-van")
+def dang_ky_tu_van():
+    return render_template('dang-ky-tu-van.html')
+
+# AI Chat API endpoints
+@app.route("/api/gemini-chat/", methods=['POST'])
+def gemini_chat():
+    """API endpoint cho AI chat"""
+    if not AI_AVAILABLE:
+        return jsonify({
+            'success': False,
+            'error': 'AI service không khả dụng'
+        }), 503
+    
+    try:
+        data = request.get_json()
+        message = data.get('message', '')
+        history = data.get('history', [])
+        user_id = data.get('user_id', 'anonymous')
+        
+        if not message:
+            return jsonify({
+                'success': False,
+                'error': 'Tin nhắn không được để trống'
+            }), 400
+        
+        # Gọi AI advisor
+        response = ai_advisor.generate_response(message, history, user_id)
+        
+        return jsonify({
+            'success': True,
+            'response': response,
+            'user_id': user_id
+        })
+        
+    except Exception as e:
+        print(f"Lỗi trong AI chat: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Có lỗi xảy ra khi xử lý tin nhắn'
+        }), 500
+
+@app.route("/api/user-form-data/<user_id>")
+def user_form_data(user_id):
+    """API endpoint để lấy dữ liệu form đã thu thập"""
+    if not AI_AVAILABLE:
+        return jsonify({
+            'success': False,
+            'error': 'AI service không khả dụng'
+        }), 503
+    
+    try:
+        form_data = ai_advisor.get_user_form_data(user_id)
+        
+        if form_data:
+            return jsonify({
+                'success': True,
+                'form_data': form_data
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Không tìm thấy dữ liệu cho user này'
+            }), 404
+            
+    except Exception as e:
+        print(f"Lỗi khi lấy form data: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Có lỗi xảy ra khi lấy dữ liệu'
+        }), 500
+
+@app.route("/api/expert-applications/", methods=['POST'])
+def expert_applications():
+    """API endpoint cho đăng ký chuyên gia tư vấn"""
+    try:
+        data = request.get_json()
+        
+        # Validate required fields
+        required_fields = ['full_name', 'email', 'phone']
+        for field in required_fields:
+            if not data.get(field):
+                return jsonify({
+                    'success': False,
+                    'error': f'Trường {field} là bắt buộc'
+                }), 400
+        
+        # Mock response - trong thực tế sẽ lưu vào database
+        print(f"Đăng ký chuyên gia mới: {data['full_name']} - {data['email']}")
+        
+        return jsonify({
+            'success': True,
+            'message': 'Đăng ký thành công! Chúng tôi sẽ liên hệ sớm nhất.'
+        })
+        
+    except Exception as e:
+        print(f"Lỗi khi đăng ký chuyên gia: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Có lỗi xảy ra khi đăng ký'
+        }), 500
+
+@app.route("/api/consultation-requests/", methods=['POST'])
+def consultation_requests():
+    """API endpoint cho yêu cầu tư vấn từ AI"""
+    try:
+        data = request.get_json()
+        
+        # Validate required fields
+        required_fields = ['full_name', 'email', 'phone']
+        for field in required_fields:
+            if not data.get(field):
+                return jsonify({
+                    'success': False,
+                    'error': f'Trường {field} là bắt buộc'
+                }), 400
+        
+        # Lưu vào database nếu Django available
+        if DJANGO_AVAILABLE:
+            try:
+                consultation = ConsultationRequest.objects.create(
+                    full_name=data['full_name'],
+                    email=data['email'],
+                    phone=data['phone'],
+                    conversation_summary=data.get('conversation_summary', '')
+                )
+                print(f"Đã lưu yêu cầu tư vấn AI: {consultation.full_name} - {consultation.email}")
+            except Exception as db_error:
+                print(f"Lỗi database: {db_error}")
+                # Fallback to mock nếu database lỗi
+                print(f"Yêu cầu tư vấn mới (mock): {data['full_name']} - {data['email']}")
+        else:
+            # Mock response nếu Django không available
+            print(f"Yêu cầu tư vấn mới (mock): {data['full_name']} - {data['email']}")
+        
+        return jsonify({
+            'success': True,
+            'message': 'Yêu cầu tư vấn đã được ghi nhận!'
+        })
+        
+    except Exception as e:
+        print(f"Lỗi khi tạo yêu cầu tư vấn: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Có lỗi xảy ra khi tạo yêu cầu'
+        }), 500
+
+# Google Auth được xử lý bởi Django backend trên PythonAnywhere
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    try:
+        app.run(debug=True, host='127.0.0.1', port=5000)
+    except OSError:
+        print("Port 5000 is in use. Trying port 5001...")
+        app.run(debug=True, host='127.0.0.1', port=5001)

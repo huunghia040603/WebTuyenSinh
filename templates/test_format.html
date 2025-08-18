@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Markdown Format</title>
+    <style>
+        .message {
+            margin: 0.5rem 0;
+            display: flex;
+        }
+        .message.user {
+            justify-content: flex-end;
+        }
+        .message .bubble {
+            display: inline-block;
+            padding: 0.7rem 1rem;
+            border-radius: 14px;
+            max-width: 78%;
+            font-size: 13px;
+        }
+        .message.user .bubble {
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            color: #fff;
+        }
+        .message.ai .bubble {
+            background: #eef2ff;
+            color: #1e293b;
+            border: 1px solid #e5e7eb;
+        }
+
+        /* CSS cho định dạng Markdown trong chat */
+        .message.ai .bubble strong {
+            font-weight: 700;
+            color: #1e40af;
+        }
+
+        .message.ai .bubble ul {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+        }
+
+        .message.ai .bubble li {
+            margin: 0.25rem 0;
+            line-height: 1.4;
+        }
+
+        .message.ai .bubble br {
+            margin: 0.25rem 0;
+        }
+
+        /* Đảm bảo text có line-height tốt */
+        .message.ai .bubble {
+            line-height: 1.5;
+            white-space: pre-line;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat_body">
+        <div class="message ai">
+            <div class="bubble" id="test-bubble"></div>
+        </div>
+    </div>
+
+    <script>
+        // Hàm chuyển đổi Markdown thành HTML
+        function formatMarkdown(text) {
+            if (!text) return '';
+            
+            let formattedText = text;
+            
+            // Chuyển đổi **text** thành <strong>text</strong>
+            formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            
+            // Chuyển đổi xuống dòng \n thành <br>
+            formattedText = formattedText.replace(/\n/g, '<br>');
+            
+            // Xử lý bullet points • thành danh sách có cấu trúc
+            const lines = formattedText.split('<br>');
+            const processedLines = [];
+            let inList = false;
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                
+                if (line.startsWith('•')) {
+                    if (!inList) {
+                        processedLines.push('<ul>');
+                        inList = true;
+                    }
+                    // Loại bỏ • và thêm <li>
+                    const listItem = line.replace(/^•\s*/, '');
+                    processedLines.push(`<li>${listItem}</li>`);
+                } else {
+                    if (inList) {
+                        processedLines.push('</ul>');
+                        inList = false;
+                    }
+                    if (line) {
+                        processedLines.push(line);
+                    }
+                }
+            }
+            
+            // Đóng list nếu còn mở
+            if (inList) {
+                processedLines.push('</ul>');
+            }
+            
+            // Nối lại các dòng
+            formattedText = processedLines.join('<br>');
+            
+            // Xử lý các trường hợp đặc biệt
+            formattedText = formattedText.replace(/<br><br>/g, '<br>');
+            formattedText = formattedText.replace(/<ul><br>/g, '<ul>');
+            formattedText = formattedText.replace(/<br><\/ul>/g, '</ul>');
+            
+            return formattedText;
+        }
+
+        // Test với text mẫu
+        const testText = `**Thông tin ngành Công nghệ thông tin**
+
+**📝 Mô tả:**
+Ngành học về máy tính, phần mềm, mạng và công nghệ số. Đây là ngành hot nhất hiện nay với cơ hội việc làm rộng mở và mức lương cao.
+
+**💼 Cơ hội việc làm:**
+• Lập trình viên (Developer)
+• Kỹ sư phần mềm (Software Engineer)
+• Data Scientist
+• AI Engineer
+• DevOps Engineer
+
+**💰 Mức lương:**
+15-150 triệu VND/tháng (tùy kinh nghiệm và vị trí)
+
+**🎯 Kỹ năng cần thiết:**
+• Lập trình (Programming)
+• Tư duy logic (Logical Thinking)
+• Giải quyết vấn đề (Problem Solving)
+• Làm việc nhóm (Teamwork)
+
+Bạn có muốn tìm hiểu thêm về **điểm chuẩn** hoặc **cơ hội thực tập** không?`;
+
+        document.getElementById('test-bubble').innerHTML = formatMarkdown(testText);
+    </script>
+</body>
+</html> 
