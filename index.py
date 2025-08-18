@@ -123,7 +123,7 @@ def debug_auth():
 
 @app.route('/thuatngu')
 def thuatngu():
-    return render_template('thuatngu.html')
+    return render_template('cunghoangdao/thuatngu.html')
 
 @app.route('/demo-smart-terms')
 def demo_smart_terms():

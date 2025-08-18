@@ -7,17 +7,13 @@
     .hero-section {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
-        padding: 80px 0 60px;
+        padding: 120px 0 100px;
         text-align: center;
         position: relative;
-        min-height: 40vh;
+        min-height: 45vh;
         display: flex;
         align-items: center;
         overflow: hidden;
-        border-radius: 24px;
-        margin: 24px;
-        box-shadow: 0 12px 32px rgba(2,6,23,0.06);
-        border: 1px solid #e5e7eb;
     }
 
     .hero-section::before {
@@ -406,6 +402,36 @@
         letter-spacing: 0.5px;
     }
 
+    .hero-actions {
+        margin-top: 3rem;
+        text-align: center;
+    }
+
+    .hero-collection-btn {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(20px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    .hero-collection-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: translateY(-3px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+        color: white;
+        text-decoration: none;
+    }
+
     @media (max-width: 768px) {
         .hero-stats {
             gap: 30px;
@@ -455,12 +481,12 @@
     }
 
     .featured-term-card {
-        background: linear-gradient(180deg,#ffffff, #f8fafc);
-        border-radius: 16px;
+        background: white;
+        border-radius: 20px;
         padding: 24px;
-        box-shadow: 0 12px 32px rgba(2,6,23,0.06);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         transition: all 0.3s ease;
-        border: 1px solid #e5e7eb;
+        border: 1px solid #e2e8f0;
         cursor: pointer;
         position: relative;
         overflow: hidden;
@@ -538,12 +564,6 @@
         background: #f8fafc;
     }
 
-    .page-container {
-        max-width: 1350px;
-        margin: 0 auto;
-        /* padding: 2rem; */
-    }
-    
     .container {
         max-width: 1200px;
         margin: 0 auto;
@@ -566,10 +586,10 @@
     }
 
     .feature-card {
-        background: linear-gradient(180deg,#ffffff, #f8fafc);
+        background: white;
         border-radius: 16px;
         padding: 2rem;
-        box-shadow: 0 12px 32px rgba(2,6,23,0.06);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         transition: all 0.3s ease;
         border: 1px solid #e5e7eb;
     }
@@ -896,6 +916,268 @@
         color: var(--text-secondary);
     }
 
+    /* My Collection Section */
+    .my-collection-section {
+        padding: 4rem 0;
+        background: #f8fafc;
+    }
+
+    .section-subtitle {
+        text-align: center;
+        color: #6b7280;
+        font-size: 1.1rem;
+        margin-bottom: 3rem;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .collection-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        border: 1px solid #e5e7eb;
+    }
+
+    .collection-stats {
+        font-size: 1.1rem;
+        color: #374151;
+        font-weight: 600;
+    }
+
+    .collection-count {
+        color: #0a4191;
+        font-weight: 700;
+        font-size: 1.3rem;
+    }
+
+    .collection-actions {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .btn-outline {
+        background: transparent;
+        color: #ffffff;
+        border: 2px solid #ffffff;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+    }
+
+    .btn-outline:hover {
+        background: #0a4191;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(10, 65, 145, 0.3);
+    }
+
+    .collection-container {
+        min-height: 400px;
+    }
+
+    .collection-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .collection-item {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        border: 1px solid #e5e7eb;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .collection-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        border-color: #0a4191;
+    }
+
+    .collection-item-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+
+    .collection-item-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #0a4191;
+        margin-bottom: 0.5rem;
+    }
+
+    .collection-item-category {
+        display: inline-block;
+        background: #e0f2fe;
+        color: #0a4191;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .collection-item-remove {
+        background: #fee2e2;
+        color: #dc2626;
+        border: none;
+        padding: 0.5rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+    }
+
+    .collection-item-remove:hover {
+        background: #dc2626;
+        color: white;
+        transform: scale(1.1);
+    }
+
+    .collection-item-content {
+        margin-bottom: 1rem;
+    }
+
+    .collection-item-definition {
+        color: #4b5563;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+
+    .collection-item-english {
+        font-style: italic;
+        color: #6b7280;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .collection-item-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 1rem;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .collection-item-date {
+        font-size: 0.8rem;
+        color: #9ca3af;
+    }
+
+    .collection-item-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .collection-item-action {
+        background: #f3f4f6;
+        color: #374151;
+        border: none;
+        padding: 0.5rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+    }
+
+    .collection-item-action:hover {
+        background: #0a4191;
+        color: white;
+    }
+
+    .empty-collection {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        border: 1px solid #e5e7eb;
+    }
+
+    .empty-icon {
+        width: 80px;
+        height: 80px;
+        background: #f3f4f6;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 2rem;
+        color: #9ca3af;
+        font-size: 2rem;
+    }
+
+    .empty-collection h3 {
+        color: #374151;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .empty-collection p {
+        color: #6b7280;
+        margin-bottom: 2rem;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Dark mode support for collection */
+    .dark-mode .my-collection-section {
+        background: var(--bg-secondary);
+    }
+
+    .dark-mode .collection-controls {
+        background: var(--card-bg);
+        border-color: var(--border-color);
+    }
+
+    .dark-mode .collection-stats {
+        color: var(--text-primary);
+    }
+
+    .dark-mode .collection-item {
+        background: var(--card-bg);
+        border-color: var(--border-color);
+    }
+
+    .dark-mode .collection-item-title {
+        color: var(--text-primary);
+    }
+
+    .dark-mode .collection-item-definition {
+        color: var(--text-secondary);
+    }
+
+    .dark-mode .empty-collection {
+        background: var(--card-bg);
+        border-color: var(--border-color);
+    }
+
+    .dark-mode .empty-collection h3 {
+        color: var(--text-primary);
+    }
+
+    .dark-mode .empty-collection p {
+        color: var(--text-secondary);
+    }
+
     /* How to Use Section */
     .how-to-use-section {
         padding: 4rem 0;
@@ -1078,7 +1360,6 @@
 {% endblock %}
 
 {% block content %}
-<div class="page-container">
             <!-- Hero Section -->
             <section class="hero-section">
                 <div class="hero-background">
@@ -1130,6 +1411,13 @@
                             <div class="stat-number">99%</div>
                             <div class="stat-label">Chính xác</div>
                         </div>
+                    </div>
+                    
+                    <div class="hero-actions">
+                        <a href="#my-collection-section" class="btn btn-outline hero-collection-btn">
+                            <i class="fas fa-bookmark"></i>
+                            Xem Bộ Sưu Tập
+                        </a>
                     </div>
                 </div>
                 
@@ -1489,6 +1777,55 @@
                 </div>
             </section>
 
+            <!-- My Collection Section -->
+            <section class="my-collection-section" id="my-collection-section">
+                <div class="container">
+                    <h2 class="section-title">
+                        <i class="fas fa-bookmark"></i>
+                        Bộ Sưu Tập Của Tôi
+                    </h2>
+                    <p class="section-subtitle">Danh sách thuật ngữ bạn đã lưu</p>
+                    
+                    <div class="collection-controls">
+                        <div class="collection-stats">
+                            <span class="collection-count">0</span> thuật ngữ đã lưu
+                        </div>
+                        <div class="collection-actions">
+                            <button class="btn btn-outline" onclick="exportCollection()">
+                                <i class="fas fa-download"></i>
+                                Xuất PDF
+                            </button>
+                            <button class="btn btn-outline" onclick="clearCollection()">
+                                <i class="fas fa-trash"></i>
+                                Xóa Tất Cả
+                            </button>
+                            <button class="btn btn-outline" onclick="resetCollection()" style="background: #dc2626; color: white; border-color: #dc2626;">
+                                <i class="fas fa-redo"></i>
+                                Reset
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="collection-container">
+                        <div id="collection-list" class="collection-list">
+                            <!-- Collection items will be loaded here -->
+                        </div>
+                        
+                        <div id="empty-collection" class="empty-collection">
+                            <div class="empty-icon">
+                                <i class="fas fa-bookmark"></i>
+                            </div>
+                            <h3>Chưa có thuật ngữ nào được lưu</h3>
+                            <p>Bắt đầu tìm kiếm và lưu những thuật ngữ hữu ích vào bộ sưu tập của bạn</p>
+                            <button class="btn btn-primary" onclick="scrollToSearch()">
+                                <i class="fas fa-search"></i>
+                                Tìm Kiếm Ngay
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- CTA Section -->
             <section class="cta-section">
                 <div class="container">
@@ -1507,7 +1844,6 @@
                     </div>
                 </div>
             </section>
-</div>
 
-<script src="/static/js/thuatngu.js"></script>
+<script src="/static/js/thuatngu1.js"></script>
 {% endblock %} 
