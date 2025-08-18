@@ -290,7 +290,7 @@ async function sendTokenToBackend(idToken) {
         
         if (response.ok) {
             console.log('✅ Google login successful:', data);
-            
+
             // Handle new token structure
             let accessToken, refreshToken, userData;
             
@@ -352,6 +352,7 @@ async function sendTokenToBackend(idToken) {
             
             // Chuyển hướng về trang chủ
             alert('Đăng nhập Google thành công!');
+
             setTimeout(() => window.location.href = '/', 300);
         } else {
             let errorMessage = 'Đăng nhập bằng Google thất bại.';
